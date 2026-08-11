@@ -1,2 +1,5 @@
 .DS_Store
 WEBSITE_REDESIGN_REQUIREMENTS.md
+node_modules/
+dist/
+.astro/
