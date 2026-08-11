@@ -883,6 +883,10 @@
     .level-table th { background:var(--navy); color:#fff; font-size:14px; letter-spacing:.04em; text-align:center; font-weight:850; }
     .level-table tr:last-child td { border-bottom:0; } .level-table tr > *:last-child { border-right:0; }
     .level-group-cell { width:160px; text-align:center; font-weight:850; font-size:15px; vertical-align:middle !important; color:#fff; }
+    .level-group-step,
+    .level-group-name,
+    .level-group-subtitle { display:block; }
+    .level-group-subtitle { margin-top:3px; font-size:11px; font-weight:500; opacity:.9; }
     .level-grp-s1 { background:var(--level-step1); } .level-grp-s2 { background:var(--level-step2); }
     .level-grp-s3 { background:var(--level-step3); } .level-grp-s4 { background:var(--level-step4); }
     .level-lvl-cell { width:90px; text-align:center; vertical-align:middle !important; background:#f8fafc; }
@@ -898,6 +902,17 @@
     .level-rg-cell { padding:14px 6px; text-align:center; border-bottom:1px solid var(--line); border-right:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
     .level-rg-head { color:#fff; font-weight:800; } .level-rg-label { background:#f0f4f8; color:var(--navy); font-weight:850; }
     .level-rg-lvl { font-weight:850; color:#fff; } .level-grade-band { background:#fff; font-weight:700; color:#475569; }
+    .level-roadmap-mobile { display:none; }
+    .level-roadmap-mobile-card { overflow:hidden; border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:0 10px 30px rgba(16,42,67,.06); }
+    .level-roadmap-mobile-head { padding:16px 18px; background:var(--roadmap-color); color:#fff; }
+    .level-roadmap-mobile-label { display:block; margin-bottom:4px; font-size:10px; font-weight:800; letter-spacing:.08em; opacity:.78; }
+    .level-roadmap-mobile-head h4 { margin:0; font-size:15px; font-weight:850; }
+    .level-roadmap-mobile-card dl { margin:0; }
+    .level-roadmap-mobile-row { display:grid; grid-template-columns:112px minmax(0,1fr); border-top:1px solid var(--line); }
+    .level-roadmap-mobile-row dt,
+    .level-roadmap-mobile-row dd { margin:0; padding:13px 14px; font-size:12.5px; line-height:1.55; }
+    .level-roadmap-mobile-row dt { display:flex; align-items:center; background:#f0f4f8; color:var(--navy); font-weight:850; }
+    .level-roadmap-mobile-row dd { color:#486581; font-weight:650; word-break:keep-all; }
     .level-roadmap-note { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:22px; }
     .level-note-card { background:#fff; border-radius:14px; padding:20px 18px; border:1px solid var(--line); box-shadow:0 10px 30px rgba(16,42,67,.05); }
     .level-note-card .level-tag { display:inline-block; font-size:11px; font-weight:850; color:#fff; padding:5px 10px; border-radius:999px; margin-bottom:10px; }
@@ -905,16 +920,132 @@
     @media (max-width:900px) {
       .level-roadmap-note { grid-template-columns:repeat(2,1fr); }
       .level-period-badge { font-size:10.5px; padding:7px 2px; }
-      .level-system-section .level-table, .level-roadmap-grid { min-width:860px; }
-      .level-system-section { overflow:hidden; }
-      .level-system-section .main-content { overflow-x:auto; padding-bottom:4px; }
-      .level-system-section .level-heading, .level-barchart-section, .level-roadmap-note { min-width:0; }
+      .level-system-section .main-content { overflow:visible; }
+      .level-system-section .level-table {
+        display:block;
+        width:100%;
+        overflow:visible;
+        border:0;
+        border-radius:0;
+        background:transparent;
+        box-shadow:none;
+      }
+      .level-system-section .level-table thead { display:none; }
+      .level-system-section .level-table tbody { display:block; }
+      .level-system-section .level-table tr {
+        display:grid;
+        grid-template-columns:70px minmax(0,1fr);
+        overflow:hidden;
+        border-right:1px solid var(--line);
+        border-left:1px solid var(--line);
+      }
+      .level-system-section .level-table tr:has(.level-group-cell) {
+        margin-top:24px;
+        border-top:1px solid var(--line);
+        border-radius:16px 16px 0 0;
+        box-shadow:0 8px 24px rgba(16,42,67,.05);
+      }
+      .level-system-section .level-table tr:first-child { margin-top:0; }
+      .level-system-section .level-table tr:nth-child(2),
+      .level-system-section .level-table tr:nth-child(4),
+      .level-system-section .level-table tr:nth-child(6),
+      .level-system-section .level-table tr:nth-child(9) {
+        border-bottom:1px solid var(--line);
+        border-radius:0 0 16px 16px;
+        box-shadow:0 8px 24px rgba(16,42,67,.05);
+      }
+      .level-system-section .level-table td { padding:15px; border:0; border-bottom:1px solid var(--line); }
+      .level-system-section .level-table tr:nth-child(2) td,
+      .level-system-section .level-table tr:nth-child(4) td,
+      .level-system-section .level-table tr:nth-child(6) td,
+      .level-system-section .level-table tr:nth-child(9) td { border-bottom:0; }
+      .level-system-section .level-group-cell {
+        grid-column:1 / -1;
+        width:auto;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:15px 18px;
+        text-align:left;
+        line-height:1.35;
+        border-bottom:1px solid rgba(255,255,255,.24) !important;
+      }
+      .level-system-section .level-group-step { font-size:12px; opacity:.8; }
+      .level-system-section .level-group-name { font-size:14px; letter-spacing:.015em; }
+      .level-system-section .level-group-subtitle { margin:0 0 0 auto; font-size:11.5px; }
+      .level-system-section .level-lvl-cell {
+        width:auto;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:15px 9px;
+        border-right:1px solid var(--line);
+      }
+      .level-system-section .level-desc-cell { min-width:0; }
+      .level-system-section .level-desc-cell b { font-size:14px; line-height:1.6; word-break:keep-all; }
+      .level-system-section .level-desc-cell ul { padding-left:17px; font-size:12.5px; line-height:1.72; }
+      .level-roadmap-grid { display:none; }
+      .level-roadmap-mobile {
+        display:block;
+        overflow:hidden;
+        border:1px solid var(--line);
+        border-radius:14px;
+        background:#fff;
+        box-shadow:0 10px 30px rgba(16,42,67,.06);
+      }
+      .level-roadmap-mobile-card {
+        display:grid;
+        grid-template-columns:120px minmax(0,1fr);
+        overflow:visible;
+        border:0;
+        border-bottom:1px solid var(--line);
+        border-radius:0;
+        box-shadow:none;
+      }
+      .level-roadmap-mobile-card:last-child { border-bottom:0; }
+      .level-roadmap-mobile-head {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        padding:14px 8px;
+        text-align:center;
+      }
+      .level-roadmap-mobile-label { font-size:8.5px; letter-spacing:0; }
+      .level-roadmap-mobile-head h4 { font-size:11.5px; line-height:1.45; overflow-wrap:anywhere; }
+      .level-roadmap-mobile-card dl { min-width:0; }
+      .level-roadmap-mobile-row { grid-template-columns:104px minmax(0,1fr); }
+      .level-roadmap-mobile-row:first-child { border-top:0; }
+      .level-roadmap-mobile-row dt,
+      .level-roadmap-mobile-row dd { padding:11px 10px; font-size:11.5px; }
     }
     @media (max-width:700px) {
       .level-barchart-section { padding:24px 16px; }
       .level-period-tags { grid-template-columns:1fr 1fr; }
       .level-barchart-container { height:160px; gap:5px; }
       .level-bar { max-width:28px; }
+      .level-system-section .level-table tr { grid-template-columns:60px minmax(0,1fr); }
+      .level-system-section .level-table td { padding:14px 13px; }
+      .level-system-section .level-group-cell {
+        width:auto;
+        padding:14px 15px;
+        font-size:inherit;
+        letter-spacing:normal;
+        overflow-wrap:normal;
+        word-break:normal;
+      }
+      .level-system-section .level-group-step { font-size:11px; }
+      .level-system-section .level-group-name { font-size:13px; }
+      .level-system-section .level-group-subtitle { font-size:10.5px; }
+      .level-system-section .level-lvl-cell { width:auto; padding:14px 7px; }
+      .level-system-section .level-lvl-num { width:36px; height:36px; font-size:14px; }
+      .level-system-section .level-desc-cell b { font-size:13.5px; }
+      .level-system-section .level-desc-cell ul { font-size:12px; line-height:1.7; }
+      .level-roadmap-mobile-card { grid-template-columns:110px minmax(0,1fr); }
+      .level-roadmap-mobile-row { grid-template-columns:96px minmax(0,1fr); }
+      .level-roadmap-mobile-row dt,
+      .level-roadmap-mobile-row dd { padding:10px 9px; font-size:11px; }
       .level-roadmap-note { grid-template-columns:1fr; }
     }
 
@@ -1145,7 +1276,7 @@
     <tbody>
       <!-- STEP 1 -->
       <tr class="level-row-s1">
-        <td class="level-group-cell level-grp-s1" rowspan="2">STEP 1<br>FOUNDATION<br><span style="font-weight:500;font-size:11px;opacity:.9">읽기 습관 형성</span></td>
+        <td class="level-group-cell level-grp-s1" rowspan="2"><span class="level-group-step">STEP 1</span><span class="level-group-name">FOUNDATION</span><span class="level-group-subtitle">읽기 습관 형성</span></td>
         <td class="level-lvl-cell"><span class="level-lvl-num" style="background:var(--level-step1)">1</span><span class="level-grade">G1</span></td>
         <td class="level-desc-cell">
           <b>파닉스와 사이트워드를 기반으로 그림책·초급 리더스를 즐겁게 읽으며 읽기 흥미를 형성하는 단계</b>
@@ -1168,7 +1299,7 @@
 
       <!-- STEP 2 -->
       <tr class="level-row-s2">
-        <td class="level-group-cell level-grp-s2" rowspan="2">STEP 2<br>BUILD-UP<br><span style="font-weight:500;font-size:11px;opacity:.9">어휘 &amp; 사고 확장</span></td>
+        <td class="level-group-cell level-grp-s2" rowspan="2"><span class="level-group-step">STEP 2</span><span class="level-group-name">BUILD-UP</span><span class="level-group-subtitle">어휘 &amp; 사고 확장</span></td>
         <td class="level-lvl-cell"><span class="level-lvl-num" style="background:var(--level-step2)">3</span><span class="level-grade">G3</span></td>
         <td class="level-desc-cell">
           <b>챕터북 독서량을 늘리며 핵심 어휘와 표현을 문맥 속에서 습득하는 단계</b>
@@ -1191,7 +1322,7 @@
 
       <!-- STEP 3 -->
       <tr class="level-row-s3">
-        <td class="level-group-cell level-grp-s3" rowspan="2">STEP 3<br>GROWTH<br><span style="font-weight:500;font-size:11px;opacity:.9">비판적 사고 &amp; 표현</span></td>
+        <td class="level-group-cell level-grp-s3" rowspan="2"><span class="level-group-step">STEP 3</span><span class="level-group-name">GROWTH</span><span class="level-group-subtitle">비판적 사고 &amp; 표현</span></td>
         <td class="level-lvl-cell"><span class="level-lvl-num" style="background:var(--level-step3)">5</span><span class="level-grade">G5</span></td>
         <td class="level-desc-cell">
           <b>문학 작품 속 인물의 동기와 관점을 분석하며 비판적 사고력을 키우는 단계</b>
@@ -1214,7 +1345,7 @@
 
       <!-- STEP 4 -->
       <tr class="level-row-s4">
-        <td class="level-group-cell level-grp-s4" rowspan="3">STEP 4<br>ADVANCE<br><span style="font-weight:500;font-size:11px;opacity:.9">학술 독해 &amp; 입시 기초</span></td>
+        <td class="level-group-cell level-grp-s4" rowspan="3"><span class="level-group-step">STEP 4</span><span class="level-group-name">ADVANCE</span><span class="level-group-subtitle">학술 독해 &amp; 입시 기초</span></td>
         <td class="level-lvl-cell"><span class="level-lvl-num" style="background:var(--level-step4)">7</span><span class="level-grade">G7</span></td>
         <td class="level-desc-cell">
           <b>현대 문학 작품의 이면적 주제를 자신의 관점으로 분석하는 전략적 읽기 단계 — SAT·AP 기초 어휘·독해 훈련 시작</b>
@@ -1293,6 +1424,58 @@
       <div class="level-rg-cell" style="grid-column:4/6">어휘 확장·주니어 소설<br>추론적 사고 &amp; 단락 에세이</div>
       <div class="level-rg-cell" style="grid-column:6/8">장편 노블·인물 관점 분석<br>비판적 토론 &amp; 멀티 에세이</div>
       <div class="level-rg-cell" style="grid-column:8/11">현대문학·역사·과학 도서 탐구<br>학술적 독해 &amp; 입시 기초 에세이</div>
+    </div>
+
+    <!-- 모바일에서는 가로형 로드맵을 단계별 카드로 표시 -->
+    <div class="level-roadmap-mobile" aria-label="4STEPS 모바일 레벨 로드맵">
+      <article class="level-roadmap-mobile-card" style="--roadmap-color:var(--level-step1)">
+        <div class="level-roadmap-mobile-head">
+          <span class="level-roadmap-mobile-label">4단계 구분</span>
+          <h4>STEP 1: FOUNDATION</h4>
+        </div>
+        <dl>
+          <div class="level-roadmap-mobile-row"><dt>미국 학년</dt><dd>G1 · G2</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>4STEPS 레벨</dt><dd>1 · 2</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>권장 소요 기간</dt><dd>6개월 ~ 8개월</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>중심 학습 내용</dt><dd>파닉스·사이트워드·챕터북<br>기초 문장 작성 &amp; 읽기 습관</dd></div>
+        </dl>
+      </article>
+      <article class="level-roadmap-mobile-card" style="--roadmap-color:var(--level-step2)">
+        <div class="level-roadmap-mobile-head">
+          <span class="level-roadmap-mobile-label">4단계 구분</span>
+          <h4>STEP 2: BUILD-UP</h4>
+        </div>
+        <dl>
+          <div class="level-roadmap-mobile-row"><dt>미국 학년</dt><dd>G3 · G4</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>4STEPS 레벨</dt><dd>3 · 4</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>권장 소요 기간</dt><dd>8개월 ~ 10개월</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>중심 학습 내용</dt><dd>어휘 확장·주니어 소설<br>추론적 사고 &amp; 단락 에세이</dd></div>
+        </dl>
+      </article>
+      <article class="level-roadmap-mobile-card" style="--roadmap-color:var(--level-step3)">
+        <div class="level-roadmap-mobile-head">
+          <span class="level-roadmap-mobile-label">4단계 구분</span>
+          <h4>STEP 3: GROWTH</h4>
+        </div>
+        <dl>
+          <div class="level-roadmap-mobile-row"><dt>미국 학년</dt><dd>G5 · G6</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>4STEPS 레벨</dt><dd>5 · 6</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>권장 소요 기간</dt><dd>10개월 ~ 12개월</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>중심 학습 내용</dt><dd>장편 노블·인물 관점 분석<br>비판적 토론 &amp; 멀티 에세이</dd></div>
+        </dl>
+      </article>
+      <article class="level-roadmap-mobile-card" style="--roadmap-color:var(--level-step4)">
+        <div class="level-roadmap-mobile-head">
+          <span class="level-roadmap-mobile-label">4단계 구분</span>
+          <h4>STEP 4: ADVANCE</h4>
+        </div>
+        <dl>
+          <div class="level-roadmap-mobile-row"><dt>미국 학년</dt><dd>G7 · G8 · G9</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>4STEPS 레벨</dt><dd>7 · 8 · 9</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>권장 소요 기간</dt><dd>12개월 ~ 18개월</dd></div>
+          <div class="level-roadmap-mobile-row"><dt>중심 학습 내용</dt><dd>현대문학·역사·과학 도서 탐구<br>학술적 독해 &amp; 입시 기초 에세이</dd></div>
+        </dl>
+      </article>
     </div>
 
     <!-- 4단계 요약 카드 -->
