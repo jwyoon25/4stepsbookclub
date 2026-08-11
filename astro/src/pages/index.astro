@@ -240,12 +240,13 @@
     }
     .section-description { color:var(--muted); }
 
-    .story-layout, .faculty-layout {
+    .story-layout {
       display:grid;
       grid-template-columns:1.08fr .92fr;
       align-items:center;
       gap:64px;
     }
+    .faculty-copy { max-width:820px; margin-inline:auto; }
     .story-copy h3, .faculty-copy h2 {
       line-height:1.35;
       margin-bottom:20px;
@@ -393,7 +394,7 @@
 
     .content-showcase {
       display:grid;
-      grid-template-columns:1.05fr .95fr;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
       gap:24px;
       align-items:stretch;
     }
@@ -405,7 +406,6 @@
       border-radius:18px;
       box-shadow:0 18px 50px rgba(16,42,67,.08);
     }
-    .sample-card.featured { grid-row:span 2; }
     .sample-media {
       position:relative;
       overflow:hidden;
@@ -426,7 +426,6 @@
     }
     .sample-card:hover .sample-image { transform:scale(1.018); }
     .sample-card.workbook .sample-image { object-fit:contain; background:#fff; padding:12px; }
-    .sample-card.overview .sample-image { object-fit:contain; background:#fff; padding:8px; }
     .expand-button {
       position:absolute;
       right:14px;
@@ -784,12 +783,11 @@
       .desktop-nav .nav-social { display:inline-flex; width:100%; margin:5px 0; }
       .desktop-nav .nav-cta { text-align:center; }
       .menu-button { display:inline-flex; }
-      .story-layout, .faculty-layout { grid-template-columns:1fr; }
+      .story-layout { grid-template-columns:1fr; }
       .curriculum-grid { grid-template-columns:repeat(2, 1fr); }
       .learning-flow { grid-template-columns:repeat(3, 1fr); row-gap:34px; }
       .flow-item::after { display:none; }
       .content-showcase { grid-template-columns:1fr; }
-      .sample-card.featured { grid-row:auto; }
       .sample-card.featured .sample-media { min-height:300px; }
       .weekly-steps { grid-template-columns:1fr; padding:10px 28px 30px; }
       .weekly-step {
@@ -942,7 +940,7 @@
       <h1 data-template-id="hero-title" class="canva-text hero-title" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 40px; line-height: 1.2;">책을 읽는 아이에서
 생각하고 쓰는 아이로 </h1>
       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal; font-size: 20px; line-height: 1.7;">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽<br> </p>
-       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal; font-size: 20px; line-height: 1.7;"> 검증된 서울대학교 출신, 원어민급 강사진과 함께하는 4인 소수 관리형 프로그램<br></p>
+       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal; font-size: 20px; line-height: 1.7;">서울대학교에 재학 중이며 원어민급 영어 역량을 갖춘 검증된 강사진과 함께하는 4인 소수 관리형 프로그램<br></p>
       <div class="hero-actions">
        <a href="#consulting" data-template-id="hero-primary-button" class="canva-button action-button primary-button" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">무료 레벨 테스트 신청하기 →</a> <a href="#class-content" data-template-id="hero-secondary-button" class="canva-button action-button outline-button" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">실제 수업 콘텐츠 보기</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-naver-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">네이버 블로그</a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" data-template-id="hero-kakao-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">카카오톡 상담</a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-instagram-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;"><i data-lucide="instagram" class="w-4 h-4"></i> 인스타그램</a>
       </div>
@@ -951,7 +949,7 @@
         <b data-template-id="hero-stat-one-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">4:1</b> <small data-template-id="hero-stat-one-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">최대 4명 소그룹</small>
        </div>
        <div class="hero-stat">
-        <b data-template-id="hero-stat-two-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">SNU</b> <small data-template-id="hero-stat-two-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">서울대 출신 강사진</small>
+        <b data-template-id="hero-stat-two-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">SNU</b> <small data-template-id="hero-stat-two-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">서울대학교 재학 강사진</small>
        </div>
        <div class="hero-stat">
         <b data-template-id="hero-stat-three-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">READ → WRITE</b> <small data-template-id="hero-stat-three-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">읽기부터 에세이까지</small>
@@ -1002,7 +1000,7 @@
         <div data-template-id="comparison-heading-general" class="canva-text comparison-head" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">일반 북클럽</div>
         <div data-template-id="comparison-label-faculty" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">강사진</div>
         <div class="premium-cell">
-         <strong data-template-id="comparison-faculty-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">서울대 출신 + 원어민급 Bilingual</strong><br><small data-template-id="comparison-faculty-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">학력·영어 구사력·수업 역량을 선별 검증</small>
+         <strong data-template-id="comparison-faculty-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">서울대학교 재학생 + 원어민급 Bilingual</strong><br><small data-template-id="comparison-faculty-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">재학 여부·영어 구사력·수업 역량을 선별 검증</small>
         </div>
         <div data-template-id="comparison-faculty-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">검증 기준이 불명확한 외국인·교포·해외대학 출신 강사진</div>
         <div data-template-id="comparison-label-size" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">수업 정원</div>
@@ -1029,31 +1027,14 @@
       <div class="faculty-copy">
        <p data-template-id="faculty-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">VERIFIED FACULTY</p>
        <h2 data-template-id="faculty-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">아이의 영어를 맡기는 선생님, 4steps는 기준부터 다릅니다</h2>
-       <p data-template-id="faculty-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 서울대학교 출신이라는 명확한 학력 기준과 원어민 수준의 영어 구사력, 그리고 실제 수업 역량을 함께 검증하여 선별합니다.</p>
+       <p data-template-id="faculty-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 서울대학교 재학 여부와 원어민 수준의 영어 구사력, 그리고 실제 수업 역량을 함께 검증하여 선별합니다.</p>
        <ul class="checks">
-        <li data-template-id="faculty-check-one" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">서울대학교 출신 강사진으로 구성</li>
+        <li data-template-id="faculty-check-one" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">서울대학교 재학생 강사진으로 구성</li>
         <li data-template-id="faculty-check-two" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">원어민 수준의 영어 구사력을 갖춘 Bilingual Teacher</li>
         <li data-template-id="faculty-check-three" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">국제학교·해외 유학 환경에 대한 높은 이해도</li>
         <li data-template-id="faculty-check-four" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">서류 검증과 인터뷰, 시강을 거친 선별 과정</li>
        </ul>
       </div>
-      <article data-template-id="faculty-card" class="canva-card faculty-card" style="background: rgb(255, 255, 255);">
-       <span data-template-id="faculty-badge" class="canva-tag faculty-badge" style="background: rgb(230, 247, 242); color: rgb(0, 129, 112); font-weight: 900; font-style: normal; font-size: 12px;">SNU ELITE TEACHER GROUP</span>
-       <h3 data-template-id="faculty-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 26px;">검증된 선생님만
-4STEPS의 교실에 들어옵니다.</h3>
-       <p data-template-id="faculty-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">학력과 실제 영어 능력, 아이들과 소통하는 수업 역량까지. 부모님이 안심하고 맡길 수 있는 기준을 지향합니다.</p>
-       <div class="faculty-stats">
-        <div data-template-id="faculty-stat-one" class="canva-card faculty-stat" style="background: rgb(247, 249, 251);">
-         <b data-template-id="faculty-stat-one-value" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 23px;">SNU</b> <span data-template-id="faculty-stat-one-label" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 11px;">출신 강사진</span>
-        </div>
-        <div data-template-id="faculty-stat-two" class="canva-card faculty-stat" style="background: rgb(247, 249, 251);">
-         <b data-template-id="faculty-stat-two-value" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 23px;">4:1</b> <span data-template-id="faculty-stat-two-label" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 11px;">최대 수업 정원</span>
-        </div>
-        <div data-template-id="faculty-stat-three" class="canva-card faculty-stat" style="background: rgb(247, 249, 251);">
-         <b data-template-id="faculty-stat-three-value" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 23px;">1:1</b> <span data-template-id="faculty-stat-three-label" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 11px;">라이팅 피드백</span>
-        </div>
-       </div>
-      </article>
      </div>
     </section>
     <section id="curriculum" data-template-id="curriculum-section" class="canva-section page-section" style="background: rgb(247, 249, 251);">
@@ -1343,7 +1324,7 @@
        <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px; line-height: 1.24;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
       </div>
       <div class="content-showcase">
-       <article data-template-id="feedback-card" class="canva-card sample-card featured" style="background: rgb(255, 255, 255);">
+       <article data-template-id="feedback-card" class="canva-card sample-card" style="background: rgb(255, 255, 255);">
         <div class="sample-media">
          <img data-template-id="feedback-example-image" class="canva-image sample-image" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시"> <button data-image-target="feedback-example-image" data-template-id="feedback-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 13px;"> 크게 보기</button>
         </div>
@@ -1363,16 +1344,6 @@
          <p data-template-id="workbook-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">사실 확인에 그치지 않고 인물의 선택, 원인과 결과, 주제 해석을 묻는 주관식 문제와 Mini Essay Prompt로 구성됩니다.</p>
         </div>
        </article>
-       <article data-template-id="overview-card" class="canva-card sample-card overview" style="background: rgb(255, 255, 255);">
-        <div class="sample-media">
-         <img data-template-id="lesson-overview-image" class="canva-image sample-image" loading="lazy" src="images/lesson-overview.png" alt="Vocab Test부터 Homework까지 다섯 단계로 정리된 Lesson Overview 표"> <button data-image-target="lesson-overview-image" data-template-id="overview-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 13px;"> 크게 보기</button>
-        </div>
-        <div class="sample-copy">
-         <span data-template-id="overview-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 12px;">03 · LESSON OVERVIEW</span>
-         <h3 data-template-id="overview-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 20px;">매주 반복되는 명확한 학습 루틴</h3>
-         <p data-template-id="overview-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">어휘 확인, 독해, 토론, Paragraph Writing, Homework가 매주 연결되어 수업의 목표와 결과가 선명합니다.</p>
-        </div>
-       </article>
       </div>
       <section class="lesson-panel" aria-labelledby="weekly-lesson-title">
        <div data-template-id="lesson-panel-header" class="canva-banner lesson-panel-head" style="background: linear-gradient(120deg, rgb(16, 42, 67), rgb(30, 78, 114));">
@@ -1389,6 +1360,8 @@
         <li class="weekly-step"><span class="weekly-number">5</span> <h4 data-template-id="weekly-five-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Homework</h4></li>
        </ol>
       </section>
+     </div>
+    </section>
     <section id="management" class="page-section">
      <div class="main-content">
       <div class="section-heading">
@@ -1425,25 +1398,28 @@
        <p data-template-id="form-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">START WITH 4STEPS</p>
        <h2 data-template-id="form-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">우리 아이에게 맞는
 첫 번째 STEP을 찾아보세요.</h2>
-       <p data-template-id="form-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">학생의 현재 학년과 영어 독서 환경을 알려주시면 상담과 무료 레벨 테스트를 안내해 드립니다.</p>
+       <p data-template-id="form-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">학생의 기본 정보를 알려주시면 상담과 무료 레벨 테스트를 안내해 드립니다.</p>
       </div>
       <div data-template-id="consult-panel" class="canva-panel consult-panel" style="background: rgb(255, 255, 255);">
        <form id="consult-form" novalidate="">
         <div class="form-grid">
          <div class="form-group">
-          <label data-template-id="student-label" class="canva-text" for="student" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">학생 이름</label> <input data-template-id="student-input" class="canva-input" id="student" name="student" type="text" placeholder="이름을 입력하세요 (익명 가능)" style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label data-template-id="student-label" class="canva-text" for="student" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">학생 이름 *</label> <input data-template-id="student-input" class="canva-input" id="student" name="student" type="text" autocomplete="name" placeholder="학생 이름을 입력하세요" required style="font-weight: 400; font-style: normal; font-size: 16px;">
          </div>
          <div class="form-group">
-          <label data-template-id="grade-label" class="canva-text" for="grade" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">현재 학년 *</label> <select id="grade" name="grade" required=""> <option value="">선택하세요</option> <option value="초등 1~3학년">초등 1~3학년</option> <option value="초등 4~6학년">초등 4~6학년</option> <option value="중학교 1~3학년">중학교 1~3학년</option> <option value="기타">기타</option> </select>
+          <label data-template-id="grade-label" class="canva-text" for="grade" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">현재 학년 *</label> <select id="grade" name="grade" required> <option value="">선택하세요</option> <option value="초등학교 1학년">초등학교 1학년</option> <option value="초등학교 2학년">초등학교 2학년</option> <option value="초등학교 3학년">초등학교 3학년</option> <option value="초등학교 4학년">초등학교 4학년</option> <option value="초등학교 5학년">초등학교 5학년</option> <option value="초등학교 6학년">초등학교 6학년</option> <option value="중학교 1학년">중학교 1학년</option> <option value="중학교 2학년">중학교 2학년</option> <option value="중학교 3학년">중학교 3학년</option> <option value="기타">기타</option> </select>
+         </div>
+         <div class="form-group">
+          <label class="canva-text" for="birth-month" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">출생 연도 및 월</label> <input class="canva-input" id="birth-month" name="birthMonth" type="month" autocomplete="bday-month" style="font-weight: 400; font-style: normal; font-size: 16px;">
+         </div>
+         <div class="form-group">
+          <label data-template-id="school-label" class="canva-text" for="school" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">학교명</label> <input data-template-id="school-input" class="canva-input" id="school" name="school" type="text" autocomplete="organization" placeholder="현재 학교명을 입력하세요" style="font-weight: 400; font-style: normal; font-size: 16px;">
+         </div>
+         <div class="form-group">
+          <label class="canva-text" for="region" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">거주 지역</label> <input class="canva-input" id="region" name="region" type="text" autocomplete="address-level2" placeholder="예: 서울 강남구 / 해외 거주" style="font-weight: 400; font-style: normal; font-size: 16px;">
          </div>
          <div class="form-group full">
-          <label data-template-id="school-label" class="canva-text" for="school" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">현재 학교 / 교육 환경</label> <input data-template-id="school-input" class="canva-input" id="school" name="school" type="text" placeholder="예: 국제학교 G5 / 해외 유학생 / 국내 학교" style="font-weight: 400; font-style: normal; font-size: 16px;">
-         </div>
-         <div class="form-group full">
-          <label data-template-id="phone-label" class="canva-text" for="phone" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">연락처</label> <input data-template-id="phone-input" class="canva-input" id="phone" name="phone" type="tel" placeholder="010-0000-0000 (익명 가능)" style="font-weight: 400; font-style: normal; font-size: 16px;">
-         </div>
-         <div class="form-group full">
-          <label data-template-id="message-label" class="canva-text" for="message" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">상담하고 싶은 내용</label> <textarea data-template-id="message-input" class="canva-input" id="message" name="message" style="font-weight: 400; font-style: normal; font-size: 16px;">현재 영어 독서 수준, 희망 수업 시간 등을 자유롭게 적어주세요.</textarea>
+          <label class="canva-text" for="overseas-residence" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">해외 거주 기간</label> <input class="canva-input" id="overseas-residence" name="overseasResidence" type="text" placeholder="예: 2년 / 해외 거주 경험 없음" style="font-weight: 400; font-style: normal; font-size: 16px;">
          </div>
         </div><button data-template-id="form-submit-button" class="canva-button submit-button" id="submit-button" type="submit" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">무료 레벨 테스트 상담 신청하기</button>
         <p data-template-id="form-note" class="canva-text form-note" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal; font-size: 12px;">버튼을 누르면 입력한 상담 내용이 이메일 작성 화면에 준비됩니다.</p>
@@ -1523,7 +1499,7 @@
    </footer>
    <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-hidden="true">
     <div class="modal-dialog">
-     <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x"></i> </button> <img data-template-id="modal-feedback-image" data-modal-image="feedback-example-image" class="canva-image modal-image hidden" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시 확대 이미지"> <img data-template-id="modal-workbook-image" data-modal-image="workbook-sample-image" class="canva-image modal-image hidden" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 확대 이미지"> <img data-template-id="modal-overview-image" data-modal-image="lesson-overview-image" class="canva-image modal-image hidden" loading="lazy" src="images/lesson-overview.png" alt="Vocab Test부터 Homework까지 다섯 단계로 정리된 Lesson Overview 확대 이미지">
+     <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x"></i> </button> <img data-template-id="modal-feedback-image" data-modal-image="feedback-example-image" class="canva-image modal-image hidden" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시 확대 이미지"> <img data-template-id="modal-workbook-image" data-modal-image="workbook-sample-image" class="canva-image modal-image hidden" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 확대 이미지">
      <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">4STEPS 실제 수업 자료</p>
     </div>
    </div>
@@ -1599,23 +1575,25 @@
         submitButton.disabled = true;
 
         const values = new FormData(form);
-        const student = String(values.get("student") || "익명 신청자");
+        const student = String(values.get("student") || "");
         const grade = String(values.get("grade") || "");
+        const birthMonth = String(values.get("birthMonth") || "미입력");
         const school = String(values.get("school") || "미입력");
-        const phone = String(values.get("phone") || "미입력");
-        const message = String(values.get("message") || "미입력");
+        const region = String(values.get("region") || "미입력");
+        const overseasResidence = String(values.get("overseasResidence") || "미입력");
 
         const subject = encodeURIComponent("[4STEPS 무료 레벨테스트 신청] " + student);
         const body = encodeURIComponent(
           "학생 이름: " + student + "\n" +
-          "학년: " + grade + "\n" +
-          "학교/교육 환경: " + school + "\n" +
-          "연락처: " + phone + "\n\n" +
-          "상담 내용:\n" + message
+          "현재 학년: " + grade + "\n" +
+          "출생 연도 및 월: " + birthMonth + "\n" +
+          "학교명: " + school + "\n" +
+          "거주 지역: " + region + "\n" +
+          "해외 거주 기간: " + overseasResidence
         );
 
         window.open(
-          "mailto:soyounpark4321@gmail.com?subject=" + subject + "&body=" + body,
+          "mailto:4stepsbookclub@gmail.com?subject=" + subject + "&body=" + body,
           "_blank"
         );
 
