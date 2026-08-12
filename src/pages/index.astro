@@ -28,21 +28,40 @@
       --soft:#f7f9fb;
       --cream:#fbfaf7;
       --white:#fff;
+
+      /* Shared type scale: keep every text style on a small, predictable set of sizes. */
+      --type-micro:11px;
+      --type-meta:12px;
+      --type-ui:13px;
+      --type-body-sm:14px;
+      --type-body:16px;
+      --type-lead:clamp(16px, 1.25vw, 18px);
+      --type-ui-lg:18px;
+      --type-card-title:20px;
+      --type-subheading:clamp(22px, 2.2vw, 26px);
+      --type-section:clamp(28px, 3vw, 32px);
+      --type-display:clamp(36px, 4.5vw, 48px);
     }
 
     * { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
+    html { scroll-behavior:smooth; font-size:100%; }
     body {
       width:100%;
       min-height:100%;
       font-family:Inter, "Noto Sans KR", sans-serif;
       color:var(--ink);
+      font-size:var(--type-body);
       line-height:1.7;
       overflow-x:hidden;
     }
     body.modal-open { overflow:hidden; }
     a { color:inherit; text-decoration:none; }
-    button, input, textarea, select { font:inherit; }
+    h1 { font-size:var(--type-display); line-height:1.15; }
+    h2 { font-size:var(--type-section); line-height:1.25; }
+    h3 { font-size:var(--type-subheading); line-height:1.35; }
+    h4 { font-size:var(--type-card-title); line-height:1.4; }
+    p, li, blockquote { font-size:var(--type-body); line-height:1.7; }
+    button, input, textarea, select { font:inherit; font-size:var(--type-body); }
     button, a, input, textarea, select { outline-offset:3px; }
     button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
       outline:3px solid rgba(207,122,56,.55);
@@ -86,7 +105,7 @@
     }
     .desktop-nav > a:not(.nav-social):not(.nav-cta) {
       color:#526579;
-      font-size:12px;
+      font-size:var(--type-meta);
       font-weight:750;
       letter-spacing:.03em;
       white-space:nowrap;
@@ -112,7 +131,7 @@
     .nav-cta {
       padding:10px 15px;
       border-radius:7px;
-      font-size:13px;
+      font-size:var(--type-ui);
       font-weight:800;
       white-space:nowrap;
     }
@@ -174,18 +193,23 @@
       border:1px solid rgba(255,255,255,.25);
       border-radius:999px;
       background:rgba(255,255,255,.08);
+      font-size:var(--type-body-sm);
+      line-height:1.35;
       letter-spacing:.12em;
       margin-bottom:23px;
     }
     .hero-title {
+      font-size:var(--type-display);
       line-height:1.12;
       letter-spacing:-.045em;
       margin-bottom:24px;
       white-space:pre-line;
     }
     .hero-desc {
-      max-width:790px;
+      max-width:860px;
       color:#d0dce6;
+      font-size:var(--type-lead);
+      line-height:1.7;
       margin-bottom:34px;
     }
     .hero-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
@@ -197,6 +221,8 @@
       min-height:52px;
       border-radius:7px;
       padding:13px 24px;
+      font-size:var(--type-body);
+      line-height:1.4;
       font-weight:800;
       transition:.2s;
     }
@@ -219,8 +245,8 @@
       border-left:2px solid var(--orange);
       background:rgba(255,255,255,.07);
     }
-    .hero-stat b { display:block; }
-    .hero-stat small { display:block; color:#b9c9d8; }
+    .hero-stat b { display:block; font-size:var(--type-card-title); line-height:1.2; }
+    .hero-stat small { display:block; color:#b9c9d8; font-size:var(--type-meta); line-height:1.4; }
 
     .page-section { padding:105px 0; scroll-margin-top:78px; }
     .section-heading {
@@ -229,16 +255,19 @@
       text-align:center;
     }
     .eyebrow {
+      font-size:var(--type-body-sm);
+      line-height:1.3;
       letter-spacing:.18em;
       margin-bottom:10px;
     }
     .section-title {
+      font-size:var(--type-section);
       line-height:1.24;
       letter-spacing:-.035em;
       margin-bottom:16px;
       white-space:pre-line;
     }
-    .section-description { color:var(--muted); }
+    .section-description { color:var(--muted); font-size:var(--type-body); }
 
     .story-layout {
       display:grid;
@@ -252,8 +281,11 @@
       margin-bottom:20px;
       white-space:pre-line;
     }
+    .story-copy h3 { font-size:var(--type-subheading); }
+    .faculty-copy h2 { font-size:var(--type-section); }
     .story-copy p, .faculty-copy > p {
       color:var(--muted);
+      font-size:var(--type-body);
       margin-bottom:17px;
     }
     .quote {
@@ -268,13 +300,14 @@
       color:#fff;
       box-shadow:0 20px 55px rgba(16,42,67,.18);
     }
-    .problem-panel h3 { line-height:1.35; margin-bottom:22px; white-space:pre-line; }
+    .problem-panel h3 { font-size:var(--type-subheading); line-height:1.35; margin-bottom:22px; white-space:pre-line; }
     .problem-list { list-style:none; }
     .problem-list li {
       position:relative;
       padding:14px 0 14px 30px;
       border-bottom:1px solid rgba(255,255,255,.12);
       color:#cfdae3;
+      font-size:var(--type-body);
     }
     .problem-list li::before {
       content:"×";
@@ -300,9 +333,12 @@
     .comparison-grid > div {
       padding:22px 24px;
       border-bottom:1px solid var(--line);
+      font-size:var(--type-body);
+      line-height:1.6;
     }
     .comparison-head { text-align:center; font-weight:850; }
     .comparison-label { background:#f0f4f8; text-align:center; font-weight:850; }
+    .comparison-grid small { font-size:var(--type-body-sm); line-height:1.6; }
     .premium-cell { background:#fffaf6; }
     .premium-cell strong { color:var(--orange); }
     .normal-cell { color:var(--muted); }
@@ -320,7 +356,7 @@
       margin-bottom:15px;
       border-radius:999px;
     }
-    .faculty-card h3 { line-height:1.3; margin-bottom:5px; white-space:pre-line; }
+    .faculty-card h3 { font-size:var(--type-card-title); line-height:1.3; margin-bottom:5px; white-space:pre-line; }
     .faculty-card .faculty-sub { color:var(--orange); font-weight:850; margin-bottom:25px; }
     .faculty-card > p { color:var(--muted); }
     .checks { list-style:none; margin-top:22px; }
@@ -351,10 +387,10 @@
     .curriculum-card:nth-child(2) { border-top:4px solid var(--orange); }
     .curriculum-card:nth-child(3) { border-top:4px solid var(--green); }
     .curriculum-card:nth-child(4) { border-top:4px solid var(--gold); }
-    .step-number { color:#9fb3c8; letter-spacing:.12em; margin-bottom:10px; }
-    .curriculum-card h3 { margin-bottom:3px; }
-    .step-ko { display:block; color:var(--muted); margin-bottom:19px; }
-    .curriculum-card p { color:#486581; }
+    .step-number { color:#9fb3c8; font-size:var(--type-meta); line-height:1.4; letter-spacing:.12em; margin-bottom:10px; }
+    .curriculum-card h3 { font-size:var(--type-card-title); margin-bottom:3px; }
+    .step-ko { display:block; color:var(--muted); font-size:var(--type-ui); line-height:1.5; margin-bottom:19px; }
+    .curriculum-card p { color:#486581; font-size:var(--type-body-sm); line-height:1.65; }
 
     .learning-flow {
       display:grid;
@@ -389,8 +425,8 @@
     }
     .flow-item:nth-child(5) .flow-icon { background:var(--orange); }
     .flow-item:nth-child(6) .flow-icon { background:var(--green); }
-    .flow-item h3 { margin-bottom:5px; }
-    .flow-item p { color:var(--muted); }
+    .flow-item h3 { font-size:var(--type-ui-lg); margin-bottom:5px; }
+    .flow-item p { color:var(--muted); font-size:var(--type-body-sm); line-height:1.6; }
 
     .content-showcase {
       display:grid;
@@ -438,6 +474,8 @@
       border-radius:8px;
       background:rgba(8,28,44,.86);
       color:#fff;
+      font-size:var(--type-ui);
+      line-height:1.4;
       cursor:pointer;
       box-shadow:0 8px 24px rgba(8,28,44,.2);
       transition:.2s;
@@ -448,11 +486,13 @@
       display:inline-block;
       margin-bottom:7px;
       color:var(--orange);
+      font-size:var(--type-meta);
+      line-height:1.4;
       font-weight:900;
       letter-spacing:.14em;
     }
-    .sample-copy h3 { margin-bottom:9px; color:var(--navy); }
-    .sample-copy p { color:var(--muted); }
+    .sample-copy h3 { font-size:var(--type-card-title); margin-bottom:9px; color:var(--navy); }
+    .sample-copy p { color:var(--muted); font-size:var(--type-body-sm); line-height:1.65; }
 
     .lesson-panel {
       margin-top:30px;
@@ -470,7 +510,7 @@
       padding:30px 32px;
       color:#fff;
     }
-    .lesson-panel-head h3 { margin-top:5px; }
+    .lesson-panel-head h3 { font-size:var(--type-subheading); margin-top:5px; }
     .lesson-panel-head p:last-child { max-width:480px; color:#cfdae3; }
     .weekly-steps {
       display:grid;
@@ -509,8 +549,8 @@
     .weekly-step:nth-child(3) .weekly-number { background:#eaf4e8; color:var(--green); }
     .weekly-step:nth-child(4) .weekly-number { background:#e9f4f6; color:var(--teal); }
     .weekly-step:nth-child(5) .weekly-number { background:#fff4e5; color:#a76b23; }
-    .weekly-step h4 { margin-bottom:6px; color:var(--navy); }
-    .weekly-step p { color:var(--muted); }
+    .weekly-step h4 { font-size:var(--type-body-sm); margin-bottom:6px; color:var(--navy); }
+    .weekly-step p { color:var(--muted); font-size:var(--type-body-sm); }
 
     .outcome-grid {
       display:grid;
@@ -534,8 +574,8 @@
       color:var(--orange);
       background:#fff4eb;
     }
-    .outcome-card h3 { margin-bottom:8px; color:var(--navy); }
-    .outcome-card p { color:var(--muted); }
+    .outcome-card h3 { font-size:var(--type-ui-lg); margin-bottom:8px; color:var(--navy); }
+    .outcome-card p { color:var(--muted); font-size:var(--type-body-sm); line-height:1.65; }
 
     .feature-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
     .feature-card {
@@ -554,8 +594,8 @@
       color:var(--orange);
       background:#fff4eb;
     }
-    .feature-card h3 { margin-bottom:10px; }
-    .feature-card p { color:var(--muted); }
+    .feature-card h3 { font-size:var(--type-ui-lg); margin-bottom:10px; }
+    .feature-card p { color:var(--muted); font-size:var(--type-body-sm); line-height:1.65; }
 
     .consult-panel {
       max-width:700px;
@@ -568,7 +608,7 @@
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
     .form-group { display:flex; flex-direction:column; gap:7px; }
     .form-group.full { grid-column:1/-1; }
-    .form-group label { font-weight:750; }
+    .form-group label { font-size:var(--type-ui); line-height:1.4; font-weight:750; }
     .form-group input, .form-group textarea, .form-group select {
       width:100%;
       padding:13px 14px;
@@ -593,14 +633,15 @@
     }
     .submit-button:hover { transform:translateY(-2px); }
     .submit-button:disabled { opacity:.65; cursor:wait; transform:none; }
-    .form-note { text-align:center; margin-top:12px; }
+    .form-note { text-align:center; font-size:var(--type-meta); line-height:1.5; margin-top:12px; }
 
     .site-footer { padding:55px 0 28px; }
     .footer-top { display:flex; justify-content:space-between; align-items:flex-start; gap:30px; }
-    .footer-brand b { display:block; margin-bottom:7px; }
-    .footer-brand p { color:#b9c9d8; }
+    .footer-brand b { display:block; font-size:var(--type-ui-lg); margin-bottom:7px; }
+    .footer-brand p { color:#b9c9d8; font-size:var(--type-ui); line-height:1.6; }
     .footer-right { display:flex; flex-direction:column; align-items:flex-end; gap:18px; }
     .footer-links, .footer-socials { display:flex; flex-wrap:wrap; gap:18px; }
+    .footer-links a { font-size:var(--type-ui); line-height:1.5; }
     .footer-social {
       width:42px;
       height:42px;
@@ -614,7 +655,7 @@
       padding-top:24px;
       border-top:1px solid rgba(255,255,255,.1);
       color:#9fb3c8;
-      font-size:12px;
+      font-size:var(--type-meta);
       line-height:1.85;
       word-break:keep-all;
     }
@@ -629,6 +670,8 @@
       padding-top:18px;
       border-top:1px solid rgba(255,255,255,.08);
       color:#829ab1;
+      font-size:var(--type-meta);
+      line-height:1.5;
     }
 
     .floating-actions {
@@ -673,7 +716,7 @@
       border-radius:7px;
       background:rgba(8,28,44,.94);
       color:#fff;
-      font-size:12px;
+      font-size:var(--type-meta);
       font-weight:700;
       line-height:1;
       white-space:nowrap;
@@ -740,7 +783,7 @@
       color:#fff;
       cursor:pointer;
     }
-    .modal-caption { padding:15px 4px 2px; color:var(--navy); font-weight:800; }
+    .modal-caption { padding:15px 4px 2px; color:var(--navy); font-size:var(--type-body-sm); font-weight:800; }
 
     .toast {
       position:fixed;
@@ -813,8 +856,9 @@
       .brand-logo { width:156px; height:55px; }
       .page-section { padding:72px 0; }
       .hero { min-height:650px; }
-      .hero-inner { padding:76px 0; }
+      .hero-inner { padding:64px 0; }
       .hero-title { letter-spacing:-.03em; }
+      .hero-stats { margin-top:36px; }
       .action-button { width:100%; }
       .hero-stat { min-width:calc(50% - 6px); }
       .comparison-grid { grid-template-columns:1fr; }
@@ -854,7 +898,7 @@
     .level-system-section .level-lead {
       text-align:center;
       color:var(--muted);
-      font-size:16px;
+      font-size:var(--type-lead);
       max-width:800px;
       margin:0 auto;
       line-height:1.75;
@@ -868,58 +912,58 @@
       margin-bottom:42px;
       box-shadow:0 18px 50px rgba(16,42,67,.07);
     }
-    .level-barchart-title { text-align:center; font-size:18px; font-weight:850; color:var(--navy); margin-bottom:22px; }
+    .level-barchart-title { text-align:center; font-size:var(--type-ui-lg); font-weight:850; color:var(--navy); margin-bottom:22px; }
     .level-period-tags { display:grid; grid-template-columns:2fr 2fr 2fr 3fr; gap:8px; margin-bottom:20px; text-align:center; }
-    .level-period-badge { padding:9px 5px; border-radius:8px; font-size:12px; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .level-period-badge { padding:9px 5px; border-radius:8px; font-size:var(--type-meta); line-height:1.4; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .level-pb-s1 { background:var(--level-step1); } .level-pb-s2 { background:var(--level-step2); }
     .level-pb-s3 { background:var(--level-step3); } .level-pb-s4 { background:var(--level-step4); }
     .level-barchart-container { display:flex; align-items:flex-end; justify-content:space-between; height:190px; gap:8px; padding-top:25px; border-bottom:2px solid #cbd5e1; }
     .level-bar-item { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; }
     .level-bar { width:100%; max-width:45px; border-radius:6px 6px 0 0; position:relative; }
-    .level-bar-val { position:absolute; top:-23px; width:100%; text-align:center; font-size:11px; font-weight:850; color:var(--navy); }
-    .level-bar-label { font-size:12px; font-weight:800; color:#475569; margin-top:8px; }
+    .level-bar-val { position:absolute; top:-23px; width:100%; text-align:center; font-size:var(--type-meta); font-weight:850; color:var(--navy); }
+    .level-bar-label { font-size:var(--type-meta); font-weight:800; color:#475569; margin-top:8px; }
     .level-system-section .level-table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:0 18px 50px rgba(16,42,67,.07); }
     .level-table td, .level-table th { padding:18px 20px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); vertical-align:top; }
-    .level-table th { background:var(--navy); color:#fff; font-size:14px; letter-spacing:.04em; text-align:center; font-weight:850; }
+    .level-table th { background:var(--navy); color:#fff; font-size:var(--type-body-sm); line-height:1.4; letter-spacing:.04em; text-align:center; font-weight:850; }
     .level-table tr:last-child td { border-bottom:0; } .level-table tr > *:last-child { border-right:0; }
-    .level-group-cell { width:160px; text-align:center; font-weight:850; font-size:15px; vertical-align:middle !important; color:#fff; }
+    .level-group-cell { width:160px; text-align:center; font-weight:850; font-size:var(--type-body-sm); vertical-align:middle !important; color:#fff; }
     .level-group-step,
     .level-group-name,
     .level-group-subtitle { display:block; }
-    .level-group-subtitle { margin-top:3px; font-size:11px; font-weight:500; opacity:.9; }
+    .level-group-subtitle { margin-top:3px; font-size:var(--type-micro); font-weight:500; opacity:.9; }
     .level-grp-s1 { background:var(--level-step1); } .level-grp-s2 { background:var(--level-step2); }
     .level-grp-s3 { background:var(--level-step3); } .level-grp-s4 { background:var(--level-step4); }
     .level-lvl-cell { width:90px; text-align:center; vertical-align:middle !important; background:#f8fafc; }
-    .level-lvl-num { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; color:#fff; font-weight:850; font-size:15px; }
-    .level-grade { display:block; margin-top:6px; font-size:11px; color:#64748b; font-weight:700; }
-    .level-desc-cell b { display:block; color:var(--navy); font-size:15px; margin-bottom:8px; }
-    .level-desc-cell ul { margin:0; padding-left:18px; color:#486581; font-size:13px; line-height:1.75; }
+    .level-lvl-num { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; color:#fff; font-weight:850; font-size:var(--type-body-sm); }
+    .level-grade { display:block; margin-top:6px; font-size:var(--type-micro); color:#64748b; font-weight:700; }
+    .level-desc-cell b { display:block; color:var(--navy); font-size:var(--type-body-sm); margin-bottom:8px; }
+    .level-desc-cell ul { margin:0; padding-left:18px; color:#486581; font-size:var(--type-ui); line-height:1.75; }
     .level-row-s1 { background:#f8fafc; } .level-row-s2 { background:#f6fbf7; }
     .level-row-s3 { background:#fffaf6; } .level-row-s4 { background:#f4fafb; }
     .level-roadmap { margin-top:54px; }
-    .level-roadmap-title h3 { margin:0 0 20px; color:var(--navy); font-size:22px; font-weight:850; }
-    .level-roadmap-grid { display:grid; grid-template-columns:130px repeat(9, 1fr); border:1px solid var(--line); border-radius:14px; overflow:hidden; font-size:12.5px; background:#fff; box-shadow:0 18px 50px rgba(16,42,67,.06); }
+    .level-roadmap-title h3 { margin:0 0 20px; color:var(--navy); font-size:var(--type-subheading); font-weight:850; }
+    .level-roadmap-grid { display:grid; grid-template-columns:130px repeat(9, 1fr); border:1px solid var(--line); border-radius:14px; overflow:hidden; font-size:var(--type-ui); background:#fff; box-shadow:0 18px 50px rgba(16,42,67,.06); }
     .level-rg-cell { padding:14px 6px; text-align:center; border-bottom:1px solid var(--line); border-right:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
     .level-rg-head { color:#fff; font-weight:800; } .level-rg-label { background:#f0f4f8; color:var(--navy); font-weight:850; }
     .level-rg-lvl { font-weight:850; color:#fff; } .level-grade-band { background:#fff; font-weight:700; color:#475569; }
     .level-roadmap-mobile { display:none; }
     .level-roadmap-mobile-card { overflow:hidden; border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:0 10px 30px rgba(16,42,67,.06); }
     .level-roadmap-mobile-head { padding:16px 18px; background:var(--roadmap-color); color:#fff; }
-    .level-roadmap-mobile-label { display:block; margin-bottom:4px; font-size:10px; font-weight:800; letter-spacing:.08em; opacity:.78; }
-    .level-roadmap-mobile-head h4 { margin:0; font-size:15px; font-weight:850; }
+    .level-roadmap-mobile-label { display:block; margin-bottom:4px; font-size:var(--type-micro); font-weight:800; letter-spacing:.08em; opacity:.78; }
+    .level-roadmap-mobile-head h4 { margin:0; font-size:var(--type-ui); font-weight:850; }
     .level-roadmap-mobile-card dl { margin:0; }
     .level-roadmap-mobile-row { display:grid; grid-template-columns:112px minmax(0,1fr); border-top:1px solid var(--line); }
     .level-roadmap-mobile-row dt,
-    .level-roadmap-mobile-row dd { margin:0; padding:13px 14px; font-size:12.5px; line-height:1.55; }
+    .level-roadmap-mobile-row dd { margin:0; padding:13px 14px; font-size:var(--type-ui); line-height:1.55; }
     .level-roadmap-mobile-row dt { display:flex; align-items:center; background:#f0f4f8; color:var(--navy); font-weight:850; }
     .level-roadmap-mobile-row dd { color:#486581; font-weight:650; word-break:keep-all; }
     .level-roadmap-note { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:22px; }
     .level-note-card { background:#fff; border-radius:14px; padding:20px 18px; border:1px solid var(--line); box-shadow:0 10px 30px rgba(16,42,67,.05); }
-    .level-note-card .level-tag { display:inline-block; font-size:11px; font-weight:850; color:#fff; padding:5px 10px; border-radius:999px; margin-bottom:10px; }
-    .level-note-card p { margin:0; font-size:12px; color:var(--muted); line-height:1.65; word-break:keep-all; }
+    .level-note-card .level-tag { display:inline-block; font-size:var(--type-meta); font-weight:850; color:#fff; padding:5px 10px; border-radius:999px; margin-bottom:10px; }
+    .level-note-card p { margin:0; font-size:var(--type-body-sm); color:var(--muted); line-height:1.65; word-break:keep-all; }
     @media (max-width:900px) {
       .level-roadmap-note { grid-template-columns:repeat(2,1fr); }
-      .level-period-badge { font-size:10.5px; padding:7px 2px; }
+      .level-period-badge { font-size:var(--type-meta); padding:7px 2px; }
       .level-system-section .main-content { overflow:visible; }
       .level-system-section .level-table {
         display:block;
@@ -970,9 +1014,9 @@
         line-height:1.35;
         border-bottom:1px solid rgba(255,255,255,.24) !important;
       }
-      .level-system-section .level-group-step { font-size:12px; opacity:.8; }
-      .level-system-section .level-group-name { font-size:14px; letter-spacing:.015em; }
-      .level-system-section .level-group-subtitle { margin:0 0 0 auto; font-size:11.5px; }
+      .level-system-section .level-group-step { font-size:var(--type-ui); opacity:.8; }
+      .level-system-section .level-group-name { font-size:var(--type-body-sm); letter-spacing:.015em; }
+      .level-system-section .level-group-subtitle { margin:0 0 0 auto; font-size:var(--type-meta); }
       .level-system-section .level-lvl-cell {
         width:auto;
         display:flex;
@@ -983,8 +1027,8 @@
         border-right:1px solid var(--line);
       }
       .level-system-section .level-desc-cell { min-width:0; }
-      .level-system-section .level-desc-cell b { font-size:14px; line-height:1.6; word-break:keep-all; }
-      .level-system-section .level-desc-cell ul { padding-left:17px; font-size:12.5px; line-height:1.72; }
+      .level-system-section .level-desc-cell b { font-size:var(--type-body-sm); line-height:1.6; word-break:keep-all; }
+      .level-system-section .level-desc-cell ul { padding-left:17px; font-size:var(--type-ui); line-height:1.72; }
       .level-roadmap-grid { display:none; }
       .level-roadmap-mobile {
         display:block;
@@ -1012,13 +1056,13 @@
         padding:14px 8px;
         text-align:center;
       }
-      .level-roadmap-mobile-label { font-size:8.5px; letter-spacing:0; }
-      .level-roadmap-mobile-head h4 { font-size:11.5px; line-height:1.45; overflow-wrap:anywhere; }
+      .level-roadmap-mobile-label { font-size:var(--type-micro); letter-spacing:0; }
+      .level-roadmap-mobile-head h4 { font-size:var(--type-ui); line-height:1.45; overflow-wrap:anywhere; }
       .level-roadmap-mobile-card dl { min-width:0; }
       .level-roadmap-mobile-row { grid-template-columns:104px minmax(0,1fr); }
       .level-roadmap-mobile-row:first-child { border-top:0; }
       .level-roadmap-mobile-row dt,
-      .level-roadmap-mobile-row dd { padding:11px 10px; font-size:11.5px; }
+      .level-roadmap-mobile-row dd { padding:11px 10px; font-size:var(--type-ui); }
     }
     @media (max-width:700px) {
       .level-barchart-section { padding:24px 16px; }
@@ -1035,17 +1079,17 @@
         overflow-wrap:normal;
         word-break:normal;
       }
-      .level-system-section .level-group-step { font-size:11px; }
-      .level-system-section .level-group-name { font-size:13px; }
-      .level-system-section .level-group-subtitle { font-size:10.5px; }
+      .level-system-section .level-group-step { font-size:var(--type-ui); }
+      .level-system-section .level-group-name { font-size:var(--type-body-sm); }
+      .level-system-section .level-group-subtitle { font-size:var(--type-meta); }
       .level-system-section .level-lvl-cell { width:auto; padding:14px 7px; }
-      .level-system-section .level-lvl-num { width:36px; height:36px; font-size:14px; }
-      .level-system-section .level-desc-cell b { font-size:13.5px; }
-      .level-system-section .level-desc-cell ul { font-size:12px; line-height:1.7; }
+      .level-system-section .level-lvl-num { width:36px; height:36px; font-size:var(--type-body-sm); }
+      .level-system-section .level-desc-cell b { font-size:var(--type-body-sm); }
+      .level-system-section .level-desc-cell ul { font-size:var(--type-ui); line-height:1.7; }
       .level-roadmap-mobile-card { grid-template-columns:110px minmax(0,1fr); }
       .level-roadmap-mobile-row { grid-template-columns:96px minmax(0,1fr); }
       .level-roadmap-mobile-row dt,
-      .level-roadmap-mobile-row dd { padding:10px 9px; font-size:11px; }
+      .level-roadmap-mobile-row dd { padding:10px 9px; font-size:var(--type-ui); }
       .level-roadmap-note { grid-template-columns:1fr; }
     }
 
@@ -1057,7 +1101,7 @@
     <div class="main-content navbar">
      <a href="#top" class="brand" aria-label="4STEPS Book Club 홈"> <img data-template-id="brand-logo" class="canva-image brand-logo" loading="lazy" src="images/logo.png" alt="네 개의 성장 막대와 4steps bookclub 글자가 있는 로고"> </a> <button id="menu-button" class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav"> <i data-lucide="menu"></i> </button>
      <nav id="site-nav" class="desktop-nav" aria-label="주요 메뉴">
-      <a href="#about" data-template-id="nav-about" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">ABOUT</a> <a href="#faculty" data-template-id="nav-faculty" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">FACULTY</a> <a href="#curriculum" data-template-id="nav-curriculum" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">CURRICULUM</a> <a href="#level-system" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">LEVEL SYSTEM</a> <a href="#class-content" data-template-id="nav-class-content" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">CLASS CONTENT</a> <a href="#management" data-template-id="nav-management" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal; font-size: 12px;">MANAGEMENT</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social naver" aria-label="네이버 블로그"><span aria-hidden="true" class="font-black">N</span></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="nav-social kakao" aria-label="카카오톡"><i data-lucide="message-circle" class="w-4 h-4"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social instagram" aria-label="인스타그램"><i data-lucide="instagram" class="w-4 h-4"></i></a> <a href="#consulting" data-template-id="nav-cta" class="canva-button nav-cta" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 13px;">무료 레벨테스트</a>
+      <a href="#about" data-template-id="nav-about" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">ABOUT</a> <a href="#faculty" data-template-id="nav-faculty" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">FACULTY</a> <a href="#curriculum" data-template-id="nav-curriculum" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CURRICULUM</a> <a href="#level-system" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">LEVEL SYSTEM</a> <a href="#class-content" data-template-id="nav-class-content" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CLASS CONTENT</a> <a href="#management" data-template-id="nav-management" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">MANAGEMENT</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social naver" aria-label="네이버 블로그"><span aria-hidden="true" class="font-black">N</span></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="nav-social kakao" aria-label="카카오톡"><i data-lucide="message-circle" class="w-4 h-4"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social instagram" aria-label="인스타그램"><i data-lucide="instagram" class="w-4 h-4"></i></a> <a href="#consulting" data-template-id="nav-cta" class="canva-button nav-cta" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨테스트</a>
      </nav>
     </div>
    </header>
@@ -1067,23 +1111,23 @@
       <rect x="8" y="55" width="16" height="30" rx="4" fill="#fff"></rect> <rect x="30" y="42" width="16" height="43" rx="4" fill="#fff"></rect> <rect x="52" y="26" width="16" height="59" rx="4" fill="#fff"></rect> <rect x="74" y="10" width="16" height="75" rx="4" fill="#fff"></rect>
      </svg>
      <div class="main-content hero-inner">
-      <p data-template-id="hero-kicker" class="canva-tag kicker" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 20px;">PREMIUM JUNIOR BOOKCLUB</p>
-      <h1 data-template-id="hero-title" class="canva-text hero-title" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 40px; line-height: 1.2;">책을 읽는 아이에서
+      <p data-template-id="hero-kicker" class="canva-tag kicker" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal;">PREMIUM JUNIOR BOOKCLUB</p>
+      <h1 data-template-id="hero-title" class="canva-text hero-title" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal;">책을 읽는 아이에서
 생각하고 쓰는 아이로 </h1>
-      <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal; font-size: 20px; line-height: 1.7;">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽<br> </p>
-       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal; font-size: 20px; line-height: 1.7;">국제학교 출신의 원어민급 영어실력과 검증된 최상위 공인성적을 보유한 서울대생 강사진들과 함께하는 4인 소수 관리형 프로그램<br></p>
+      <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal;">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽<br> </p>
+       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal;">국제학교 출신의 원어민급 영어실력과 검증된 최상위 공인성적을 보유한 서울대생 강사진들과 함께하는 4인 소수 관리형 프로그램<br></p>
       <div class="hero-actions">
-       <a href="#consulting" data-template-id="hero-primary-button" class="canva-button action-button primary-button" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">무료 레벨 테스트 신청하기 →</a> <a href="#class-content" data-template-id="hero-secondary-button" class="canva-button action-button outline-button" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">실제 수업 콘텐츠 보기</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-naver-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">네이버 블로그</a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" data-template-id="hero-kakao-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">카카오톡 상담</a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-instagram-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;"><i data-lucide="instagram" class="w-4 h-4"></i> 인스타그램</a>
+       <a href="#consulting" data-template-id="hero-primary-button" class="canva-button action-button primary-button" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨 테스트 신청하기 →</a> <a href="#class-content" data-template-id="hero-secondary-button" class="canva-button action-button outline-button" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">실제 수업 콘텐츠 보기</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-naver-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">네이버 블로그</a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" data-template-id="hero-kakao-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">카카오톡 상담</a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-instagram-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"><i data-lucide="instagram" class="w-4 h-4"></i> 인스타그램</a>
       </div>
       <div class="hero-stats" aria-label="프로그램 핵심 정보">
        <div class="hero-stat">
-        <b data-template-id="hero-stat-one-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">4:1</b> <small data-template-id="hero-stat-one-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">최대 4명 소그룹</small>
+        <b data-template-id="hero-stat-one-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal;">4:1</b> <small data-template-id="hero-stat-one-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">최대 4명 소그룹</small>
        </div>
        <div class="hero-stat">
-        <b data-template-id="hero-stat-two-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">SNU</b> <small data-template-id="hero-stat-two-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">서울대학교 재학 강사진</small>
+        <b data-template-id="hero-stat-two-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal;">SNU</b> <small data-template-id="hero-stat-two-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">서울대학교 재학 강사진</small>
        </div>
        <div class="hero-stat">
-        <b data-template-id="hero-stat-three-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 22px;">READ → WRITE</b> <small data-template-id="hero-stat-three-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 12px;">읽기부터 에세이까지</small>
+        <b data-template-id="hero-stat-three-value" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal;">READ → WRITE</b> <small data-template-id="hero-stat-three-label" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">읽기부터 에세이까지</small>
        </div>
       </div>
      </div>
@@ -1091,27 +1135,27 @@
     <section id="about" class="page-section">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="about-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">WHY 4STEPS?</p>
-       <h2 data-template-id="about-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px; line-height: 1.24;">좋은 책을 읽는 것만으로는
+       <p data-template-id="about-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">WHY 4STEPS?</p>
+       <h2 data-template-id="about-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">좋은 책을 읽는 것만으로는
 아이의 실력이 완성되지 않습니다.</h2>
       </div>
       <div class="story-layout">
        <div class="story-copy">
-        <h3 data-template-id="story-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 31px;">검증되지 않은 북클럽의 시대를 넘어,
+        <h3 data-template-id="story-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">검증되지 않은 북클럽의 시대를 넘어,
 확실한 시스템을 선택하세요.</h3>
-        <p data-template-id="story-paragraph-one" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">기존의 많은 북클럽은 좋은 책을 선정하고 아이들이 자유롭게 이야기하는 방식으로 운영됩니다. 그러나 누가 가르치는지, 무엇을 배우는지, 수업 후 무엇이 남는지는 명확하지 않은 경우가 많습니다.</p>
-        <p data-template-id="story-paragraph-two" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">4STEPS는 이 문제에서 출발했습니다. 강사진부터 수업의 구조, 교재, 매주 확인하는 어휘와 글쓰기까지 학부모님이 확인할 수 있는 기준을 만들었습니다.</p>
-        <blockquote data-template-id="story-quote" class="canva-banner quote" style="background: rgb(255, 250, 246); color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 16px;">"책을 읽었다"에서 끝나지 않고, 아이의 머릿속에 남은 생각이 실제 말과 글이 되도록 합니다.</blockquote>
+        <p data-template-id="story-paragraph-one" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">기존의 많은 북클럽은 좋은 책을 선정하고 아이들이 자유롭게 이야기하는 방식으로 운영됩니다. 그러나 누가 가르치는지, 무엇을 배우는지, 수업 후 무엇이 남는지는 명확하지 않은 경우가 많습니다.</p>
+        <p data-template-id="story-paragraph-two" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">4STEPS는 이 문제에서 출발했습니다. 강사진부터 수업의 구조, 교재, 매주 확인하는 어휘와 글쓰기까지 학부모님이 확인할 수 있는 기준을 만들었습니다.</p>
+        <blockquote data-template-id="story-quote" class="canva-banner quote" style="background: rgb(255, 250, 246); color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">"책을 읽었다"에서 끝나지 않고, 아이의 머릿속에 남은 생각이 실제 말과 글이 되도록 합니다.</blockquote>
        </div>
        <aside data-template-id="problem-panel" class="canva-panel problem-panel" aria-labelledby="problem-title" style="background: rgb(16, 42, 67);">
-        <h3 id="problem-title" data-template-id="problem-title" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 25px;">기존 북클럽의
+        <h3 id="problem-title" data-template-id="problem-title" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">기존 북클럽의
 고민을 해결했습니다.</h3>
         <ul class="problem-list">
-         <li data-template-id="problem-one" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal; font-size: 16px;">강사의 학력과 실제 영어 역량이 불분명하다</li>
-         <li data-template-id="problem-two" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal; font-size: 16px;">수업이 자유 토론 위주라 학습 목표가 모호하다</li>
-         <li data-template-id="problem-three" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal; font-size: 16px;">책을 읽었지만 아이가 무엇을 이해했는지 알기 어렵다</li>
-         <li data-template-id="problem-four" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal; font-size: 16px;">라이팅과 에세이 피드백이 부족하다</li>
-         <li data-template-id="problem-five" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal; font-size: 16px;">학부모가 아이의 성장을 확인하기 어렵다</li>
+         <li data-template-id="problem-one" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal;">강사의 학력과 실제 영어 역량이 불분명하다</li>
+         <li data-template-id="problem-two" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal;">수업이 자유 토론 위주라 학습 목표가 모호하다</li>
+         <li data-template-id="problem-three" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal;">책을 읽었지만 아이가 무엇을 이해했는지 알기 어렵다</li>
+         <li data-template-id="problem-four" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal;">라이팅과 에세이 피드백이 부족하다</li>
+         <li data-template-id="problem-five" class="canva-text" style="color: rgb(207, 218, 227); font-weight: 400; font-style: normal;">학부모가 아이의 성장을 확인하기 어렵다</li>
         </ul>
        </aside>
       </div>
@@ -1120,35 +1164,35 @@
     <section data-template-id="difference-section" class="canva-section page-section" style="background: rgb(247, 249, 251);">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="difference-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">THE 4STEPS DIFFERENCE</p>
-       <h2 data-template-id="difference-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">같은 북클럽이 아닙니다.</h2>
-       <p data-template-id="difference-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">강사진의 검증부터 수업의 결과물까지, 4STEPS는 북클럽을 '관리되는 학습'으로 바꿉니다.</p>
+       <p data-template-id="difference-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">THE 4STEPS DIFFERENCE</p>
+       <h2 data-template-id="difference-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">같은 북클럽이 아닙니다.</h2>
+       <p data-template-id="difference-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">강사진의 검증부터 수업의 결과물까지, 4STEPS는 북클럽을 '관리되는 학습'으로 바꿉니다.</p>
       </div>
       <div class="comparison">
        <div class="comparison-grid">
-        <div data-template-id="comparison-heading-item" class="canva-text comparison-head" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">비교 항목</div>
-        <div data-template-id="comparison-heading-steps" class="canva-text comparison-head" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">4STEPS BOOK CLUB</div>
-        <div data-template-id="comparison-heading-general" class="canva-text comparison-head" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">일반 북클럽</div>
-        <div data-template-id="comparison-label-faculty" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">강사진</div>
+        <div data-template-id="comparison-heading-item" class="canva-text comparison-head" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">비교 항목</div>
+        <div data-template-id="comparison-heading-steps" class="canva-text comparison-head" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">4STEPS BOOK CLUB</div>
+        <div data-template-id="comparison-heading-general" class="canva-text comparison-head" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">일반 북클럽</div>
+        <div data-template-id="comparison-label-faculty" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal;">강사진</div>
         <div class="premium-cell">
-         <strong data-template-id="comparison-faculty-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">서울대학교 + 원어민급 Bilingual</strong>
+         <strong data-template-id="comparison-faculty-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal;">서울대학교 + 원어민급 Bilingual</strong>
         </div>
-        <div data-template-id="comparison-faculty-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">검증 기준이 불명확한 외국인·교포·해외대학 출신 강사진</div>
-        <div data-template-id="comparison-label-size" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">수업 정원</div>
+        <div data-template-id="comparison-faculty-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">검증 기준이 불명확한 외국인·교포·해외대학 출신 강사진</div>
+        <div data-template-id="comparison-label-size" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal;">수업 정원</div>
         <div class="premium-cell">
-         <strong data-template-id="comparison-size-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">최대 4명 소그룹</strong><br><small data-template-id="comparison-size-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">모든 학생의 발언·사고·글쓰기까지 확인</small>
+         <strong data-template-id="comparison-size-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal;">최대 4명 소그룹</strong><br><small data-template-id="comparison-size-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">모든 학생의 발언·사고·글쓰기까지 확인</small>
         </div>
-        <div data-template-id="comparison-size-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">다수 인원으로 개별 피드백에 한계</div>
-        <div data-template-id="comparison-label-structure" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">수업 구조</div>
+        <div data-template-id="comparison-size-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">다수 인원으로 개별 피드백에 한계</div>
+        <div data-template-id="comparison-label-structure" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal;">수업 구조</div>
         <div class="premium-cell">
-         <strong data-template-id="comparison-structure-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">자체 교재 + 단계별 커리큘럼</strong><br><small data-template-id="comparison-structure-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">읽기에서 라이팅까지 연결</small>
+         <strong data-template-id="comparison-structure-steps-title" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal;">자체 교재 + 단계별 커리큘럼</strong><br><small data-template-id="comparison-structure-steps-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">읽기에서 라이팅까지 연결</small>
         </div>
-        <div data-template-id="comparison-structure-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">책을 읽고 자유롭게 토론하는 방식</div>
-        <div data-template-id="comparison-label-result" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal; font-size: 16px;">학습 결과</div>
+        <div data-template-id="comparison-structure-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">책을 읽고 자유롭게 토론하는 방식</div>
+        <div data-template-id="comparison-label-result" class="canva-text comparison-label" style="color: rgb(36, 59, 83); font-weight: 800; font-style: normal;">학습 결과</div>
         <div class="premium-cell">
-         <strong data-template-id="comparison-result-steps" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal; font-size: 16px;">주간 어휘시험 + Paragraph + 에세이 첨삭</strong>
+         <strong data-template-id="comparison-result-steps" class="canva-text" style="color: rgb(207, 122, 56); font-weight: 800; font-style: normal;">주간 어휘시험 + Paragraph + 에세이 첨삭</strong>
         </div>
-        <div data-template-id="comparison-result-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">수업 후 눈에 보이는 결과물과 피드백이 제한적</div>
+        <div data-template-id="comparison-result-general" class="canva-text normal-cell" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">수업 후 눈에 보이는 결과물과 피드백이 제한적</div>
        </div>
       </div>
      </div>
@@ -1156,15 +1200,15 @@
     <section id="faculty" class="page-section">
      <div class="main-content faculty-layout">
       <div class="faculty-copy">
-       <p data-template-id="faculty-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">VERIFIED FACULTY</p>
-       <h2 data-template-id="faculty-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">아이의 영어를 맡기는 선생님, 4steps는 기준부터 다릅니다</h2>
-       <p data-template-id="faculty-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 서울대학교 재학 여부와 원어민 수준의 영어 구사력, 그리고 실제 수업 역량을 함께 검증하여 선별합니다.</p>
+       <p data-template-id="faculty-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">VERIFIED FACULTY</p>
+       <h2 data-template-id="faculty-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">아이의 영어를 맡기는 선생님, 4steps는 기준부터 다릅니다</h2>
+       <p data-template-id="faculty-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 서울대학교 재학 여부와 원어민 수준의 영어 구사력, 그리고 실제 수업 역량을 함께 검증하여 선별합니다.</p>
        <ul class="checks">
-        <li data-template-id="faculty-check-one" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">최상위 공인성적을 보유한 서울대생 강사진들로 구성</li>
-        <li data-template-id="faculty-check-two" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">원어민 수준의 영어 구사력을 갖춘 Bilingual Teacher</li>
-        <li data-template-id="faculty-check-three" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">국제학교·해외 유학 환경에 대한 높은 이해도</li>
-        <li data-template-id="faculty-check-four" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">서류 검증과 인터뷰, 시강을 거친 선별 과정</li>
-        <li data-template-id="faculty-check-five" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 16px;">각종 국제 토론대회 및 MUN 참가 및 Writing Award 수상경력 다수 보유</li>
+        <li data-template-id="faculty-check-one" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">최상위 공인성적을 보유한 서울대생 강사진들로 구성</li>
+        <li data-template-id="faculty-check-two" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">원어민 수준의 영어 구사력을 갖춘 Bilingual Teacher</li>
+        <li data-template-id="faculty-check-three" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">국제학교·해외 유학 환경에 대한 높은 이해도</li>
+        <li data-template-id="faculty-check-four" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">서류 검증과 인터뷰, 시강을 거친 선별 과정</li>
+        <li data-template-id="faculty-check-five" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">각종 국제 토론대회 및 MUN 참가 및 Writing Award 수상경력 다수 보유</li>
        </ul>
       </div>
      </div>
@@ -1172,38 +1216,38 @@
     <section id="curriculum" data-template-id="curriculum-section" class="canva-section page-section" style="background: rgb(247, 249, 251);">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="curriculum-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">THE 4STEPS CURRICULUM</p>
-       <h2 data-template-id="curriculum-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">책 한 권을 읽는 과정이
+       <p data-template-id="curriculum-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">THE 4STEPS CURRICULUM</p>
+       <h2 data-template-id="curriculum-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">책 한 권을 읽는 과정이
 하나의 성장 과정이 되도록</h2>
       </div>
       <div class="curriculum-grid">
        <article data-template-id="step-one-card" class="canva-card curriculum-card" style="background: rgb(255, 255, 255);">
-        <p data-template-id="step-one-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal; font-size: 12px;">STEP 01</p>
-        <h3 data-template-id="step-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 20px;">DEEP READ</h3><span data-template-id="step-one-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal; font-size: 13px;">정독 &amp; 이해</span>
-        <p data-template-id="step-one-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 14px;">책의 줄거리만 읽는 것이 아닙니다. 자체 교재의 주관식 문제를 통해 인물, 사건, 주제와 숨은 맥락까지 정확하게 이해합니다.</p>
+        <p data-template-id="step-one-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal;">STEP 01</p>
+        <h3 data-template-id="step-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">DEEP READ</h3><span data-template-id="step-one-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal;">정독 &amp; 이해</span>
+        <p data-template-id="step-one-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">책의 줄거리만 읽는 것이 아닙니다. 자체 교재의 주관식 문제를 통해 인물, 사건, 주제와 숨은 맥락까지 정확하게 이해합니다.</p>
        </article>
        <article data-template-id="step-two-card" class="canva-card curriculum-card" style="background: rgb(255, 255, 255);">
-        <p data-template-id="step-two-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal; font-size: 12px;">STEP 02</p>
-        <h3 data-template-id="step-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 20px;">SHARP THINK</h3><span data-template-id="step-two-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal; font-size: 13px;">분석 &amp; 토론</span>
-        <p data-template-id="step-two-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 14px;">교재에서 생각한 질문과 문제를 바탕으로 토론합니다. 근거를 찾고, 자신의 생각을 논리적으로 말하며 비판적 사고력을 키웁니다.</p>
+        <p data-template-id="step-two-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal;">STEP 02</p>
+        <h3 data-template-id="step-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">SHARP THINK</h3><span data-template-id="step-two-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal;">분석 &amp; 토론</span>
+        <p data-template-id="step-two-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">교재에서 생각한 질문과 문제를 바탕으로 토론합니다. 근거를 찾고, 자신의 생각을 논리적으로 말하며 비판적 사고력을 키웁니다.</p>
        </article>
        <article data-template-id="step-three-card" class="canva-card curriculum-card" style="background: rgb(255, 255, 255);">
-        <p data-template-id="step-three-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal; font-size: 12px;">STEP 03</p>
-        <h3 data-template-id="step-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 20px;">WIDE WORD</h3><span data-template-id="step-three-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal; font-size: 13px;">어휘 확장</span>
-        <p data-template-id="step-three-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 14px;">매주 어휘 시험을 통해 책에서 만난 핵심 어휘를 정확하게 익힙니다. 독서가 실제 학업에 필요한 Academic Vocabulary로 확장됩니다.</p>
+        <p data-template-id="step-three-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal;">STEP 03</p>
+        <h3 data-template-id="step-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">WIDE WORD</h3><span data-template-id="step-three-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal;">어휘 확장</span>
+        <p data-template-id="step-three-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">매주 어휘 시험을 통해 책에서 만난 핵심 어휘를 정확하게 익힙니다. 독서가 실제 학업에 필요한 Academic Vocabulary로 확장됩니다.</p>
        </article>
        <article data-template-id="step-four-card" class="canva-card curriculum-card" style="background: rgb(255, 255, 255);">
-        <p data-template-id="step-four-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal; font-size: 12px;">STEP 04</p>
-        <h3 data-template-id="step-four-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 20px;">CLEAR WRITE</h3><span data-template-id="step-four-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal; font-size: 13px;">Paragraph &amp; Essay</span>
-        <p data-template-id="step-four-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal; font-size: 14px;">토론한 생각을 paragraph로 쓰고, 책 한 권을 완독할 때마다 에세이를 완성합니다. 구조와 문장을 꼼꼼하게 첨삭합니다.</p>
+        <p data-template-id="step-four-number" class="canva-text step-number" style="color: rgb(159, 179, 200); font-weight: 900; font-style: normal;">STEP 04</p>
+        <h3 data-template-id="step-four-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">CLEAR WRITE</h3><span data-template-id="step-four-korean" class="canva-text step-ko" style="color: rgb(98, 125, 152); font-weight: 700; font-style: normal;">Paragraph &amp; Essay</span>
+        <p data-template-id="step-four-description" class="canva-text" style="color: rgb(72, 101, 129); font-weight: 400; font-style: normal;">토론한 생각을 paragraph로 쓰고, 책 한 권을 완독할 때마다 에세이를 완성합니다. 구조와 문장을 꼼꼼하게 첨삭합니다.</p>
        </article>
       </div>
     </section>
     <section id="level-system" class="level-system-section page-section" style="background: rgb(255, 255, 255);">
      <div class="main-content">
 <div class="section-heading level-heading">
-       <p class="eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-size: 24px;">4STEPS LEVEL SYSTEM</p>
-  <h2 class="section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-size: 28px; line-height: 1.24;">Level &amp; Roadmap 안내</h2>
+       <p class="eyebrow" style="color: rgb(207, 122, 56); font-weight: 900;">4STEPS LEVEL SYSTEM</p>
+  <h2 class="section-title" style="color: rgb(16, 42, 67); font-weight: 900;">Level &amp; Roadmap 안내</h2>
   
   <!-- 자연스러운 맥락 줄바꿈 적용 -->
   <p class="level-lead">
@@ -1504,44 +1548,44 @@
     <section id="class-content" data-template-id="class-content-section" class="canva-section page-section" style="background: rgb(255, 255, 255);">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="class-content-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">INSIDE THE CLASS</p>
-       <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px; line-height: 1.24;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
+       <p data-template-id="class-content-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">INSIDE THE CLASS</p>
+       <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
       </div>
       <div class="content-showcase">
        <article data-template-id="feedback-card" class="canva-card sample-card" style="background: rgb(255, 255, 255);">
         <div class="sample-media">
-         <img data-template-id="feedback-example-image" class="canva-image sample-image" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시"> <button data-image-target="feedback-example-image" data-template-id="feedback-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 13px;"> 크게 보기</button>
+         <img data-template-id="feedback-example-image" class="canva-image sample-image" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시"> <button data-image-target="feedback-example-image" data-template-id="feedback-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"> 크게 보기</button>
         </div>
         <div class="sample-copy">
-         <span data-template-id="feedback-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 12px;">01 · ESSAY FEEDBACK</span>
-         <h3 data-template-id="feedback-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 23px;">수업 후에도 이어지는 구체적인 첨삭</h3>
-         <p data-template-id="feedback-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">주제 소개와 토론 후 충분한 글쓰기 시간을 제공합니다. 완성한 글에는 논리, 구조, 표현, 문법을 구분해 피드백하고 이후 수업에서 개선점을 다시 확인합니다.</p>
+         <span data-template-id="feedback-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">01 · ESSAY FEEDBACK</span>
+         <h3 data-template-id="feedback-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">수업 후에도 이어지는 구체적인 첨삭</h3>
+         <p data-template-id="feedback-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">주제 소개와 토론 후 충분한 글쓰기 시간을 제공합니다. 완성한 글에는 논리, 구조, 표현, 문법을 구분해 피드백하고 이후 수업에서 개선점을 다시 확인합니다.</p>
         </div>
        </article>
        <article data-template-id="workbook-card" class="canva-card sample-card workbook" style="background: rgb(255, 255, 255);">
         <div class="sample-media">
-         <img data-template-id="workbook-sample-image" class="canva-image sample-image" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 예시"> <button data-image-target="workbook-sample-image" data-template-id="workbook-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 13px;"> 크게 보기</button>
+         <img data-template-id="workbook-sample-image" class="canva-image sample-image" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 예시"> <button data-image-target="workbook-sample-image" data-template-id="workbook-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"> 크게 보기</button>
         </div>
         <div class="sample-copy">
-         <span data-template-id="workbook-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 12px;">02 · ORIGINAL WORKBOOK</span>
-         <h3 data-template-id="workbook-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 20px;">질문이 생각과 글쓰기를 이끄는 자체 교재</h3>
-         <p data-template-id="workbook-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">사실 확인에 그치지 않고 인물의 선택, 원인과 결과, 주제 해석을 묻는 주관식 문제와 Mini Essay Prompt로 구성됩니다.</p>
+         <span data-template-id="workbook-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">02 · ORIGINAL WORKBOOK</span>
+         <h3 data-template-id="workbook-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">질문이 생각과 글쓰기를 이끄는 자체 교재</h3>
+         <p data-template-id="workbook-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">사실 확인에 그치지 않고 인물의 선택, 원인과 결과, 주제 해석을 묻는 주관식 문제와 Mini Essay Prompt로 구성됩니다.</p>
         </div>
        </article>
       </div>
       <section class="lesson-panel" aria-labelledby="weekly-lesson-title">
        <div data-template-id="lesson-panel-header" class="canva-banner lesson-panel-head" style="background: linear-gradient(120deg, rgb(16, 42, 67), rgb(30, 78, 114));">
         <div>
-         <p data-template-id="lesson-panel-eyebrow" class="canva-text eyebrow" style="color: rgb(240, 162, 99); font-weight: 900; font-style: normal; font-size: 18px;">A WEEK AT 4STEPS</p>
-         <h3 id="weekly-lesson-title" data-template-id="lesson-panel-title" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 24px;">매주 수업은 이렇게 진행됩니다.</h3>
+         <p data-template-id="lesson-panel-eyebrow" class="canva-text eyebrow" style="color: rgb(240, 162, 99); font-weight: 900; font-style: normal;">A WEEK AT 4STEPS</p>
+         <h3 id="weekly-lesson-title" data-template-id="lesson-panel-title" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 900; font-style: normal;">매주 수업은 이렇게 진행됩니다.</h3>
         </div>
        </div>
        <ol class="weekly-steps">
-        <li class="weekly-step"><span class="weekly-number">1</span> <h4 data-template-id="weekly-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Vocab Test</h4></li>
-        <li class="weekly-step"><span class="weekly-number">2</span> <h4 data-template-id="weekly-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Reading Comprehension</h4></li>
-        <li class="weekly-step"><span class="weekly-number">3</span> <h4 data-template-id="weekly-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Book Club Discussion</h4></li>
-        <li class="weekly-step"><span class="weekly-number">4</span> <h4 data-template-id="weekly-four-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Paragraph Writing</h4></li>
-        <li class="weekly-step"><span class="weekly-number">5</span> <h4 data-template-id="weekly-five-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">Homework</h4></li>
+        <li class="weekly-step"><span class="weekly-number">1</span> <h4 data-template-id="weekly-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">Vocab Test</h4></li>
+        <li class="weekly-step"><span class="weekly-number">2</span> <h4 data-template-id="weekly-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">Reading Comprehension</h4></li>
+        <li class="weekly-step"><span class="weekly-number">3</span> <h4 data-template-id="weekly-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">Book Club Discussion</h4></li>
+        <li class="weekly-step"><span class="weekly-number">4</span> <h4 data-template-id="weekly-four-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">Paragraph Writing</h4></li>
+        <li class="weekly-step"><span class="weekly-number">5</span> <h4 data-template-id="weekly-five-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">Homework</h4></li>
        </ol>
       </section>
      </div>
@@ -1549,29 +1593,29 @@
     <section id="management" class="page-section">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="management-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">FEEDBACK &amp; MANAGEMENT</p>
-       <h2 data-template-id="management-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">수업은 피드백으로 완성되고,
+       <p data-template-id="management-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">FEEDBACK &amp; MANAGEMENT</p>
+       <h2 data-template-id="management-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">수업은 피드백으로 완성되고,
 관리는 성장으로 이어집니다.</h2>
-       <p data-template-id="management-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">4STEPS는 화면만 켜놓는 온라인 수업이 아닙니다. 소수 정예 수업, 명확한 결과물, 세밀한 첨삭과 지속적인 관리로 아이의 성장을 확인합니다.</p>
+       <p data-template-id="management-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">4STEPS는 화면만 켜놓는 온라인 수업이 아닙니다. 소수 정예 수업, 명확한 결과물, 세밀한 첨삭과 지속적인 관리로 아이의 성장을 확인합니다.</p>
       </div>
       <div class="feature-grid">
        <article data-template-id="feature-one-card" class="canva-card feature-card" style="background: rgb(255, 255, 255);">
         <div class="feature-icon"><i data-lucide="users"></i>
         </div>
-        <h3 data-template-id="feature-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 18px;">4인 정밀 관리형 라이브 수업</h3>
-        <p data-template-id="feature-one-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">최대 4명의 소그룹 안에서 모든 학생이 읽고, 말하고, 질문하고, 생각합니다. 한 명도 수업 속에 묻히지 않습니다.</p>
+        <h3 data-template-id="feature-one-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">4인 정밀 관리형 라이브 수업</h3>
+        <p data-template-id="feature-one-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">최대 4명의 소그룹 안에서 모든 학생이 읽고, 말하고, 질문하고, 생각합니다. 한 명도 수업 속에 묻히지 않습니다.</p>
        </article>
        <article data-template-id="feature-two-card" class="canva-card feature-card" style="background: rgb(255, 255, 255);">
         <div class="feature-icon"><i data-lucide="clipboard-check"></i>
         </div>
-        <h3 data-template-id="feature-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 18px;">매주 어휘 테스트와 학습 확인</h3>
-        <p data-template-id="feature-two-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">책에서 배운 핵심 어휘와 이해도를 매주 확인합니다. 읽은 내용을 실제 언어 자산으로 만들기 위한 지속적인 관리입니다.</p>
+        <h3 data-template-id="feature-two-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">매주 어휘 테스트와 학습 확인</h3>
+        <p data-template-id="feature-two-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">책에서 배운 핵심 어휘와 이해도를 매주 확인합니다. 읽은 내용을 실제 언어 자산으로 만들기 위한 지속적인 관리입니다.</p>
        </article>
        <article data-template-id="feature-three-card" class="canva-card feature-card" style="background: rgb(255, 255, 255);">
         <div class="feature-icon"><i data-lucide="pencil"></i>
         </div>
-        <h3 data-template-id="feature-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 18px;">에세이 첨삭과 개별 피드백</h3>
-        <p data-template-id="feature-three-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 14px;">책마다 완성한 글을 구조와 문장 단위로 꼼꼼하게 첨삭하고, 다음 학습 목표까지 연결해 성장을 관리합니다.</p>
+        <h3 data-template-id="feature-three-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">에세이 첨삭과 개별 피드백</h3>
+        <p data-template-id="feature-three-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">책마다 완성한 글을 구조와 문장 단위로 꼼꼼하게 첨삭하고, 다음 학습 목표까지 연결해 성장을 관리합니다.</p>
        </article>
       </div>
      </div>
@@ -1579,34 +1623,34 @@
     <section id="consulting" data-template-id="consulting-section" class="canva-section page-section" style="background: rgb(247, 249, 251);">
      <div class="main-content">
       <div class="section-heading">
-       <p data-template-id="form-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal; font-size: 24px;">START WITH 4STEPS</p>
-       <h2 data-template-id="form-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal; font-size: 28px;">우리 아이에게 맞는
+       <p data-template-id="form-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">START WITH 4STEPS</p>
+       <h2 data-template-id="form-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">우리 아이에게 맞는
 첫 번째 STEP을 찾아보세요.</h2>
-       <p data-template-id="form-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal; font-size: 16px;">학생의 기본 정보를 알려주시면 상담과 무료 레벨 테스트를 안내해 드립니다.</p>
+       <p data-template-id="form-description" class="canva-text section-description" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">학생의 기본 정보를 알려주시면 상담과 무료 레벨 테스트를 안내해 드립니다.</p>
       </div>
       <div data-template-id="consult-panel" class="canva-panel consult-panel" style="background: rgb(255, 255, 255);">
        <form id="consult-form" novalidate="">
         <div class="form-grid">
          <div class="form-group">
-          <label data-template-id="student-label" class="canva-text" for="student" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">학생 이름 *</label> <input data-template-id="student-input" class="canva-input" id="student" name="student" type="text" autocomplete="name" placeholder="학생 이름을 입력하세요" required style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label data-template-id="student-label" class="canva-text" for="student" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">학생 이름 *</label> <input data-template-id="student-input" class="canva-input" id="student" name="student" type="text" autocomplete="name" placeholder="학생 이름을 입력하세요" required style="font-weight: 400; font-style: normal;">
          </div>
          <div class="form-group">
-          <label data-template-id="grade-label" class="canva-text" for="grade" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">현재 학년 *</label> <select id="grade" name="grade" required> <option value="">선택하세요</option> <option value="초등학교 1학년">초등학교 1학년</option> <option value="초등학교 2학년">초등학교 2학년</option> <option value="초등학교 3학년">초등학교 3학년</option> <option value="초등학교 4학년">초등학교 4학년</option> <option value="초등학교 5학년">초등학교 5학년</option> <option value="초등학교 6학년">초등학교 6학년</option> <option value="중학교 1학년">중학교 1학년</option> <option value="중학교 2학년">중학교 2학년</option> <option value="중학교 3학년">중학교 3학년</option> <option value="기타">기타</option> </select>
+          <label data-template-id="grade-label" class="canva-text" for="grade" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">현재 학년 *</label> <select id="grade" name="grade" required> <option value="">선택하세요</option> <option value="초등학교 1학년">초등학교 1학년</option> <option value="초등학교 2학년">초등학교 2학년</option> <option value="초등학교 3학년">초등학교 3학년</option> <option value="초등학교 4학년">초등학교 4학년</option> <option value="초등학교 5학년">초등학교 5학년</option> <option value="초등학교 6학년">초등학교 6학년</option> <option value="중학교 1학년">중학교 1학년</option> <option value="중학교 2학년">중학교 2학년</option> <option value="중학교 3학년">중학교 3학년</option> <option value="기타">기타</option> </select>
          </div>
          <div class="form-group">
-          <label class="canva-text" for="birth-month" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">출생 연도 및 월</label> <input class="canva-input" id="birth-month" name="birthMonth" type="month" autocomplete="bday-month" style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label class="canva-text" for="birth-month" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">출생 연도 및 월</label> <input class="canva-input" id="birth-month" name="birthMonth" type="month" autocomplete="bday-month" style="font-weight: 400; font-style: normal;">
          </div>
          <div class="form-group">
-          <label data-template-id="school-label" class="canva-text" for="school" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">학교명</label> <input data-template-id="school-input" class="canva-input" id="school" name="school" type="text" autocomplete="organization" placeholder="현재 학교명을 입력하세요" style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label data-template-id="school-label" class="canva-text" for="school" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">학교명</label> <input data-template-id="school-input" class="canva-input" id="school" name="school" type="text" autocomplete="organization" placeholder="현재 학교명을 입력하세요" style="font-weight: 400; font-style: normal;">
          </div>
          <div class="form-group">
-          <label class="canva-text" for="region" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">거주 지역</label> <input class="canva-input" id="region" name="region" type="text" autocomplete="address-level2" placeholder="예: 서울 강남구 / 해외 거주" style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label class="canva-text" for="region" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">거주 지역</label> <input class="canva-input" id="region" name="region" type="text" autocomplete="address-level2" placeholder="예: 서울 강남구 / 해외 거주" style="font-weight: 400; font-style: normal;">
          </div>
          <div class="form-group full">
-          <label class="canva-text" for="overseas-residence" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal; font-size: 13px;">해외 거주 기간</label> <input class="canva-input" id="overseas-residence" name="overseasResidence" type="text" placeholder="예: 2년 / 해외 거주 경험 없음" style="font-weight: 400; font-style: normal; font-size: 16px;">
+          <label class="canva-text" for="overseas-residence" style="color: rgb(36, 59, 83); font-weight: 700; font-style: normal;">해외 거주 기간</label> <input class="canva-input" id="overseas-residence" name="overseasResidence" type="text" placeholder="예: 2년 / 해외 거주 경험 없음" style="font-weight: 400; font-style: normal;">
          </div>
-        </div><button data-template-id="form-submit-button" class="canva-button submit-button" id="submit-button" type="submit" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">무료 레벨 테스트 상담 신청하기</button>
-        <p data-template-id="form-note" class="canva-text form-note" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal; font-size: 12px;">버튼을 누르면 입력한 상담 내용이 이메일 작성 화면에 준비됩니다.</p>
+        </div><button data-template-id="form-submit-button" class="canva-button submit-button" id="submit-button" type="submit" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨 테스트 상담 신청하기</button>
+        <p data-template-id="form-note" class="canva-text form-note" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal;">버튼을 누르면 입력한 상담 내용이 이메일 작성 화면에 준비됩니다.</p>
        </form>
       </div>
      </div>
@@ -1642,12 +1686,12 @@
     <div class="main-content">
      <div class="footer-top">
       <div class="footer-brand">
-       <b data-template-id="footer-brand-name" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 19px;">4STEPS BOOK CLUB</b>
-       <p data-template-id="footer-description" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">국제학교·해외유학생을 위한 프리미엄 주니어 Reading &amp; Writing Club</p>
+       <b data-template-id="footer-brand-name" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">4STEPS BOOK CLUB</b>
+       <p data-template-id="footer-description" class="canva-text" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">국제학교·해외유학생을 위한 프리미엄 주니어 Reading &amp; Writing Club</p>
       </div>
       <div class="footer-right">
        <nav class="footer-links" aria-label="푸터 메뉴">
-        <a href="#about" data-template-id="footer-about" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">About</a> <a href="#faculty" data-template-id="footer-faculty" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">Faculty</a> <a href="#curriculum" data-template-id="footer-curriculum" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">Curriculum</a> <a href="#class-content" data-template-id="footer-class-content" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">Class Content</a> <a href="#consulting" data-template-id="footer-contact" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal; font-size: 13px;">Contact</a>
+        <a href="#about" data-template-id="footer-about" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">About</a> <a href="#faculty" data-template-id="footer-faculty" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Faculty</a> <a href="#curriculum" data-template-id="footer-curriculum" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Curriculum</a> <a href="#class-content" data-template-id="footer-class-content" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Class Content</a> <a href="#consulting" data-template-id="footer-contact" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Contact</a>
        </nav>
        <div class="footer-socials">
         <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social naver" aria-label="네이버 블로그"><strong>N</strong></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="footer-social kakao" aria-label="카카오톡"><i data-lucide="message-circle"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social instagram" aria-label="인스타그램"><i data-lucide="instagram"></i></a>
@@ -1678,16 +1722,16 @@
        <strong>신고기관명</strong> 서울특별시 강남서초교육지원청
       </p>
      </div>
-     <p data-template-id="footer-copyright" class="canva-text copyright" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal; font-size: 12px;">© 2026 4STEPS BOOK CLUB. All Rights Reserved.</p>
+     <p data-template-id="footer-copyright" class="canva-text copyright" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal;">© 2026 4STEPS BOOK CLUB. All Rights Reserved.</p>
     </div>
    </footer>
    <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-hidden="true">
     <div class="modal-dialog">
      <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x"></i> </button> <img data-template-id="modal-feedback-image" data-modal-image="feedback-example-image" class="canva-image modal-image hidden" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시 확대 이미지"> <img data-template-id="modal-workbook-image" data-modal-image="workbook-sample-image" class="canva-image modal-image hidden" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 확대 이미지">
-     <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal; font-size: 15px;">4STEPS 실제 수업 자료</p>
+     <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">4STEPS 실제 수업 자료</p>
     </div>
    </div>
-   <div id="toast" data-template-id="success-toast" class="canva-banner toast" role="status" aria-live="polite" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 600; font-style: normal; font-size: 16px;">상담 내용을 담은 이메일 작성 화면을 열었습니다.</div>
+   <div id="toast" data-template-id="success-toast" class="canva-banner toast" role="status" aria-live="polite" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 600; font-style: normal;">상담 내용을 담은 이메일 작성 화면을 열었습니다.</div>
   </div>
   <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
