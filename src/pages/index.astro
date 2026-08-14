@@ -857,9 +857,9 @@ const faqItems = [
         .nav-links > a:not(.nav-cta):hover { color: var(--coral-dark); }
         .nav-cta { width: auto; min-height: 44px; margin: 0 0 0 4px; padding: 10px 16px; font-size: 12px; }
         .nav-socials { gap: 5px; margin: 0; }
-        .nav-socials .social-chip { width: 38px; min-height: 38px; justify-content: center; padding: 0; }
+        .nav-socials .social-chip { width: 38px; height: 38px; min-height: 38px; justify-content: center; padding: 0; overflow: hidden; border: 0; border-radius: 50%; background: transparent; }
         .nav-socials .social-label { display: none; }
-        .nav-socials .brand-icon { width: 19px; height: 19px; }
+        .nav-socials .brand-icon { display: block; width: 100%; height: 100%; object-fit: cover; }
         .hero { min-height: 720px; display: flex; align-items: center; }
         .hero-grid { grid-template-columns: 1.13fr .87fr; gap: 64px; }
         .intro-card { padding: 34px; }
