@@ -57,7 +57,7 @@ Library Green and Warm Paper should carry most of the experience. Coral is reser
 - Use notebook lines, page tabs, annotations, and paper cards as supporting motifs.
 - Favor asymmetrical editorial composition over centered corporate feature grids.
 - Rounded forms should feel like paper, tabs, and speech notes rather than generic app UI.
-- Avoid glossy gradients, neon colors, academic crests, and overused “elite education” imagery.
+- Avoid crest-led branding and overused “elite education” imagery. University marks may appear only in approved, clearly contextualized credential callouts—not as the 4steps identity or an implied university partnership.
 
 ## Voice
 
