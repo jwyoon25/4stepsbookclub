@@ -16,6 +16,7 @@ export interface EssayComment {
 export interface EssaySegment {
   text: string;
   commentId?: WonderFeedbackId;
+  mobileCommentAfter?: WonderFeedbackId;
   italic?: boolean;
 }
 
@@ -80,14 +81,22 @@ export const wonderEssayExcerpts: EssayExcerpt[] = [
       { text: "Throughout the novel " },
       { text: "Wonder", italic: true },
       { text: ", August is treated in a variety of ways, whether it is cruelty, pity, or genuine respect. These reactions can show how someone truly feels about August —for example when Julian showed his cruel personality, making jokes about August's face. The novel shows the different ways of treating a person who appears different, and " },
-      { text: "this essay will focus on analyzing each of these ways of treating a new person.", commentId: "thesis" }
+      {
+        text: "this essay will focus on analyzing each of these ways of treating a new person.",
+        commentId: "thesis",
+        mobileCommentAfter: "thesis"
+      }
     ]
   },
   {
     id: "cruelty",
     segments: [
       { text: "Out of the many different ways, the majority of the characters treat August with cruelty or, like Julian. " },
-      { text: "They show this by constantly avoiding him, making jokes about him, or talking bad behind his back.", commentId: "evidence" },
+      {
+        text: "They show this by constantly avoiding him, making jokes about him, or talking bad behind his back.",
+        commentId: "evidence",
+        mobileCommentAfter: "evidence"
+      },
       { text: " This is not a very respectful way to treat someone—since doing this would hurt others' feelings. The individuals who treat August with cruelty are looking at him the same way the rich used to look at the poor in the olden times; not caring a single bit about him. This would definitely not be a very respectful way to treat a person who is already struggling to adapt to the new environment." }
     ]
   },
@@ -95,17 +104,25 @@ export const wonderEssayExcerpts: EssayExcerpt[] = [
     id: "pity",
     segments: [
       { text: "Pity however, is actually feeling bad for someone, unlike cruelty, where they don't care about the 'victim'. However, pity is not true kindness; instead, it's helping someone because you feel bad for them, not necessarily because you want to help them. Think of it like this: You have a friend struggling with studying for a test, and " },
-      { text: "you say 'Good luck' but not actually helping them directly. This is not an example of showing kindness, this is an example of pity.", commentId: "reasoning" },
+      {
+        text: "you say 'Good luck' but not actually helping them directly. This is not an example of showing kindness, this is an example of pity.",
+        commentId: "reasoning",
+        mobileCommentAfter: "reasoning"
+      },
       { text: " This can be helpful for helping someone who is struggling, but not directly helpful. In August's case, " },
       { text: "Summer initially was only feeling a sense of pity", commentId: "interpretation" },
-      { text: ", because August was just sitting alone, quietly." }
+      { text: ", because August was just sitting alone, quietly.", mobileCommentAfter: "interpretation" }
     ]
   },
   {
     id: "respect",
     segments: [
       { text: "Finally, genuine respect is when someone truly cares about another individual. This was shown in the novel when " },
-      { text: "summer began hanging out with August more; asking what had happened when he was gone, and helping him in tough situations.", commentId: "analysis" },
+      {
+        text: "summer began hanging out with August more; asking what had happened when he was gone, and helping him in tough situations.",
+        commentId: "analysis",
+        mobileCommentAfter: "analysis"
+      },
       { text: " This is true kindness, when you deeply care about another person. This is almost identical to treating your best friend." }
     ]
   },

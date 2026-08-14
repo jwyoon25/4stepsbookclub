@@ -10,14 +10,11 @@ const commentById = new Map(wonderHomepageComments.map((comment) => [comment.id,
 const commentNumberById = new Map(
   wonderHomepageComments.map((comment, index) => [comment.id, String(index + 1).padStart(2, "0")])
 );
-const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
-  ...excerpt,
-  commentIds: [...new Set(
-    excerpt.segments
-      .map((segment) => segment.commentId)
-      .filter((id): id is WonderFeedbackId => Boolean(id) && commentById.has(id as WonderFeedbackId))
-  )]
-}));
+const splitHighlightText = (text: string) => {
+  const lastSpace = text.lastIndexOf(" ");
+  if (lastSpace < 0) return ["", text];
+  return [text.slice(0, lastSpace + 1), text.slice(lastSpace + 1)];
+};
 ---
 
 <article
@@ -45,54 +42,58 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
       </header>
 
       <div class="essay-body">
-        {annotatedParagraphs.map((paragraph) => (
+        {wonderEssayExcerpts.map((paragraph) => (
           <div class="essay-paragraph-group" data-essay-paragraph={paragraph.id}>
-            <p class="essay-paragraph">
+            <div class="essay-paragraph" role="paragraph">
               {paragraph.segments.map((segment) => {
+                const mobileCommentId = segment.mobileCommentAfter;
+                const mobileComment = mobileCommentId ? commentById.get(mobileCommentId) : undefined;
+                let segmentContent;
+
                 if (segment.commentId && commentById.has(segment.commentId)) {
                   const number = commentNumberById.get(segment.commentId);
-                  return (
+                  const [highlightLead, highlightTail] = splitHighlightText(segment.text);
+                  segmentContent = (
                     <span
                       id={`wonder-highlight-${segment.commentId}`}
                       class="essay-highlight"
                       role="button"
                       tabindex="0"
                       data-comment-trigger={segment.commentId}
-                      data-mobile-panel-id={`wonder-mobile-panel-${paragraph.id}`}
-                      aria-controls={`wonder-mobile-panel-${paragraph.id}`}
+                      data-mobile-panel-id={`wonder-mobile-comment-${segment.commentId}`}
+                      aria-controls={`wonder-mobile-comment-${segment.commentId}`}
                       aria-expanded="false"
                       aria-label={`튜터 코멘트 ${number} 보기: ${segment.text}`}
                     >
-                      <span class="highlight-copy">{segment.text}</span>
-                      <span class="annotation-chip" aria-hidden="true">{number}</span>
+                      <span class="highlight-copy">{highlightLead}<span class="highlight-tail">{highlightTail}<span class="annotation-chip" aria-hidden="true">{number}</span></span></span>
                     </span>
                   );
+                } else if (segment.italic) {
+                  segmentContent = <em>{segment.text}</em>;
+                } else {
+                  segmentContent = segment.text;
                 }
 
-                if (segment.italic) return <em>{segment.text}</em>;
-                return segment.text;
+                return (
+                  <>
+                    {segmentContent}
+                    {mobileCommentId && mobileComment && (
+                      <div
+                        id={`wonder-mobile-comment-${mobileCommentId}`}
+                        class="essay-mobile-comment-panel"
+                        data-mobile-panel={mobileCommentId}
+                        hidden
+                      >
+                        <article data-mobile-comment={mobileCommentId}>
+                          <span>TUTOR COMMENT {commentNumberById.get(mobileCommentId)}</span>
+                          <p>{mobileComment.text}</p>
+                        </article>
+                      </div>
+                    )}
+                  </>
+                );
               })}
-            </p>
-
-            {paragraph.commentIds.length > 0 && (
-              <div
-                id={`wonder-mobile-panel-${paragraph.id}`}
-                class="essay-mobile-comment-panel"
-                data-mobile-panel={paragraph.id}
-                hidden
-              >
-                {paragraph.commentIds.map((id) => {
-                  const comment = commentById.get(id);
-                  if (!comment) return null;
-                  return (
-                    <article data-mobile-comment={id} hidden>
-                      <span>TUTOR COMMENT {commentNumberById.get(id)}</span>
-                      <p>{comment.text}</p>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
+            </div>
           </div>
         ))}
       </div>
@@ -161,7 +162,6 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
       const markerItems = [...root.querySelectorAll("[data-rail-marker]")];
       const desktopComments = [...root.querySelectorAll("[data-desktop-comment]")];
       const mobilePanels = [...root.querySelectorAll("[data-mobile-panel]")];
-      const mobileComments = [...root.querySelectorAll("[data-mobile-comment]")];
       const defaultId = root.dataset.defaultComment || "thesis";
       let activeId = desktopQuery.matches ? defaultId : null;
       let lastActiveId = defaultId;
@@ -202,10 +202,11 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
       const keepMobilePanelVisible = (panel) => {
         requestAnimationFrame(() => {
           const rect = panel.getBoundingClientRect();
-          const safeBottom = window.innerHeight - 16;
-          if (rect.bottom <= safeBottom) return;
+          const safeBottom = window.innerHeight - 20;
+          const visiblePanelTop = safeBottom - 88;
+          if (rect.top <= visiblePanelTop) return;
           window.scrollBy({
-            top: rect.bottom - safeBottom,
+            top: rect.top - visiblePanelTop,
             behavior: reducedMotionQuery.matches ? "auto" : "smooth"
           });
         });
@@ -239,13 +240,9 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
 
         let openMobilePanel = null;
         mobilePanels.forEach((panel) => {
-          const matchingComment = panel.querySelector(`[data-mobile-comment="${activeId || ""}"]`);
-          const open = !desktop && Boolean(activeId) && Boolean(matchingComment);
+          const open = !desktop && Boolean(activeId) && panel.dataset.mobilePanel === activeId;
           panel.hidden = !open;
           if (open) openMobilePanel = panel;
-        });
-        mobileComments.forEach((comment) => {
-          comment.hidden = desktop || comment.dataset.mobileComment !== activeId;
         });
 
         if (desktop) scheduleRailPosition();
@@ -259,13 +256,29 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
         render({ ensureVisible });
       };
 
+      const toggleMobile = (id) => {
+        if (!id) return;
+        if (activeId === id) {
+          activeId = null;
+          render();
+          return;
+        }
+        activate(id, true);
+      };
+
       triggers.forEach((trigger) => {
-        trigger.addEventListener("focus", () => activate(trigger.dataset.commentTrigger));
-        trigger.addEventListener("click", () => activate(trigger.dataset.commentTrigger, !desktopQuery.matches));
+        trigger.addEventListener("focus", () => {
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+        });
+        trigger.addEventListener("click", () => {
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+          else toggleMobile(trigger.dataset.commentTrigger);
+        });
         trigger.addEventListener("keydown", (event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
-          activate(trigger.dataset.commentTrigger, !desktopQuery.matches);
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+          else toggleMobile(trigger.dataset.commentTrigger);
         });
       });
 
@@ -429,6 +442,12 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
       rgba(215,160,78,.5) 92%,
       transparent 92%
     );
+  }
+  .highlight-tail {
+    display:inline-flex;
+    align-items:center;
+    white-space:nowrap;
+    vertical-align:baseline;
   }
   .essay-highlight.is-active {
     text-decoration:underline;
