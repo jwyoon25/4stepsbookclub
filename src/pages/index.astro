@@ -1,13 +1,15 @@
 ---
+import AnnotatedEssay from "../components/AnnotatedEssay.astro";
+
 const previewFor = (path) => path.replace(/\.png$/, "-preview.webp");
 
 const classContentGalleries = [
   {
     id: "feedback",
-    index: "01",
-    label: "ESSAY FEEDBACK",
-    title: "학생의 생각을 더 선명한 글로 다듬는 첨삭",
-    description: "문법과 어휘부터 어색한 표현, 문장 구조, 글의 방향과 다음 개선 목표까지 실제 첨삭 과정을 보여드립니다.",
+    index: "01A",
+    label: "REAL FEEDBACK PAGES",
+    title: "실제 첨삭 원본도 함께 확인해보세요",
+    description: "학생이 작성한 글 위에 남긴 문법·어휘·표현·구조 피드백과 다음 개선 목표를 원본 페이지로 보여드립니다.",
     tags: ["문법·어휘", "표현·구조", "개선 방향"],
     images: [
       {
@@ -1964,6 +1966,7 @@ const classContentGalleries = [
        <p data-template-id="class-content-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">INSIDE THE CLASS</p>
        <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
       </div>
+      <AnnotatedEssay />
       <div class="content-showcase">
        {classContentGalleries.map((gallery) => (
         <article data-gallery={gallery.id} data-gallery-label={gallery.label} class:list={["canva-card", "sample-card", "example-gallery", gallery.id]} style="background: rgb(255, 255, 255);">

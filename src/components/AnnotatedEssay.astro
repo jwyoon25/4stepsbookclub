@@ -1,0 +1,459 @@
+---
+import {
+  wonderEssayExcerpts,
+  wonderHomepageComments,
+  type WonderFeedbackId
+} from "../data/wonder-feedback";
+
+const defaultCommentId: WonderFeedbackId = "thesis";
+const commentById = new Map(wonderHomepageComments.map((comment) => [comment.id, comment]));
+const commentNumberById = new Map(
+  wonderHomepageComments.map((comment, index) => [comment.id, String(index + 1).padStart(2, "0")])
+);
+---
+
+<article
+  class="annotated-essay"
+  data-annotated-essay
+  data-default-comment={defaultCommentId}
+  aria-labelledby="wonder-feedback-title"
+>
+  <header class="feedback-feature-head">
+    <span class="feedback-feature-index">01 · ESSAY FEEDBACK</span>
+    <div class="feedback-feature-copy">
+      <h3 id="wonder-feedback-title">좋은 글은 좋은 생각에서 시작됩니다.</h3>
+      <p>튜터가 글을 대신 고치지 않고, 학생 스스로 논리와 근거를 강화하도록 질문합니다.</p>
+    </div>
+  </header>
+
+  <div class="annotated-layout">
+    <section class="essay-paper" aria-labelledby="wonder-essay-title">
+      <header class="essay-document-head">
+        <div>
+          <span class="artifact-label">STUDENT ESSAY</span>
+          <h4 id="wonder-essay-title"><em>Wonder</em> — Literary Analysis</h4>
+        </div>
+        <span class="artifact-meta">Grade 7 · Selected excerpts</span>
+      </header>
+
+      <div class="essay-body">
+        {wonderEssayExcerpts.map((excerpt) => {
+          const excerptCommentIds = [...new Set(
+            excerpt.segments
+              .map((segment) => segment.commentId)
+              .filter((id): id is WonderFeedbackId => Boolean(id) && commentById.has(id as WonderFeedbackId))
+          )];
+
+          return (
+            <div class="essay-excerpt">
+              {excerpt.omissionBefore && (
+                <div class="essay-omission" aria-label="일부 문장 생략"><span aria-hidden="true">•••</span></div>
+              )}
+              <p class="essay-paragraph">
+                {excerpt.segments.map((segment) => {
+                  if (segment.commentId && commentById.has(segment.commentId)) {
+                    const isDefault = segment.commentId === defaultCommentId;
+                    const number = commentNumberById.get(segment.commentId);
+                    return (
+                      <button
+                        id={`wonder-highlight-${segment.commentId}`}
+                        class:list={["essay-highlight", { "is-active": isDefault }]}
+                        type="button"
+                        data-comment-trigger={segment.commentId}
+                        aria-controls={`wonder-comment-${segment.commentId} wonder-mobile-comment-${segment.commentId}`}
+                        aria-expanded={String(isDefault)}
+                        aria-label={`튜터 코멘트 ${number} 보기: ${segment.text}`}
+                      >
+                        {segment.text}
+                      </button>
+                    );
+                  }
+
+                  if (segment.italic) return <em>{segment.text}</em>;
+                  return segment.text;
+                })}
+              </p>
+
+              {excerptCommentIds.length > 0 && (
+                <div class="essay-mobile-comments">
+                  {excerptCommentIds.map((id) => {
+                    const comment = commentById.get(id);
+                    if (!comment) return null;
+                    const isDefault = id === defaultCommentId;
+                    return (
+                      <article
+                        id={`wonder-mobile-comment-${id}`}
+                        class:list={["essay-mobile-comment", { "is-active": isDefault }]}
+                        data-mobile-comment={id}
+                      >
+                        <span>TUTOR COMMENT {commentNumberById.get(id)}</span>
+                        <p>{comment.text}</p>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <aside class="tutor-comments" aria-label="튜터 코멘트">
+      <div class="tutor-comments-head">
+        <span class="artifact-label">TUTOR COMMENTS</span>
+        <p>강조된 문장을 선택해 피드백을 확인해보세요.</p>
+      </div>
+      <ol class="tutor-comment-list">
+        {wonderHomepageComments.map((comment, index) => {
+          const isDefault = comment.id === defaultCommentId;
+          return (
+            <li>
+              <button
+                id={`wonder-comment-${comment.id}`}
+                class:list={["tutor-comment-button", { "is-active": isDefault }]}
+                type="button"
+                data-comment-card={comment.id}
+                aria-controls={`wonder-highlight-${comment.id}`}
+                aria-pressed={String(isDefault)}
+              >
+                <span class="comment-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <span class="comment-text">{comment.text}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </aside>
+  </div>
+</article>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-annotated-essay]").forEach((root) => {
+      if (root.dataset.enhanced === "true") return;
+      root.dataset.enhanced = "true";
+      root.classList.add("is-enhanced");
+
+      const triggers = [...root.querySelectorAll("[data-comment-trigger]")];
+      const commentCards = [...root.querySelectorAll("[data-comment-card]")];
+      const mobileComments = [...root.querySelectorAll("[data-mobile-comment]")];
+
+      const setActiveComment = (id) => {
+        if (!id) return;
+        root.dataset.activeComment = id;
+
+        triggers.forEach((trigger) => {
+          const active = trigger.dataset.commentTrigger === id;
+          trigger.classList.toggle("is-active", active);
+          trigger.setAttribute("aria-expanded", String(active));
+        });
+
+        commentCards.forEach((card) => {
+          const active = card.dataset.commentCard === id;
+          card.classList.toggle("is-active", active);
+          card.setAttribute("aria-pressed", String(active));
+        });
+
+        mobileComments.forEach((comment) => {
+          comment.classList.toggle("is-active", comment.dataset.mobileComment === id);
+        });
+      };
+
+      triggers.forEach((trigger) => {
+        const activate = () => setActiveComment(trigger.dataset.commentTrigger);
+        trigger.addEventListener("pointerenter", activate);
+        trigger.addEventListener("focus", activate);
+        trigger.addEventListener("click", activate);
+      });
+
+      commentCards.forEach((card) => {
+        const activate = () => setActiveComment(card.dataset.commentCard);
+        card.addEventListener("pointerenter", activate);
+        card.addEventListener("focus", activate);
+        card.addEventListener("click", activate);
+      });
+
+      setActiveComment(root.dataset.defaultComment || "thesis");
+    });
+  });
+</script>
+
+<style>
+  .annotated-essay {
+    margin-bottom:24px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 18px 50px rgba(16,42,67,.08);
+  }
+  .feedback-feature-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:36px;
+    padding:28px 30px;
+    border-bottom:1px solid var(--line);
+    background:var(--cream);
+  }
+  .feedback-feature-index {
+    flex:0 0 auto;
+    padding-top:5px;
+    color:var(--orange);
+    font-size:var(--type-meta);
+    line-height:1.4;
+    font-weight:900;
+    letter-spacing:.14em;
+  }
+  .feedback-feature-copy {
+    max-width:720px;
+  }
+  .feedback-feature-copy h3 {
+    margin-bottom:8px;
+    color:var(--navy);
+    font-size:var(--type-subheading);
+    font-weight:900;
+  }
+  .feedback-feature-copy p {
+    color:var(--muted);
+    font-size:var(--type-body-sm);
+    line-height:1.7;
+  }
+  .annotated-layout {
+    display:grid;
+    grid-template-columns:minmax(0, 1.72fr) minmax(290px, 1fr);
+    gap:24px;
+    padding:24px;
+    background:var(--soft);
+  }
+  .essay-paper {
+    min-width:0;
+    overflow:hidden;
+    border:1px solid #e4ded3;
+    border-radius:12px;
+    background:#fffdf9;
+    box-shadow:0 14px 32px rgba(16,42,67,.1);
+  }
+  .essay-document-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+    padding:22px 26px 18px;
+    border-bottom:1px solid #ece5d9;
+  }
+  .artifact-label {
+    display:block;
+    margin-bottom:5px;
+    color:var(--orange);
+    font-size:var(--type-micro);
+    line-height:1.4;
+    font-weight:900;
+    letter-spacing:.14em;
+  }
+  .essay-document-head h4 {
+    color:var(--navy);
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:20px;
+    line-height:1.35;
+    font-weight:700;
+  }
+  .artifact-meta {
+    flex:0 0 auto;
+    padding-top:18px;
+    color:#7b8794;
+    font-size:var(--type-meta);
+    line-height:1.4;
+    font-weight:700;
+  }
+  .essay-body {
+    padding:28px 30px 32px;
+  }
+  .essay-paragraph {
+    color:#2f3a43;
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:16px;
+    line-height:1.9;
+  }
+  .essay-excerpt + .essay-excerpt:not(:has(.essay-omission)) {
+    margin-top:18px;
+  }
+  .essay-omission {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:18px 0;
+    color:#a3adb6;
+    font-size:13px;
+    letter-spacing:.35em;
+  }
+  .essay-omission::before,
+  .essay-omission::after {
+    content:"";
+    flex:1;
+    height:1px;
+    background:#ece5d9;
+  }
+  .essay-highlight {
+    display:inline;
+    margin:0;
+    padding:0 .08em;
+    border:0;
+    border-bottom:2px solid rgba(207,122,56,.65);
+    border-radius:2px;
+    background:linear-gradient(transparent 48%, rgba(217,160,91,.25) 48%);
+    color:inherit;
+    font:inherit;
+    line-height:inherit;
+    text-align:left;
+    cursor:pointer;
+    box-decoration-break:clone;
+    -webkit-box-decoration-break:clone;
+    transition:background .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .essay-highlight:hover,
+  .essay-highlight:focus-visible,
+  .essay-highlight.is-active {
+    border-bottom-style:solid;
+    border-bottom-color:var(--orange);
+    background:linear-gradient(transparent 38%, rgba(217,160,91,.48) 38%);
+    box-shadow:0 2px 0 rgba(207,122,56,.16);
+  }
+  .tutor-comments {
+    min-width:0;
+    align-self:start;
+  }
+  .tutor-comments-head {
+    padding:4px 2px 12px;
+  }
+  .tutor-comments-head p {
+    color:var(--muted);
+    font-size:var(--type-meta);
+    line-height:1.55;
+  }
+  .tutor-comment-list {
+    display:grid;
+    gap:9px;
+    list-style:none;
+  }
+  .tutor-comment-button {
+    display:grid;
+    grid-template-columns:32px minmax(0, 1fr);
+    gap:10px;
+    width:100%;
+    padding:14px;
+    border:1px solid #dce5eb;
+    border-left:3px solid transparent;
+    border-radius:11px;
+    background:rgba(255,255,255,.72);
+    color:var(--ink);
+    text-align:left;
+    cursor:pointer;
+    opacity:.72;
+    transition:opacity .2s ease, transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .tutor-comment-button:hover,
+  .tutor-comment-button:focus-visible,
+  .tutor-comment-button.is-active {
+    opacity:1;
+    transform:translateY(-1px);
+    border-color:#d7e0e7;
+    border-left-color:var(--orange);
+    background:#fff;
+    box-shadow:0 10px 24px rgba(16,42,67,.09);
+  }
+  .comment-number {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#eef3f6;
+    color:var(--navy);
+    font-size:var(--type-micro);
+    line-height:1;
+    font-weight:900;
+  }
+  .tutor-comment-button.is-active .comment-number {
+    background:var(--orange);
+    color:#fff;
+  }
+  .comment-text {
+    color:#40566b;
+    font-size:13px;
+    line-height:1.55;
+    font-weight:550;
+  }
+  .essay-mobile-comments {
+    display:none;
+  }
+
+  @media (max-width:900px) {
+    .feedback-feature-head {
+      flex-direction:column;
+      gap:8px;
+      padding:24px;
+    }
+    .feedback-feature-index { padding-top:0; }
+    .annotated-layout {
+      grid-template-columns:1fr;
+      padding:18px;
+    }
+    .tutor-comments { display:none; }
+    .essay-mobile-comments { display:block; }
+    .annotated-essay.is-enhanced .essay-mobile-comment { display:none; }
+    .annotated-essay.is-enhanced .essay-mobile-comment.is-active { display:block; }
+    .essay-mobile-comment {
+      margin:14px 0 4px;
+      padding:14px 15px;
+      border:1px solid #ead8c6;
+      border-left:3px solid var(--orange);
+      border-radius:10px;
+      background:#fff8f1;
+      box-shadow:0 8px 20px rgba(16,42,67,.06);
+    }
+    .essay-mobile-comment > span {
+      display:block;
+      margin-bottom:5px;
+      color:var(--orange);
+      font-size:var(--type-micro);
+      line-height:1.4;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+    .essay-mobile-comment p {
+      color:#40566b;
+      font-size:var(--type-body-sm);
+      line-height:1.6;
+    }
+  }
+
+  @media (max-width:700px) {
+    .annotated-essay { border-radius:14px; }
+    .feedback-feature-head { padding:21px 19px; }
+    .feedback-feature-copy h3 { font-size:21px; }
+    .annotated-layout { padding:10px; }
+    .essay-paper { border-radius:9px; }
+    .essay-document-head {
+      flex-direction:column;
+      gap:5px;
+      padding:18px 17px 15px;
+    }
+    .artifact-meta { padding-top:0; }
+    .essay-document-head h4 { font-size:18px; }
+    .essay-body { padding:21px 17px 24px; }
+    .essay-paragraph { font-size:15.5px; line-height:1.86; }
+    .essay-omission { margin:16px 0; }
+    .essay-highlight {
+      padding:.04em .08em .08em;
+      border-bottom-width:2px;
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    .essay-highlight,
+    .tutor-comment-button { transition:none; }
+  }
+</style>
