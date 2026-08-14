@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" role="img" aria-labelledby="title desc">
+  <title id="title">Four Beats compact mark</title>
+  <desc id="desc">A typographic four above four equal rhythm marks representing read, think, speak, and write.</desc>
+  <path fill="#17342f" aria-hidden="true" d="M37.97 22.3V43H31.67V31.8L31.04 30.09L33.78 22.3ZM18.57 35.71V32.02L25.59 12.36H31.8L24.7 32.42L24.16 29.68H42.06V35.71Z" />
+  <g fill="#ef6b4a" aria-hidden="true">
+    <rect x="8" y="49" width="8" height="4" rx="2" />
+    <rect x="20" y="49" width="8" height="4" rx="2" />
+    <rect x="32" y="49" width="8" height="4" rx="2" />
+    <rect x="44" y="49" width="8" height="4" rx="2" />
+  </g>
+</svg>

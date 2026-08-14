@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" role="img" aria-labelledby="title desc">
+  <title id="title">The Reading Table compact mark</title>
+  <desc id="desc">Four open seats gather around one shared sentence.</desc>
+  <defs>
+    <path id="seat" d="M22 5h16a4 4 0 0 1 4 4v8c-3.5-1.4-7.5-2-12-2s-8.5.6-12 2V9a4 4 0 0 1 4-4Z" />
+  </defs>
+  <g fill="#17342f" aria-hidden="true">
+    <use href="#seat" />
+    <use href="#seat" transform="rotate(90 30 30)" />
+    <use href="#seat" transform="rotate(180 30 30)" />
+    <use href="#seat" transform="rotate(270 30 30)" />
+  </g>
+  <path d="M24.5 30h6.5" stroke="#17342f" stroke-width="3" stroke-linecap="round" />
+  <circle cx="35.5" cy="30" r="2.2" fill="#ef6b4a" />
+</svg>

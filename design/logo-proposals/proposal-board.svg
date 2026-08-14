@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 2080" role="img" aria-labelledby="title desc">
+  <title id="title">4steps Book Club — three new logo proposals</title>
+  <desc id="desc">A comparison of Four Beats, The Reading Table, and The Imprint with full lockups, compact marks, mobile header previews, strengths, and risks.</desc>
+  <rect width="1440" height="2080" fill="#f7f3ea" />
+  <g font-family="Arial, sans-serif" fill="#17342f">
+    <text x="80" y="88" font-size="18" font-weight="700" letter-spacing="3">4STEPS BOOK CLUB · IDENTITY PROPOSAL 02</text>
+    <text x="80" y="164" font-family="Georgia, serif" font-size="54" font-weight="700">Three different answers to the brand.</text>
+    <text x="80" y="211" font-size="21" fill="#66766f">Method · Community · Editorial authorship</text>
+    <line x1="80" y1="258" x2="1360" y2="258" stroke="#d7ddd5" />
+
+    <text x="80" y="316" font-size="14" font-weight="700" letter-spacing="2.5" fill="#c84f37">01 · SIDE-BY-SIDE FIRST IMPRESSION</text>
+
+    <g transform="translate(80 350)">
+      <rect width="400" height="300" rx="24" fill="#fffdf8" />
+      <image href="01-four-beats-lockup.svg" x="32" y="44" width="336" height="83" />
+      <text x="32" y="180" font-size="25" font-weight="700">Four Beats</text>
+      <text x="32" y="216" font-size="17" fill="#66766f">Method-led</text>
+      <text x="32" y="256" font-size="16">Four equal actions, one repeatable rhythm.</text>
+    </g>
+    <g transform="translate(520 350)">
+      <rect width="400" height="300" rx="24" fill="#fffdf8" />
+      <image href="02-reading-table-lockup.svg" x="32" y="44" width="336" height="83" />
+      <text x="32" y="180" font-size="25" font-weight="700">The Reading Table</text>
+      <text x="32" y="216" font-size="17" fill="#66766f">Community-led</text>
+      <text x="32" y="256" font-size="16">Four students gather around one shared text.</text>
+    </g>
+    <g transform="translate(960 350)">
+      <rect width="400" height="300" rx="24" fill="#fffdf8" />
+      <image href="03-imprint-lockup.svg" x="32" y="44" width="336" height="83" />
+      <text x="32" y="180" font-size="25" font-weight="700">The Imprint</text>
+      <text x="32" y="216" font-size="17" fill="#66766f">Editorial-led</text>
+      <text x="32" y="256" font-size="16">Students' ideas are treated as authored work.</text>
+    </g>
+
+    <text x="80" y="730" font-size="14" font-weight="700" letter-spacing="2.5" fill="#c84f37">02 · REAL MOBILE HEADER SCALE</text>
+
+    <g transform="translate(80 770)">
+      <rect width="390" height="70" rx="12" fill="#fffdf8" stroke="#d7ddd5" />
+      <image href="01-four-beats-lockup.svg" x="16" y="14" width="169" height="42" />
+      <circle cx="352" cy="35" r="22" fill="#fff" stroke="#d7ddd5" />
+      <path d="M345 29h14M345 35h14M345 41h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <text x="0" y="112" font-size="19" font-weight="700">Four Beats</text>
+    </g>
+    <g transform="translate(525 770)">
+      <rect width="390" height="70" rx="12" fill="#fffdf8" stroke="#d7ddd5" />
+      <image href="02-reading-table-lockup.svg" x="16" y="14" width="169" height="42" />
+      <circle cx="352" cy="35" r="22" fill="#fff" stroke="#d7ddd5" />
+      <path d="M345 29h14M345 35h14M345 41h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <text x="0" y="112" font-size="19" font-weight="700">Reading Table</text>
+    </g>
+    <g transform="translate(970 770)">
+      <rect width="390" height="70" rx="12" fill="#fffdf8" stroke="#d7ddd5" />
+      <image href="03-imprint-lockup.svg" x="16" y="14" width="169" height="42" />
+      <circle cx="352" cy="35" r="22" fill="#fff" stroke="#d7ddd5" />
+      <path d="M345 29h14M345 35h14M345 41h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <text x="0" y="112" font-size="19" font-weight="700">The Imprint</text>
+    </g>
+
+    <line x1="80" y1="940" x2="1360" y2="940" stroke="#d7ddd5" />
+    <text x="80" y="1002" font-size="14" font-weight="700" letter-spacing="2.5" fill="#c84f37">03 · COMPACT MARKS</text>
+
+    <g transform="translate(80 1038)">
+      <rect width="400" height="250" rx="24" fill="#fffdf8" />
+      <image href="01-four-beats-mark.svg" x="38" y="38" width="120" height="120" />
+      <rect x="205" y="48" width="84" height="84" rx="18" fill="#f7f3ea" />
+      <image href="01-four-beats-mark.svg" x="215" y="58" width="64" height="64" />
+      <rect x="315" y="73" width="32" height="32" rx="7" fill="#f7f3ea" />
+      <image href="01-four-beats-mark.svg" x="315" y="73" width="32" height="32" />
+      <text x="38" y="210" font-size="16" fill="#66766f">120px · 64px · 32px</text>
+    </g>
+    <g transform="translate(520 1038)">
+      <rect width="400" height="250" rx="24" fill="#fffdf8" />
+      <image href="02-reading-table-mark.svg" x="38" y="38" width="120" height="120" />
+      <rect x="205" y="48" width="84" height="84" rx="18" fill="#f7f3ea" />
+      <image href="02-reading-table-mark.svg" x="215" y="58" width="64" height="64" />
+      <rect x="315" y="73" width="32" height="32" rx="7" fill="#f7f3ea" />
+      <image href="02-reading-table-mark.svg" x="315" y="73" width="32" height="32" />
+      <text x="38" y="210" font-size="16" fill="#66766f">120px · 64px · 32px</text>
+    </g>
+    <g transform="translate(960 1038)">
+      <rect width="400" height="250" rx="24" fill="#fffdf8" />
+      <image href="03-imprint-mark.svg" x="38" y="38" width="120" height="120" />
+      <rect x="205" y="48" width="84" height="84" rx="18" fill="#f7f3ea" />
+      <image href="03-imprint-mark.svg" x="215" y="58" width="64" height="64" />
+      <rect x="315" y="73" width="32" height="32" rx="7" fill="#f7f3ea" />
+      <image href="03-imprint-mark.svg" x="315" y="73" width="32" height="32" />
+      <text x="38" y="210" font-size="16" fill="#66766f">120px · 64px · 32px</text>
+    </g>
+
+    <text x="80" y="1380" font-size="14" font-weight="700" letter-spacing="2.5" fill="#c84f37">04 · WHAT EACH DIRECTION OPTIMIZES</text>
+
+    <g transform="translate(80 1420)">
+      <rect width="400" height="400" rx="24" fill="#17342f" />
+      <text x="34" y="52" font-size="13" font-weight="700" letter-spacing="2" fill="#ef6b4a">01 · METHOD</text>
+      <text x="34" y="102" font-family="Georgia, serif" font-size="31" font-weight="700" fill="#fffdf8">Four Beats</text>
+      <text x="34" y="154" font-size="16" fill="#dfe7e2">READ · THINK · SPEAK · WRITE</text>
+      <text x="34" y="224" font-size="14" font-weight="700" fill="#fffdf8">STRENGTH</text>
+      <text x="34" y="254" font-size="17" fill="#dfe7e2">Clearest name recognition on mobile.</text>
+      <text x="34" y="312" font-size="14" font-weight="700" fill="#fffdf8">RISK</text>
+      <text x="34" y="342" font-size="17" fill="#dfe7e2">Beats can feel decorative before explanation.</text>
+    </g>
+    <g transform="translate(520 1420)">
+      <rect width="400" height="400" rx="24" fill="#17342f" />
+      <text x="34" y="52" font-size="13" font-weight="700" letter-spacing="2" fill="#ef6b4a">02 · COMMUNITY</text>
+      <text x="34" y="102" font-family="Georgia, serif" font-size="31" font-weight="700" fill="#fffdf8">Reading Table</text>
+      <text x="34" y="154" font-size="16" fill="#dfe7e2">4 STUDENTS · 1 SHARED TEXT</text>
+      <text x="34" y="224" font-size="14" font-weight="700" fill="#fffdf8">STRENGTH</text>
+      <text x="34" y="254" font-size="17" fill="#dfe7e2">Owns the maximum-four class format.</text>
+      <text x="34" y="312" font-size="14" font-weight="700" fill="#fffdf8">RISK</text>
+      <text x="34" y="342" font-size="17" fill="#dfe7e2">May first read as a table or collaboration mark.</text>
+    </g>
+    <g transform="translate(960 1420)">
+      <rect width="400" height="400" rx="24" fill="#17342f" />
+      <text x="34" y="52" font-size="13" font-weight="700" letter-spacing="2" fill="#ef6b4a">03 · AUTHORSHIP</text>
+      <text x="34" y="102" font-family="Georgia, serif" font-size="31" font-weight="700" fill="#fffdf8">The Imprint</text>
+      <text x="34" y="154" font-size="16" fill="#dfe7e2">READERS BECOME AUTHORS</text>
+      <text x="34" y="224" font-size="14" font-weight="700" fill="#fffdf8">STRENGTH</text>
+      <text x="34" y="254" font-size="17" fill="#dfe7e2">Most distinctive and academically credible.</text>
+      <text x="34" y="312" font-size="14" font-weight="700" fill="#fffdf8">RISK</text>
+      <text x="34" y="342" font-size="17" fill="#dfe7e2">Says editorial craft before class size.</text>
+    </g>
+
+    <line x1="80" y1="1900" x2="1360" y2="1900" stroke="#d7ddd5" />
+    <text x="80" y="1965" font-family="Georgia, serif" font-size="30" font-weight="700">Choose the meaning first. Refine the drawing second.</text>
+    <text x="80" y="2010" font-size="18" fill="#66766f">Production assets are untouched until one direction is selected.</text>
+  </g>
+</svg>
