@@ -359,8 +359,10 @@ const faqItems = [
         color: var(--ink);
         font-size: 12px;
         font-weight: 700;
+        white-space: nowrap;
       }
-      .social-chip svg { width: 16px; height: 16px; }
+      .brand-icon { width: 20px; height: 20px; flex: 0 0 auto; object-fit: contain; }
+      .button .brand-icon { width: 19px; height: 19px; }
 
       .hero {
         position: relative;
@@ -847,13 +849,17 @@ const faqItems = [
         body { padding-bottom: 0; }
         .header-inner { min-height: 82px; }
         .brand-logo { width: 190px; }
-        .menu-toggle, .nav-backdrop, .nav-label, .nav-socials { display: none; }
-        .site-nav { position: static; width: auto; padding: 0; overflow: visible; background: transparent; transform: none; }
-        .nav-links { display: flex; align-items: center; gap: 22px; }
+        .menu-toggle, .nav-backdrop, .nav-label { display: none; }
+        .site-nav { position: static; width: auto; display: flex; align-items: center; gap: 10px; padding: 0; overflow: visible; background: transparent; transform: none; }
+        .nav-links { display: flex; align-items: center; gap: 17px; }
         .nav-links > a:not(.nav-cta) { min-height: auto; border: 0; font-family: var(--font-sans); font-size: 12px; }
         .nav-links > a:not(.nav-cta)::after { display: none; }
         .nav-links > a:not(.nav-cta):hover { color: var(--coral-dark); }
         .nav-cta { width: auto; min-height: 44px; margin: 0 0 0 4px; padding: 10px 16px; font-size: 12px; }
+        .nav-socials { gap: 5px; margin: 0; }
+        .nav-socials .social-chip { width: 38px; min-height: 38px; justify-content: center; padding: 0; }
+        .nav-socials .social-label { display: none; }
+        .nav-socials .brand-icon { width: 19px; height: 19px; }
         .hero { min-height: 720px; display: flex; align-items: center; }
         .hero-grid { grid-template-columns: 1.13fr .87fr; gap: 64px; }
         .intro-card { padding: 34px; }
@@ -901,9 +907,18 @@ const faqItems = [
             <a href="#consulting" class="button button-primary nav-cta">무료 레벨테스트</a>
           </div>
           <div class="nav-socials" aria-label="소셜 채널">
-            <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer">N 블로그</a>
-            <a class="social-chip" href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle" aria-hidden="true"></i> 카카오톡</a>
-            <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><i data-lucide="instagram" aria-hidden="true"></i></a>
+            <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="네이버 블로그 열기 (새 창)" title="네이버 블로그">
+              <img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" />
+              <span class="social-label">네이버</span>
+            </a>
+            <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" aria-label="카카오톡 채널 열기 (새 창)" title="카카오톡 채널">
+              <img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" />
+              <span class="social-label">카카오</span>
+            </a>
+            <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 열기 (새 창)" title="인스타그램">
+              <img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" />
+              <span class="social-label">인스타</span>
+            </a>
           </div>
         </nav>
       </div>
@@ -1161,7 +1176,7 @@ const faqItems = [
             <span>NOTICES</span>
             <h3 id="notice-title">4steps의<br />새 소식을 확인하세요</h3>
             <p>수업과 프로그램에 관한 최신 안내는 공식 네이버 블로그에서 확인할 수 있습니다.</p>
-            <a class="button" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer">네이버 블로그 열기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+            <a class="button" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/naver-blog.png" width="19" height="19" alt="" /> 네이버 블로그 열기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
           </aside>
         </div>
       </section>
@@ -1173,7 +1188,7 @@ const faqItems = [
             <h2>우리 아이에게 맞는<br />첫 번째 step을 찾아보세요</h2>
             <p>간단한 정보를 남기면 상담과 무료 레벨 테스트 안내를 위한 이메일이 준비됩니다. 카카오톡으로 바로 문의해도 좋습니다.</p>
             <div class="consult-quick">
-              <a class="button button-light" href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle" aria-hidden="true"></i> 카카오톡 상담</a>
+              <a class="button button-light" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="19" height="19" alt="" /> 카카오톡 상담</a>
               <a class="button button-light" href="mailto:4stepsbookclub@gmail.com"><i data-lucide="mail" aria-hidden="true"></i> 이메일 문의</a>
             </div>
           </div>
@@ -1204,7 +1219,11 @@ const faqItems = [
         </div>
         <div>
           <nav class="footer-links" aria-label="푸터 메뉴"><a href="#method">4steps 방식</a><a href="#class-content">수업 자료</a><a href="#faculty">강사진</a><a href="#level">레벨 안내</a><a href="#faq">FAQ</a><a href="#consulting">상담 신청</a></nav>
-          <div class="footer-socials"><a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer">N 블로그</a><a class="social-chip" href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle" aria-hidden="true"></i> 카카오톡</a><a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><i data-lucide="instagram" aria-hidden="true"></i> Instagram</a></div>
+          <div class="footer-socials">
+            <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" /> 네이버 블로그</a>
+            <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" /> 카카오톡</a>
+            <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" /> Instagram</a>
+          </div>
         </div>
         <div class="business-info">
           <p><strong>상호</strong> 4스텝스북클럽온라인원격학원 &nbsp; | &nbsp; <strong>사업자등록번호</strong> 610-93-10022 &nbsp; | &nbsp; <strong>대표자</strong> 박소연</p>

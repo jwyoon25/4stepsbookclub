@@ -43,6 +43,8 @@ The new symbol combines an open book with four rising coral lines. The book repr
 
 Library Green and Warm Paper should carry most of the experience. Coral is reserved for decisions, annotations, and conversion moments. Yellow, aqua, sage, and lilac support the four-step story and should not compete with calls to action.
 
+Third-party platform marks use the original Naver Blog, KakaoTalk Channel, and Instagram artwork without recoloring or redrawing. Keep them visually subordinate to the 4steps identity and pair icon-only header links with accessible channel labels.
+
 ## Typography
 
 - **Display and editorial headlines:** `Gowun Batang`, 700
