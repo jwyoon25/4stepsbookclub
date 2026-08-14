@@ -297,10 +297,10 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
     box-shadow:0 18px 50px rgba(16,42,67,.08);
   }
   .feedback-feature-head {
-    display:flex;
+    display:grid;
+    grid-template-columns:190px minmax(0,1fr);
     align-items:flex-start;
-    justify-content:space-between;
-    gap:28px;
+    gap:24px;
     padding:19px 24px;
     border-bottom:1px solid var(--line);
     background:var(--cream);
@@ -314,7 +314,11 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
     font-weight:900;
     letter-spacing:.14em;
   }
-  .feedback-feature-copy { max-width:720px; }
+  .feedback-feature-copy {
+    max-width:760px;
+    padding-left:24px;
+    border-left:1px solid rgba(16,42,67,.12);
+  }
   .feedback-feature-copy h3 {
     margin-bottom:5px;
     color:var(--navy);
@@ -579,11 +583,19 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
 
   @media (max-width:900px) {
     .feedback-feature-head {
-      flex-direction:column;
-      gap:7px;
+      display:block;
       padding:20px 22px;
     }
-    .feedback-feature-index { padding-top:0; }
+    .feedback-feature-index {
+      display:block;
+      margin-bottom:7px;
+      padding-top:0;
+    }
+    .feedback-feature-copy {
+      max-width:none;
+      padding-left:0;
+      border-left:0;
+    }
     .annotated-essay.is-enhanced .annotated-layout {
       display:block;
       padding:14px;
