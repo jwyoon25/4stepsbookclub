@@ -1,4 +1,6 @@
 ---
+const previewFor = (path) => path.replace(/\.png$/, "-preview.webp");
+
 const classContentGalleries = [
   {
     id: "feedback",
@@ -31,6 +33,12 @@ const classContentGalleries = [
     tags: ["Reading Comprehension", "Critical Thinking", "Paragraph Writing", "Vocabulary"],
     images: [
       {
+        full: "/images/class-content/workbook/workbook-04.png",
+        thumb: "/images/class-content/workbook/workbook-04-thumb.jpg",
+        caption: "Critical Thinking & Analysis",
+        alt: "The Maze Runner 인물과 리더십에 대한 비판적 사고 질문이 담긴 워크북 페이지"
+      },
+      {
         full: "/images/class-content/workbook/workbook-01.png",
         thumb: "/images/class-content/workbook/workbook-01-thumb.jpg",
         caption: "표지 · The Maze Runner",
@@ -47,12 +55,6 @@ const classContentGalleries = [
         thumb: "/images/class-content/workbook/workbook-03-thumb.jpg",
         caption: "Reading Comprehension에서 분석으로",
         alt: "The Maze Runner 내용 이해 질문과 Critical Thinking & Analysis가 함께 담긴 워크북 페이지"
-      },
-      {
-        full: "/images/class-content/workbook/workbook-04.png",
-        thumb: "/images/class-content/workbook/workbook-04-thumb.jpg",
-        caption: "Critical Thinking & Analysis",
-        alt: "The Maze Runner 인물과 리더십에 대한 비판적 사고 질문이 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-05.png",
@@ -539,8 +541,8 @@ const classContentGalleries = [
       display:flex;
       align-items:center;
       justify-content:center;
-      min-height:540px;
-      padding:20px;
+      min-height:0;
+      padding:14px;
       background:linear-gradient(145deg, #eef3f6, #f9fbfc);
     }
     .gallery-stage-button {
@@ -549,7 +551,8 @@ const classContentGalleries = [
       align-items:center;
       justify-content:center;
       width:100%;
-      min-height:500px;
+      height:clamp(360px, 42vw, 500px);
+      min-height:0;
       padding:0;
       border:0;
       background:transparent;
@@ -557,11 +560,12 @@ const classContentGalleries = [
     }
     .sample-image {
       display:block;
-      width:100%;
+      width:auto;
+      height:100%;
       max-width:100%;
-      height:auto;
-      max-height:500px;
+      max-height:100%;
       object-fit:contain;
+      aspect-ratio:1192 / 1684;
       background:#fff;
       border:1px solid #e4ebf0;
       border-radius:8px;
@@ -606,9 +610,10 @@ const classContentGalleries = [
     }
     .gallery-meta-caption {
       min-width:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
+      flex:1 1 auto;
+      overflow-wrap:anywhere;
+      white-space:normal;
+      line-height:1.45;
     }
     .gallery-counter {
       flex:0 0 auto;
@@ -912,6 +917,14 @@ const classContentGalleries = [
       flex-direction:column;
       align-items:flex-end;
       gap:8px;
+      transition:opacity .2s, visibility .2s, transform .2s;
+    }
+    .floating-actions.is-hidden,
+    body.modal-open .floating-actions {
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transform:translateY(8px);
     }
     .floating-button {
       position:relative;
@@ -993,7 +1006,17 @@ const classContentGalleries = [
       align-items:flex-start;
       justify-content:space-between;
       gap:18px;
-      padding:2px 58px 12px 4px;
+      padding:2px 4px 12px;
+    }
+    .modal-heading {
+      min-width:0;
+      flex:1 1 auto;
+    }
+    .modal-controls {
+      display:flex;
+      flex:0 0 auto;
+      align-items:center;
+      gap:8px;
     }
     .modal-eyebrow {
       margin-bottom:4px;
@@ -1029,12 +1052,15 @@ const classContentGalleries = [
       overflow:auto;
       cursor:zoom-out;
       touch-action:pan-x pan-y pinch-zoom;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
     }
     .modal-stage.zoomed .modal-image {
       width:min(820px, 180vw);
       max-width:none;
       max-height:none;
       cursor:zoom-out;
+      user-select:none;
     }
     .modal-stage.zoomed .modal-nav { display:none; }
     .modal-nav {
@@ -1070,14 +1096,16 @@ const classContentGalleries = [
       line-height:1.4;
       font-weight:750;
     }
+    .modal-gallery-meta > span:first-child {
+      min-width:0;
+      overflow-wrap:anywhere;
+    }
     .modal-counter { color:var(--navy); font-variant-numeric:tabular-nums; font-weight:900; }
     .modal-thumbnails { padding:12px 4px 2px; }
     .modal-zoom {
-      position:absolute;
-      top:27px;
-      right:78px;
-      z-index:2;
-      min-height:42px;
+      position:static;
+      min-width:72px;
+      min-height:44px;
       padding:8px 12px;
       border:1px solid #d8e1e8;
       border-radius:999px;
@@ -1091,12 +1119,10 @@ const classContentGalleries = [
     .modal-zoom:hover,
     .modal-zoom:focus-visible { border-color:var(--orange); background:#fffaf6; }
     .modal-close {
-      position:absolute;
-      top:27px;
-      right:27px;
-      z-index:2;
-      width:42px;
-      height:42px;
+      position:static;
+      flex:0 0 44px;
+      width:44px;
+      height:44px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -1154,9 +1180,9 @@ const classContentGalleries = [
       .learning-flow { grid-template-columns:repeat(3, 1fr); row-gap:34px; }
       .flow-item::after { display:none; }
       .content-showcase { grid-template-columns:1fr; }
-      .sample-media { min-height:460px; }
-      .gallery-stage-button { min-height:420px; }
-      .sample-image { max-height:420px; }
+      .sample-media { min-height:0; }
+      .gallery-stage-button { height:420px; }
+      .sample-image { max-height:100%; }
       .weekly-steps { grid-template-columns:1fr; padding:10px 28px 30px; }
       .weekly-step {
         display:grid;
@@ -1193,9 +1219,9 @@ const classContentGalleries = [
       .curriculum-card { min-height:auto; }
       .learning-flow { grid-template-columns:repeat(2, 1fr); }
       .faculty-stats { gap:7px; }
-      .sample-media { min-height:430px; padding:15px; }
-      .gallery-stage-button { min-height:400px; }
-      .sample-image { max-height:400px; }
+      .sample-media { min-height:0; padding:10px; }
+      .gallery-stage-button { height:clamp(270px, 78vw, 340px); min-height:0; }
+      .sample-image { max-height:100%; }
       .gallery-meta { padding-inline:15px; }
       .gallery-thumbnails { padding-inline:15px; }
       .sample-copy { padding:22px 20px 24px; }
@@ -1205,17 +1231,40 @@ const classContentGalleries = [
       .consult-panel { padding:28px 20px; }
       .footer-top { flex-direction:column; }
       .footer-right { align-items:flex-start; }
-      .floating-actions { display:none; }
+      .floating-actions {
+        right:12px;
+        bottom:calc(12px + env(safe-area-inset-bottom));
+        flex-direction:row;
+        align-items:center;
+        gap:6px;
+        padding:6px;
+        border:1px solid rgba(16,42,67,.12);
+        border-radius:999px;
+        background:rgba(255,255,255,.94);
+        backdrop-filter:blur(12px);
+        box-shadow:0 12px 30px rgba(16,42,67,.18);
+      }
+      .floating-button {
+        width:44px;
+        height:44px;
+      }
+      .floating-button::before { display:none; }
       .image-modal { padding:10px; }
-      .modal-dialog { padding:10px; border-radius:12px; }
-      .modal-header { padding:3px 48px 10px 2px; }
-      .modal-stage { min-height:230px; padding:0 38px; }
+      .modal-dialog { width:100%; padding:10px; border-radius:12px; }
+      .modal-header {
+        flex-direction:column;
+        align-items:stretch;
+        gap:8px;
+        padding:3px 2px 10px;
+      }
+      .modal-controls { width:100%; justify-content:flex-end; }
+      .modal-caption { line-height:1.5; overflow-wrap:anywhere; }
+      .modal-stage { min-height:230px; padding:0 50px; }
       .modal-image { max-height:calc(68 * min(var(--vh, 1vh), 1vh)); }
-      .modal-nav { width:34px; height:34px; }
+      .modal-nav { width:44px; height:44px; }
       .modal-gallery-meta { padding-inline:2px; }
       .modal-thumbnails { padding-inline:2px; }
-      .modal-zoom { top:18px; right:64px; min-height:34px; padding:6px 10px; }
-      .modal-close { top:18px; right:18px; }
+      .modal-zoom { min-height:44px; padding:8px 10px; }
     }
 
     /* Integrated Level & Roadmap section */
@@ -1430,6 +1479,7 @@ const classContentGalleries = [
  </head>
  <body data-template-id="__page-root" style="background: rgb(255, 255, 255);">
   <div class="site-shell">
+   <div id="page-content">
    <header class="site-header">
     <div class="main-content navbar">
      <a href="#top" class="brand" aria-label="4STEPS Book Club 홈"> <img data-template-id="brand-logo" class="canva-image brand-logo" loading="lazy" src="images/logo.png" alt="네 개의 성장 막대와 4steps bookclub 글자가 있는 로고"> </a> <button id="menu-button" class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav"> <i data-lucide="menu"></i> </button>
@@ -1889,8 +1939,8 @@ const classContentGalleries = [
         <article data-gallery={gallery.id} data-gallery-label={gallery.label} class:list={["canva-card", "sample-card", "example-gallery", gallery.id]} style="background: rgb(255, 255, 255);">
          <div class="gallery-preview">
           <div class="sample-media">
-           <button class="gallery-stage-button" data-gallery-open type="button" aria-label={`${gallery.label} ${gallery.images[0].caption} 크게 보기`}>
-            <img data-gallery-main class="canva-image sample-image" loading="eager" src={gallery.images[0].full} alt={gallery.images[0].alt} data-gallery-index="0">
+           <button class="gallery-stage-button" data-gallery-open data-gallery-stage type="button" aria-label={`${gallery.label} · ${gallery.images[0].caption} 크게 보기`}>
+            <img data-gallery-main class="canva-image sample-image" loading="lazy" decoding="async" src={previewFor(gallery.images[0].full)} alt={gallery.images[0].alt} width="1192" height="1684" data-gallery-index="0">
             <span class="gallery-stage-hint"><i data-lucide="maximize-2" aria-hidden="true"></i> 크게 보기</span>
            </button>
           </div>
@@ -1900,8 +1950,8 @@ const classContentGalleries = [
           </div>
           <div class="gallery-thumbnails" data-gallery-thumbnails role="group" aria-label={`${gallery.label} 페이지 선택`}>
            {gallery.images.map((image, index) => (
-            <button class="gallery-thumbnail" data-gallery-thumbnail data-index={index} data-full={image.full} data-thumb={image.thumb} data-caption={image.caption} data-alt={image.alt} type="button" aria-current={index === 0 ? "true" : "false"} aria-label={`${gallery.label} ${index + 1}페이지 보기`}>
-             <img src={image.thumb} alt="" loading={index === 0 ? "eager" : "lazy"} width="58" height="78">
+            <button class="gallery-thumbnail" data-gallery-thumbnail data-index={index} data-full={image.full} data-preview={previewFor(image.full)} data-thumb={image.thumb} data-caption={image.caption} data-alt={image.alt} type="button" aria-current={index === 0 ? "true" : "false"} aria-label={`${gallery.label} ${index + 1}페이지 · ${image.caption} 보기`}>
+             <img src={image.thumb} alt="" loading="lazy" decoding="async" width="58" height="78">
              <span>{String(index + 1).padStart(2, "0")}</span>
             </button>
            ))}
@@ -2071,17 +2121,22 @@ const classContentGalleries = [
      <p data-template-id="footer-copyright" class="canva-text copyright" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal;">© 2026 4STEPS BOOK CLUB. All Rights Reserved.</p>
     </div>
    </footer>
-   <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-hidden="true">
-    <div class="modal-dialog">
+   </div>
+   <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-describedby="modal-page-caption" aria-hidden="true">
+    <div class="modal-dialog" tabindex="-1">
      <div class="modal-header">
-      <div>
+      <div class="modal-heading">
        <p id="modal-eyebrow" class="modal-eyebrow">INSIDE THE CLASS</p>
        <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">4STEPS 실제 수업 자료</p>
+      </div>
+      <div class="modal-controls" aria-label="이미지 보기 도구">
+       <button id="modal-zoom" class="modal-zoom" type="button" aria-pressed="false" aria-label="이미지 확대">확대</button>
+       <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x" aria-hidden="true"></i> </button>
       </div>
      </div>
      <div id="modal-stage" class="modal-stage">
       <button id="modal-prev" class="modal-nav prev" type="button" aria-label="이전 페이지"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
-      <img id="modal-image" class="canva-image modal-image" loading="eager" src="/images/class-content/workbook/workbook-01.png" alt="4STEPS 실제 수업 자료">
+      <img id="modal-image" class="canva-image modal-image" loading="lazy" decoding="async" src={previewFor(classContentGalleries[0].images[0].full)} alt={classContentGalleries[0].images[0].alt} width="1192" height="1684">
       <button id="modal-next" class="modal-nav next" type="button" aria-label="다음 페이지"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
      </div>
      <div class="modal-gallery-meta">
@@ -2089,8 +2144,6 @@ const classContentGalleries = [
       <span id="modal-counter" class="modal-counter">01 / 01</span>
      </div>
      <div id="modal-thumbnails" class="modal-thumbnails" role="group" aria-label="갤러리 페이지 선택"></div>
-     <button id="modal-zoom" class="modal-zoom" type="button" aria-pressed="false">확대</button>
-     <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x"></i> </button>
     </div>
    </div>
    <div id="toast" data-template-id="success-toast" class="canva-banner toast" role="status" aria-live="polite" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 600; font-style: normal;">상담 내용을 담은 이메일 작성 화면을 열었습니다.</div>
@@ -2115,11 +2168,15 @@ const classContentGalleries = [
       const modalNext = document.getElementById("modal-next");
       const modalThumbnails = document.getElementById("modal-thumbnails");
       const modalZoom = document.getElementById("modal-zoom");
+      const modalDialog = document.querySelector(".modal-dialog");
+      const pageContent = document.getElementById("page-content");
+      const floatingActions = document.querySelector(".floating-actions");
       const galleries = [...document.querySelectorAll("[data-gallery]")];
       let activeGallery = null;
       let activeIndex = 0;
       let lastFocusedElement = null;
       let touchStartX = null;
+      let touchStartY = null;
 
       menuButton.addEventListener("click", () => {
         const isOpen = navigation.classList.toggle("open");
@@ -2141,6 +2198,19 @@ const classContentGalleries = [
         return String(value).padStart(2, "0");
       }
 
+      function getFocusableElements(container) {
+        return [...container.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )].filter((element) => element.getAttribute("aria-hidden") !== "true" && element.offsetParent !== null);
+      }
+
+      function setPageContentInert(isInert) {
+        pageContent.inert = isInert;
+        if (isInert) pageContent.setAttribute("inert", "");
+        else pageContent.removeAttribute("inert");
+        pageContent.setAttribute("aria-hidden", String(isInert));
+      }
+
       function setGalleryPage(gallery, requestedIndex) {
         const items = getGalleryItems(gallery);
         if (!items.length) return 0;
@@ -2150,12 +2220,14 @@ const classContentGalleries = [
         const mainImage = gallery.querySelector("[data-gallery-main]");
         const caption = gallery.querySelector("[data-gallery-caption]");
         const counter = gallery.querySelector("[data-gallery-counter]");
+        const stageButton = gallery.querySelector("[data-gallery-stage]");
 
-        mainImage.src = item.dataset.full;
+        mainImage.src = item.dataset.preview;
         mainImage.alt = item.dataset.alt;
         mainImage.dataset.galleryIndex = String(index);
         caption.textContent = item.dataset.caption;
         counter.textContent = `${pageNumber(index + 1)} / ${pageNumber(items.length)}`;
+        stageButton.setAttribute("aria-label", `${gallery.dataset.galleryLabel} · ${item.dataset.caption} 크게 보기`);
 
         items.forEach((thumbnail, thumbnailIndex) => {
           thumbnail.setAttribute("aria-current", String(thumbnailIndex === index));
@@ -2167,11 +2239,14 @@ const classContentGalleries = [
 
       function resetModalZoom() {
         modalStage.classList.remove("zoomed");
+        modalStage.scrollLeft = 0;
+        modalStage.scrollTop = 0;
         modalZoom.setAttribute("aria-pressed", "false");
+        modalZoom.setAttribute("aria-label", "이미지 확대");
         modalZoom.textContent = "확대";
       }
 
-      function updateModal() {
+      function updateModal({ restoreThumbnailFocus = false } = {}) {
         if (!activeGallery) return;
 
         const items = getGalleryItems(activeGallery);
@@ -2180,6 +2255,7 @@ const classContentGalleries = [
 
         resetModalZoom();
         modalImage.src = item.dataset.full;
+        modalImage.loading = "eager";
         modalImage.alt = item.dataset.alt;
         modalCaption.textContent = `${activeGallery.dataset.galleryLabel} · ${item.dataset.caption}`;
         modalPageCaption.textContent = item.dataset.caption;
@@ -2193,12 +2269,13 @@ const classContentGalleries = [
           thumbnail.className = "modal-thumbnail";
           thumbnail.type = "button";
           thumbnail.setAttribute("aria-current", String(index === activeIndex));
-          thumbnail.setAttribute("aria-label", `${activeGallery.dataset.galleryLabel} ${index + 1}페이지 보기`);
+          thumbnail.setAttribute("aria-label", `${activeGallery.dataset.galleryLabel} ${index + 1}페이지 · ${galleryItem.dataset.caption} 보기`);
 
           const image = document.createElement("img");
           image.src = galleryItem.dataset.thumb;
           image.alt = "";
-          image.loading = "lazy";
+          image.loading = index === activeIndex ? "eager" : "lazy";
+          image.decoding = "async";
           image.width = 58;
           image.height = 78;
 
@@ -2208,13 +2285,16 @@ const classContentGalleries = [
           thumbnail.append(image, number);
           thumbnail.addEventListener("click", () => {
             activeIndex = setGalleryPage(activeGallery, index);
-            updateModal();
+            updateModal({ restoreThumbnailFocus: true });
           });
           modalThumbnails.append(thumbnail);
         });
 
         const activeThumbnail = modalThumbnails.querySelector('[aria-current="true"]');
-        if (activeThumbnail) activeThumbnail.scrollIntoView({ block: "nearest", inline: "nearest" });
+        if (activeThumbnail) {
+          activeThumbnail.scrollIntoView({ block: "nearest", inline: "nearest" });
+          if (restoreThumbnailFocus) activeThumbnail.focus({ preventScroll: true });
+        }
       }
 
       function openGallery(gallery, trigger) {
@@ -2223,6 +2303,7 @@ const classContentGalleries = [
         activeIndex = Number(mainImage.dataset.galleryIndex || 0);
         lastFocusedElement = trigger;
         updateModal();
+        setPageContentInert(true);
         modal.classList.add("open");
         modal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
@@ -2230,10 +2311,17 @@ const classContentGalleries = [
       }
 
       function closeImageModal() {
+        resetModalZoom();
+        touchStartX = null;
+        touchStartY = null;
         modal.classList.remove("open");
         modal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
-        if (lastFocusedElement) lastFocusedElement.focus();
+        setPageContentInert(false);
+        const focusTarget = lastFocusedElement;
+        lastFocusedElement = null;
+        if (focusTarget && focusTarget.isConnected) focusTarget.focus({ preventScroll: true });
+        activeGallery = null;
       }
 
       function changeModalPage(delta) {
@@ -2261,7 +2349,14 @@ const classContentGalleries = [
       modalZoom.addEventListener("click", () => {
         const isZoomed = modalStage.classList.toggle("zoomed");
         modalZoom.setAttribute("aria-pressed", String(isZoomed));
+        modalZoom.setAttribute("aria-label", isZoomed ? "이미지 축소" : "이미지 확대");
         modalZoom.textContent = isZoomed ? "축소" : "확대";
+        if (isZoomed) {
+          modalStage.scrollLeft = 0;
+          modalStage.scrollTop = 0;
+        } else {
+          resetModalZoom();
+        }
       });
 
       modal.addEventListener("click", (event) => {
@@ -2269,20 +2364,70 @@ const classContentGalleries = [
       });
 
       modalStage.addEventListener("touchstart", (event) => {
+        if (modalStage.classList.contains("zoomed")) {
+          touchStartX = null;
+          touchStartY = null;
+          return;
+        }
         touchStartX = event.changedTouches[0].clientX;
+        touchStartY = event.changedTouches[0].clientY;
       }, { passive: true });
 
       modalStage.addEventListener("touchend", (event) => {
-        if (touchStartX === null) return;
+        if (modalStage.classList.contains("zoomed") || touchStartX === null || touchStartY === null) {
+          touchStartX = null;
+          touchStartY = null;
+          return;
+        }
         const distance = event.changedTouches[0].clientX - touchStartX;
+        const verticalDistance = event.changedTouches[0].clientY - touchStartY;
         touchStartX = null;
-        if (Math.abs(distance) < 45) return;
+        touchStartY = null;
+        if (Math.abs(distance) < 45 || Math.abs(distance) <= Math.abs(verticalDistance)) return;
         changeModalPage(distance < 0 ? 1 : -1);
       }, { passive: true });
 
+      modalStage.addEventListener("touchcancel", () => {
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+
+      if (floatingActions && "IntersectionObserver" in window) {
+        const coveredTargets = new Set();
+        const floatingObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) coveredTargets.add(entry.target);
+            else coveredTargets.delete(entry.target);
+          });
+          floatingActions.classList.toggle("is-hidden", coveredTargets.size > 0);
+        }, { rootMargin: "-10% 0px -24% 0px", threshold: 0 });
+
+        ["#class-content", "#consulting", ".site-footer"].forEach((selector) => {
+          const target = document.querySelector(selector);
+          if (target) floatingObserver.observe(target);
+        });
+      }
+
       document.addEventListener("keydown", (event) => {
         if (!modal.classList.contains("open")) return;
-        if (event.key === "Escape") {
+        if (event.key === "Tab") {
+          const focusableElements = getFocusableElements(modal);
+          if (!focusableElements.length) {
+            event.preventDefault();
+            modalDialog.focus();
+            return;
+          }
+
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          if (event.shiftKey && (document.activeElement === firstElement || !modal.contains(document.activeElement))) {
+            event.preventDefault();
+            lastElement.focus();
+          } else if (!event.shiftKey && (document.activeElement === lastElement || !modal.contains(document.activeElement))) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        } else if (event.key === "Escape") {
           closeImageModal();
         } else if (event.key === "ArrowLeft") {
           event.preventDefault();
