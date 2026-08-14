@@ -561,6 +561,44 @@ const classContentGalleries = [
       box-shadow:0 18px 50px rgba(16,42,67,.08);
     }
     .example-gallery { min-width:0; }
+    .sample-card-head {
+      border-bottom:1px solid var(--line);
+      background:#fff;
+    }
+    .feedback-view-switcher {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:5px;
+      margin:14px 14px 0;
+      padding:4px;
+      border:1px solid #dce5ec;
+      border-radius:11px;
+      background:#eef3f6;
+    }
+    .feedback-view-tab {
+      min-height:44px;
+      padding:9px 12px;
+      border:0;
+      border-radius:7px;
+      background:transparent;
+      color:#60758a;
+      font-size:var(--type-meta);
+      line-height:1.35;
+      font-weight:850;
+      letter-spacing:.02em;
+      cursor:pointer;
+      transition:background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .feedback-view-tab[aria-selected="true"] {
+      background:#fff;
+      color:var(--navy);
+      box-shadow:0 3px 10px rgba(16,42,67,.1);
+    }
+    .feedback-view-panel { min-width:0; }
+    .feedback-view-panel.interactive { padding-top:10px; }
+    .feedback-view-panel.originals .gallery-preview { border-top:0; }
+    .gallery-card-action { padding:18px 20px 22px; }
+    .gallery-card-action .gallery-open-button { margin-top:0; }
     .gallery-preview {
       display:flex;
       flex-direction:column;
@@ -1966,11 +2004,41 @@ const classContentGalleries = [
        <p data-template-id="class-content-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">INSIDE THE CLASS</p>
        <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
       </div>
-      <AnnotatedEssay />
       <div class="content-showcase">
        {classContentGalleries.map((gallery) => (
         <article data-gallery={gallery.id} data-gallery-label={gallery.label} class:list={["canva-card", "sample-card", "example-gallery", gallery.id]} style="background: rgb(255, 255, 255);">
-         <div class="gallery-preview">
+         {gallery.id === "feedback" && (
+          <div class="sample-copy sample-card-head">
+           <span class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">{gallery.index} · ESSAY FEEDBACK</span>
+           <h3 class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">좋은 글은 좋은 생각에서 시작됩니다.</h3>
+           <p class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">문장에 연결된 튜터 질문을 직접 살펴보고, 실제 첨삭 원본 7페이지도 함께 확인해보세요.</p>
+           <div class="gallery-tags" aria-label="학습 요소">
+            {gallery.tags.map((tag) => <span class="gallery-tag">{tag}</span>)}
+           </div>
+          </div>
+         )}
+         {gallery.id !== "feedback" && (
+          <div class="sample-copy sample-card-head">
+           <span class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">{gallery.index} · {gallery.label}</span>
+           <h3 class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">{gallery.title}</h3>
+           <p class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">{gallery.description}</p>
+           <div class="gallery-tags" aria-label="학습 요소">
+            {gallery.tags.map((tag) => <span class="gallery-tag">{tag}</span>)}
+           </div>
+          </div>
+         )}
+         {gallery.id === "feedback" && (
+          <div class="feedback-view-switcher" role="tablist" aria-label="에세이 피드백 보기 방식">
+           <button id="feedback-tab-interactive" class="feedback-view-tab" data-feedback-view-tab="interactive" type="button" role="tab" aria-controls="feedback-view-interactive" aria-selected="true">INTERACTIVE ESSAY</button>
+           <button id="feedback-tab-originals" class="feedback-view-tab" data-feedback-view-tab="originals" type="button" role="tab" aria-controls="feedback-view-originals" aria-selected="false">REAL FEEDBACK · 7P</button>
+          </div>
+         )}
+         {gallery.id === "feedback" && (
+          <section id="feedback-view-interactive" class="feedback-view-panel interactive" data-feedback-view-panel="interactive" role="tabpanel" aria-labelledby="feedback-tab-interactive">
+           <AnnotatedEssay embedded />
+          </section>
+         )}
+         <div id={gallery.id === "feedback" ? "feedback-view-originals" : undefined} class:list={["gallery-preview", { "feedback-view-panel originals": gallery.id === "feedback" }]} data-feedback-view-panel={gallery.id === "feedback" ? "originals" : undefined} role={gallery.id === "feedback" ? "tabpanel" : undefined} aria-labelledby={gallery.id === "feedback" ? "feedback-tab-originals" : undefined} hidden={gallery.id === "feedback"}>
           <div class="sample-media">
            <button class="gallery-stage-button" data-gallery-open data-gallery-stage type="button" aria-label={`${gallery.label} · ${gallery.images[0].caption} 크게 보기`}>
             <img data-gallery-main class="canva-image sample-image" loading="lazy" decoding="async" src={previewFor(gallery.images[0].full)} alt={gallery.images[0].alt} width="1192" height="1684" data-gallery-index="0">
@@ -1990,15 +2058,16 @@ const classContentGalleries = [
            ))}
           </div>
          </div>
-         <div class="sample-copy">
-          <span class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">{gallery.index} · {gallery.label}</span>
-          <h3 class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">{gallery.title}</h3>
-          <p class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">{gallery.description}</p>
-          <div class="gallery-tags" aria-label="학습 요소">
-           {gallery.tags.map((tag) => <span class="gallery-tag">{tag}</span>)}
+         {gallery.id === "feedback" && (
+          <div class="gallery-card-action" data-feedback-view-panel="originals" hidden>
+           <button class="gallery-open-button" data-gallery-open type="button">전체 {gallery.images.length}페이지 보기 <span aria-hidden="true">→</span></button>
           </div>
+         )}
+         {gallery.id !== "feedback" && (
+          <div class="gallery-card-action">
           <button class="gallery-open-button" data-gallery-open type="button">전체 {gallery.images.length}페이지 보기 <span aria-hidden="true">→</span></button>
          </div>
+         )}
         </article>
        ))}
       </div>
@@ -2205,6 +2274,8 @@ const classContentGalleries = [
       const pageContent = document.getElementById("page-content");
       const floatingActions = document.querySelector(".floating-actions");
       const galleries = [...document.querySelectorAll("[data-gallery]")];
+      const feedbackViewTabs = [...document.querySelectorAll("[data-feedback-view-tab]")];
+      const feedbackViewPanels = [...document.querySelectorAll("[data-feedback-view-panel]")];
       let activeGallery = null;
       let activeIndex = 0;
       let lastFocusedElement = null;
@@ -2226,6 +2297,19 @@ const classContentGalleries = [
       function getGalleryItems(gallery) {
         return [...gallery.querySelectorAll("[data-gallery-thumbnail]")];
       }
+
+      function setFeedbackView(view) {
+        feedbackViewTabs.forEach((tab) => {
+          tab.setAttribute("aria-selected", String(tab.dataset.feedbackViewTab === view));
+        });
+        feedbackViewPanels.forEach((panel) => {
+          panel.hidden = panel.dataset.feedbackViewPanel !== view;
+        });
+      }
+
+      feedbackViewTabs.forEach((tab) => {
+        tab.addEventListener("click", () => setFeedbackView(tab.dataset.feedbackViewTab));
+      });
 
       function pageNumber(value) {
         return String(value).padStart(2, "0");
