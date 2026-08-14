@@ -52,10 +52,11 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
                 if (segment.commentId && commentById.has(segment.commentId)) {
                   const number = commentNumberById.get(segment.commentId);
                   return (
-                    <button
+                    <span
                       id={`wonder-highlight-${segment.commentId}`}
                       class="essay-highlight"
-                      type="button"
+                      role="button"
+                      tabindex="0"
                       data-comment-trigger={segment.commentId}
                       data-mobile-panel-id={`wonder-mobile-panel-${paragraph.id}`}
                       aria-controls={`wonder-mobile-panel-${paragraph.id}`}
@@ -64,7 +65,7 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
                     >
                       <span class="highlight-copy">{segment.text}</span>
                       <span class="annotation-chip" aria-hidden="true">{number}</span>
-                    </button>
+                    </span>
                   );
                 }
 
@@ -261,6 +262,11 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
       triggers.forEach((trigger) => {
         trigger.addEventListener("focus", () => activate(trigger.dataset.commentTrigger));
         trigger.addEventListener("click", () => activate(trigger.dataset.commentTrigger, !desktopQuery.matches));
+        trigger.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          activate(trigger.dataset.commentTrigger, !desktopQuery.matches);
+        });
       });
 
       markers.forEach((marker) => {
