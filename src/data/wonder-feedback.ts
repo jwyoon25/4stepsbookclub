@@ -21,7 +21,6 @@ export interface EssaySegment {
 
 export interface EssayExcerpt {
   id: string;
-  omissionBefore?: boolean;
   segments: EssaySegment[];
 }
 
@@ -92,16 +91,14 @@ export const wonderEssayExcerpts: EssayExcerpt[] = [
   },
   {
     id: "cruelty",
-    omissionBefore: true,
     segments: [
       { text: "Out of the many different ways, the majority of the characters treat August with cruelty or, like Julian. " },
       { text: "They show this by constantly avoiding him, making jokes about him, or talking bad behind his back.", commentId: "evidence" },
-      { text: " This is not a very respectful way to treat someone—since doing this would hurt others' feelings." }
+      { text: " This is not a very respectful way to treat someone—since doing this would hurt others' feelings. The individuals who treat August with cruelty are looking at him the same way the rich used to look at the poor in the olden times; not caring a single bit about him. This would definitely not be a very respectful way to treat a person who is already struggling to adapt to the new environment." }
     ]
   },
   {
     id: "pity",
-    omissionBefore: true,
     segments: [
       { text: "Pity however, is actually feeling bad for someone, unlike cruelty, where they don't care about the 'victim'. However, pity is not true kindness; instead, it's helping someone because you feel bad for them, not necessarily because you want to help them. Think of it like this: You have a friend struggling with studying for a test, and " },
       { text: "you say 'Good luck' but not actually helping them directly. This is not an example of showing kindness, this is an example of pity.", commentId: "reasoning" },
@@ -112,11 +109,16 @@ export const wonderEssayExcerpts: EssayExcerpt[] = [
   },
   {
     id: "respect",
-    omissionBefore: true,
     segments: [
       { text: "Finally, genuine respect is when someone truly cares about another individual. This was shown in the novel when " },
-      { text: "Summer began hanging out with August more; asking what had happened when he was gone, and helping him in tough situations.", commentId: "analysis" },
+      { text: "summer began hanging out with August more; asking what had happened when he was gone, and helping him in tough situations.", commentId: "analysis" },
       { text: " This is true kindness, when you deeply care about another person. This is almost identical to treating your best friend." }
+    ]
+  },
+  {
+    id: "conclusion",
+    segments: [
+      { text: "In conclusion, Palacio distinguishes genuine kindness from pity and social obligation by showing the differences such as cruelty is not caring about another's feelings, pity is feeling bad for someone but not truly caring for them, and genuine kindness is caring and helping another in any situation." }
     ]
   }
 ];
