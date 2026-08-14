@@ -433,27 +433,48 @@ const faqItems = [
       .hero-lead { max-width: 620px; margin-top: 24px; color: var(--text); font-size: 17px; font-weight: 600; line-height: 1.7; word-break: keep-all; }
       .hero-detail { max-width: 670px; margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.75; word-break: keep-all; }
       .hero-credential {
+        position: relative;
         display: inline-grid;
-        grid-template-columns: 56px minmax(0, 1fr);
+        grid-template-columns: 68px minmax(0, 1fr);
         align-items: center;
-        gap: 12px;
-        max-width: 100%;
-        margin-top: 20px;
-        padding: 10px 15px 10px 10px;
-        border: 1px solid rgba(31, 55, 98, 0.2);
-        border-radius: 17px;
-        background: rgba(255, 253, 248, 0.88);
-        box-shadow: 0 12px 30px rgba(23, 52, 47, 0.1);
+        gap: 15px;
+        width: min(100%, 340px);
+        margin-top: 22px;
+        padding: 14px 16px 14px 18px;
+        overflow: hidden;
+        border: 1px solid rgba(31, 55, 98, 0.25);
+        border-radius: 20px;
+        background: rgba(255, 253, 248, 0.96);
+        box-shadow: 0 16px 36px rgba(23, 52, 47, 0.14);
+      }
+      .hero-credential::before {
+        content: "";
+        position: absolute;
+        inset: 13px auto 13px 0;
+        width: 5px;
+        border-radius: 0 999px 999px 0;
+        background: #1f3762;
+      }
+      .hero-credential-seal {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(31, 55, 98, 0.18);
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 0 0 5px rgba(31, 55, 98, 0.08);
       }
       .hero-credential-crest {
-        width: 56px;
-        height: 58px;
+        width: 53px;
+        height: 55px;
         object-fit: contain;
       }
-      .hero-credential-copy { display: grid; gap: 2px; min-width: 0; }
-      .hero-credential-copy small { color: #1f3762; font-size: 9px; font-weight: 700; letter-spacing: 0.13em; }
-      .hero-credential-copy strong { color: var(--ink); font-size: 14px; line-height: 1.45; word-break: keep-all; }
-      .hero-credential-copy span { color: var(--muted); font-size: 11px; line-height: 1.45; word-break: keep-all; }
+      .hero-credential-copy { display: grid; gap: 3px; min-width: 0; }
+      .hero-credential-copy > small { color: #1f3762; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; }
+      .hero-credential-copy > strong { color: var(--ink); font-size: 15px; line-height: 1.4; word-break: keep-all; }
+      .hero-credential-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 2px; color: var(--muted); font-size: 10px; line-height: 1.4; word-break: keep-all; }
+      .hero-credential-proof { display: inline-flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 999px; background: #1f3762; color: white; font-size: 9px; font-style: normal; font-weight: 700; }
       .hero-actions { display: grid; gap: 10px; margin-top: 28px; }
       .hero-actions .button { width: 100%; }
       .hero-art { position: relative; width: min(100%, 470px); margin-inline: auto; padding: 18px 10px 30px; }
@@ -933,11 +954,13 @@ const faqItems = [
               <p class="hero-lead">영어 원서를 깊이 읽고, 근거로 생각하고, 말한 뒤 쓰는 수업.</p>
               <p class="hero-detail">서울대학교에 재학 중이며 원어민급 영어 역량을 갖춘 검증된 강사진과 함께하는 4인 소수 관리형 프로그램입니다.</p>
               <div class="hero-credential">
-                <img class="hero-credential-crest" src="/images/snu-crest.png" width="56" height="58" alt="서울대학교 심볼마크" />
+                <span class="hero-credential-seal">
+                  <img class="hero-credential-crest" src="/images/snu-crest.png" width="53" height="55" alt="서울대학교 심볼마크" />
+                </span>
                 <span class="hero-credential-copy">
-                  <small>4STEPS FACULTY</small>
+                  <small>SNU · 4STEPS FACULTY</small>
                   <strong>서울대학교 재학 강사진</strong>
-                  <span>원어민급 영어 역량 · 검증된 튜터</span>
+                  <span class="hero-credential-meta"><em class="hero-credential-proof">✓ 재학 확인</em><span>원어민급 영어 역량</span></span>
                 </span>
               </div>
               <div class="hero-actions">
