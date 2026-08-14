@@ -1,9 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" role="img" aria-labelledby="title desc">
-  <title id="title">4steps book club</title>
-  <desc id="desc">An open book containing four rising coral lines.</desc>
-  <rect x="2" y="2" width="56" height="56" rx="17" fill="#17342f"/>
-  <path d="M13 19.5c5.2-1.9 10.2-.9 15 3.1v20.2c-4.7-3.7-9.7-4.7-15-2.8V19.5Z" fill="#f7f3ea"/>
-  <path d="M28 22.6c4.9-4 9.9-5 15-3.1V40c-5.2-1.9-10.2-.9-15 2.8V22.6Z" fill="#fffaf0"/>
-  <path d="M31.5 25.5h3.8v2.8h-3.8zM31.5 30h6.6v2.8h-6.6zM31.5 34.5h9.4v2.8h-9.4z" fill="#ef6b4a"/>
-  <circle cx="45" cy="13.5" r="3.5" fill="#f2c55c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" role="img" aria-labelledby="mark-title mark-desc">
+  <title id="mark-title">4steps Book Club</title>
+  <desc id="mark-desc">A custom number four shaped like a turning page, with its crossbar becoming a written line and period.</desc>
+  <rect width="60" height="60" rx="11" fill="#f7f3ea" />
+  <g transform="translate(5 5) scale(.833333)" aria-hidden="true">
+    <path
+      fill="#17342f"
+      fill-rule="evenodd"
+      d="M35.8 3.5c-1.7 0-3.1.7-4.2 2.1L7.5 34.8c-1.5 1.8-1.7 3.7-.7 5.6 1 1.9 2.6 2.8 4.9 2.8h20v8.4c0 3.2 1.9 4.9 5.5 4.9 3.7 0 5.6-1.7 5.6-4.9v-8.4h4.4c3 0 4.6-1.6 4.6-4.7 0-3.1-1.6-4.7-4.6-4.7h-4.4V8.5c0-3.3-2.2-5-6.5-5h-.5Zm-4.1 16.1v14.2h-11c3.8-5.3 7.5-10 11-14.2Z"
+    />
+    <path d="M24.2 31.5c2.4-3.2 4.9-6 7.5-8.4" fill="none" stroke="#ef6b4a" stroke-width="1.55" stroke-linecap="round" />
+    <path d="M46.5 38.5h6.1" fill="none" stroke="#ef6b4a" stroke-width="3.8" stroke-linecap="round" />
+    <circle cx="57.5" cy="38.5" r="2.25" fill="#ef6b4a" />
+  </g>
 </svg>

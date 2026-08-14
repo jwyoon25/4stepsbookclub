@@ -16,12 +16,18 @@ The visual and verbal sequence is:
 
 ## Logo
 
-The new symbol combines an open book with four rising coral lines. The book represents the starting point; the lines turn the four-step method into a compact progress mark. A yellow dot adds warmth and gives the mark a memorable detail at favicon size.
+**Concept: Page to sentence.**
+
+The symbol is not a separate education icon: it is the `4` in the 4steps name. Its open counter is drawn as a turned page, and the crossbar continues as a coral writing line ending in a period. It translates the brand promise directly: the book becomes the child's sentence.
+
+The sturdy numeral represents the four-part method; the editorial serif wordmark gives the identity the character of a thoughtful publisher rather than an app or cram school. The lettering is converted to vector outlines so the logo renders consistently on every device.
 
 - Primary lockup: `public/images/logo-new.svg`
 - Compact mark / favicon: `public/images/logo-mark.svg`
 - Keep clear space around the mark equal to roughly one quarter of its width.
-- Do not recolor the cream pages or coral step lines independently.
+- Use Library Green as the core mark color. Coral is reserved for the page crease, writing line, and period.
+- Do not remove the period: it completes the idea of a written sentence.
+- The compact mark uses a Warm Paper field so it stays visible on the dark footer and receives predictable favicon and Apple touch icon matting.
 - Use the compact mark when the full wordmark would render below 120px wide.
 
 ## Color palette
