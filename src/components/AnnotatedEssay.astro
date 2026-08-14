@@ -387,33 +387,62 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
   .essay-highlight {
     display:inline;
     margin:0;
-    padding:.02em .08em .08em;
+    padding:0;
     border:0;
     border-radius:3px;
-    background:linear-gradient(transparent 40%, rgba(222,165,80,.25) 40%, rgba(222,165,80,.25) 91%, transparent 91%);
+    background:transparent;
     color:inherit;
     font:inherit;
     line-height:inherit;
     text-align:left;
     cursor:pointer;
+    transition:text-decoration-color .18s ease;
+  }
+  .highlight-copy {
+    padding:0 .035em .04em;
+    border-radius:2px;
+    background:linear-gradient(
+      to bottom,
+      transparent 62%,
+      rgba(215,160,78,.17) 62%,
+      rgba(215,160,78,.22) 88%,
+      transparent 88%
+    );
     box-decoration-break:clone;
     -webkit-box-decoration-break:clone;
-    transition:background .18s ease, text-decoration-color .18s ease;
   }
-  .essay-highlight:hover {
-    background:linear-gradient(transparent 36%, rgba(222,165,80,.36) 36%, rgba(222,165,80,.36) 92%, transparent 92%);
+  .essay-highlight:hover .highlight-copy {
+    background:linear-gradient(
+      to bottom,
+      transparent 58%,
+      rgba(215,160,78,.22) 58%,
+      rgba(215,160,78,.28) 90%,
+      transparent 90%
+    );
   }
   .essay-highlight.is-active {
-    background:linear-gradient(transparent 32%, rgba(222,165,80,.45) 32%, rgba(222,165,80,.45) 93%, transparent 93%);
     text-decoration:underline;
     text-decoration-color:var(--orange);
     text-decoration-thickness:1.5px;
     text-underline-offset:3px;
   }
+  .essay-highlight.is-active .highlight-copy,
+  .essay-highlight:focus-visible .highlight-copy {
+    background:linear-gradient(
+      to bottom,
+      transparent 54%,
+      rgba(215,160,78,.25) 54%,
+      rgba(215,160,78,.34) 91%,
+      transparent 91%
+    );
+  }
   .essay-highlight:focus-visible {
+    outline:none;
+  }
+  .essay-highlight:focus-visible .annotation-chip {
     outline:2px solid var(--navy);
-    outline-offset:3px;
-    background:linear-gradient(transparent 32%, rgba(222,165,80,.45) 32%, rgba(222,165,80,.45) 93%, transparent 93%);
+    outline-offset:2px;
+    box-shadow:0 0 0 4px #fffdf9;
   }
   .annotation-chip {
     display:inline-flex;
@@ -599,7 +628,7 @@ const annotatedParagraphs = wonderEssayExcerpts.map((excerpt) => ({
     .essay-body { padding:18px 16px 21px; }
     .essay-paragraph-group + .essay-paragraph-group { margin-top:12px; }
     .essay-paragraph { font-size:15.5px; line-height:1.72; }
-    .essay-highlight { padding:.02em .06em .09em; }
+    .essay-highlight { padding:0; }
   }
 
   @media (prefers-reduced-motion:reduce) {
