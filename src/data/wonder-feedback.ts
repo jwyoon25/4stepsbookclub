@@ -79,13 +79,7 @@ export const wonderEssayExcerpts: EssayExcerpt[] = [
     segments: [
       { text: "Throughout the novel " },
       { text: "Wonder", italic: true },
-      { text: ", August is treated in a variety of ways, whether it is cruelty, pity, or genuine respect. These reactions can show how someone truly feels about August —for example when Julian showed his cruel personality, making jokes about August's face." }
-    ]
-  },
-  {
-    id: "introduction",
-    segments: [
-      { text: "The novel shows the different ways of treating a person who appears different, and " },
+      { text: ", August is treated in a variety of ways, whether it is cruelty, pity, or genuine respect. These reactions can show how someone truly feels about August —for example when Julian showed his cruel personality, making jokes about August's face. The novel shows the different ways of treating a person who appears different, and " },
       { text: "this essay will focus on analyzing each of these ways of treating a new person.", commentId: "thesis" }
     ]
   },
