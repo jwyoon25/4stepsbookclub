@@ -5,11 +5,6 @@ import {
   type WonderFeedbackId
 } from "../data/wonder-feedback";
 
-interface Props {
-  embedded?: boolean;
-}
-
-const { embedded = false } = Astro.props;
 const defaultCommentId: WonderFeedbackId = "thesis";
 const commentById = new Map(wonderHomepageComments.map((comment) => [comment.id, comment]));
 const commentNumberById = new Map(
@@ -23,21 +18,18 @@ const splitHighlightText = (text: string) => {
 ---
 
 <article
-  class:list={["annotated-essay", { "is-embedded": embedded }]}
+  class="annotated-essay"
   data-annotated-essay
   data-default-comment={defaultCommentId}
-  aria-labelledby={embedded ? undefined : "wonder-feedback-title"}
-  aria-label={embedded ? "Interactive student essay feedback" : undefined}
+  aria-labelledby="wonder-feedback-title"
 >
-  {!embedded && (
-    <header class="feedback-feature-head">
-      <span class="feedback-feature-index">01 · ESSAY FEEDBACK</span>
-      <div class="feedback-feature-copy">
-        <h3 id="wonder-feedback-title">좋은 글은 좋은 생각에서 시작됩니다.</h3>
-        <p>튜터가 글을 대신 고치지 않고, 학생 스스로 논리와 근거를 강화하도록 질문합니다.</p>
-      </div>
-    </header>
-  )}
+  <header class="feedback-feature-head">
+    <span class="feedback-feature-index">01 · ESSAY FEEDBACK</span>
+    <div class="feedback-feature-copy">
+      <h3 id="wonder-feedback-title">좋은 글은 좋은 생각에서 시작됩니다.</h3>
+      <p>튜터가 글을 대신 고치지 않고, 학생 스스로 논리와 근거를 강화하도록 질문합니다.</p>
+    </div>
+  </header>
 
   <div class="annotated-layout">
     <section class="essay-paper" aria-labelledby="wonder-essay-title">
@@ -162,8 +154,6 @@ const splitHighlightText = (text: string) => {
 
       const desktopQuery = window.matchMedia("(min-width: 901px)");
       const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      const embedded = root.classList.contains("is-embedded");
-      const usesDesktopRail = () => desktopQuery.matches && !embedded;
       const paper = root.querySelector(".essay-paper");
       const rail = root.querySelector("[data-annotation-rail]");
       const desktopPanel = root.querySelector("[data-desktop-panel]");
@@ -173,7 +163,7 @@ const splitHighlightText = (text: string) => {
       const desktopComments = [...root.querySelectorAll("[data-desktop-comment]")];
       const mobilePanels = [...root.querySelectorAll("[data-mobile-panel]")];
       const defaultId = root.dataset.defaultComment || "thesis";
-      let activeId = usesDesktopRail() ? defaultId : null;
+      let activeId = desktopQuery.matches ? defaultId : null;
       let lastActiveId = defaultId;
       let positionFrame = 0;
 
@@ -181,7 +171,7 @@ const splitHighlightText = (text: string) => {
       const triggerFor = (id) => triggers.find((trigger) => trigger.dataset.commentTrigger === id);
 
       const positionRail = () => {
-        if (!usesDesktopRail() || !paper || !rail) return;
+        if (!desktopQuery.matches || !paper || !rail) return;
         const paperRect = paper.getBoundingClientRect();
         const railRect = rail.getBoundingClientRect();
         const railHeight = railRect.height;
@@ -223,7 +213,7 @@ const splitHighlightText = (text: string) => {
       };
 
       const render = ({ ensureVisible = false } = {}) => {
-        const desktop = usesDesktopRail();
+        const desktop = desktopQuery.matches;
         if (activeId) root.dataset.activeComment = activeId;
         else delete root.dataset.activeComment;
 
@@ -278,16 +268,16 @@ const splitHighlightText = (text: string) => {
 
       triggers.forEach((trigger) => {
         trigger.addEventListener("focus", () => {
-          if (usesDesktopRail()) activate(trigger.dataset.commentTrigger);
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
         });
         trigger.addEventListener("click", () => {
-          if (usesDesktopRail()) activate(trigger.dataset.commentTrigger);
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
           else toggleMobile(trigger.dataset.commentTrigger);
         });
         trigger.addEventListener("keydown", (event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
-          if (usesDesktopRail()) activate(trigger.dataset.commentTrigger);
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
           else toggleMobile(trigger.dataset.commentTrigger);
         });
       });
@@ -298,7 +288,7 @@ const splitHighlightText = (text: string) => {
       });
 
       const handleBreakpointChange = () => {
-        activeId = usesDesktopRail() ? (lastActiveId || defaultId) : null;
+        activeId = desktopQuery.matches ? (lastActiveId || defaultId) : null;
         render();
       };
 
@@ -324,12 +314,6 @@ const splitHighlightText = (text: string) => {
     border-radius:18px;
     background:#fff;
     box-shadow:0 18px 50px rgba(16,42,67,.08);
-  }
-  .annotated-essay.is-embedded {
-    margin:0;
-    border:0;
-    border-radius:0;
-    box-shadow:none;
   }
   .feedback-feature-head {
     display:grid;
@@ -374,10 +358,6 @@ const splitHighlightText = (text: string) => {
     grid-template-columns:minmax(0, 1fr) 250px;
     gap:18px;
     align-items:stretch;
-  }
-  .annotated-essay.is-embedded.is-enhanced .annotated-layout {
-    display:block;
-    padding:10px;
   }
   .essay-paper {
     min-width:0;
@@ -524,7 +504,6 @@ const splitHighlightText = (text: string) => {
     min-height:100%;
   }
   .annotated-essay.is-enhanced .annotation-rail { display:block; }
-  .annotated-essay.is-embedded.is-enhanced .annotation-rail { display:none; }
   .annotation-rail-head {
     position:absolute;
     z-index:3;
@@ -609,27 +588,6 @@ const splitHighlightText = (text: string) => {
     font-weight:550;
   }
   .essay-mobile-comment-panel { display:none; }
-  .annotated-essay.is-embedded .essay-mobile-comment-panel:not([hidden]) {
-    display:block;
-    margin:12px 0 3px;
-    padding:14px 15px;
-    border:1px solid #ead8c6;
-    border-left:3px solid var(--orange);
-    border-radius:10px;
-    background:#fff8f1;
-    box-shadow:0 7px 18px rgba(16,42,67,.05);
-  }
-  .annotated-essay.is-embedded .essay-mobile-comment-panel p {
-    color:#40566b;
-    font-size:var(--type-body-sm);
-    line-height:1.58;
-  }
-  .annotated-essay.is-embedded .annotation-chip {
-    min-width:28px;
-    height:24px;
-    font-size:10px;
-    vertical-align:.16em;
-  }
   .annotation-fallback {
     margin-top:18px;
     padding:18px;
