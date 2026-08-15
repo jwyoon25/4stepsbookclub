@@ -1,13 +1,17 @@
 {
   "name": "4steps-bookclub",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "website"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
-  },
-  "devDependencies": {
-    "astro": "^5.0.0"
+    "dev": "npm run website:dev",
+    "build": "npm run website:build",
+    "preview": "npm run website:preview",
+    "website:dev": "npm run dev --workspace website",
+    "website:build": "npm run build --workspace website",
+    "website:preview": "npm run preview --workspace website",
+    "workbook:build": "typst compile workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
+    "workbook:watch": "typst watch workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf"
   }
 }
