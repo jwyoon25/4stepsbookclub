@@ -1,3 +1,121 @@
+---
+import AnnotatedEssay from "../components/AnnotatedEssay.astro";
+
+const previewFor = (path) => path.replace(/\.png$/, "-preview.webp");
+
+const classContentGalleries = [
+  {
+    id: "feedback",
+    index: "01A",
+    label: "REAL FEEDBACK PAGES",
+    title: "실제 첨삭 원본도 함께 확인해보세요",
+    description: "학생이 작성한 글 위에 남긴 문법·어휘·표현·구조 피드백과 다음 개선 목표를 원본 페이지로 보여드립니다.",
+    tags: ["문법·어휘", "표현·구조", "개선 방향"],
+    images: [
+      {
+        full: "/images/class-content/feedback/feedback-01.png",
+        thumb: "/images/class-content/feedback/feedback-01-thumb.jpg",
+        caption: "문법·어휘·표현 첨삭",
+        alt: "손글씨 에세이에 문법, 어휘, 표현, 문장 구조 피드백이 표시된 첨삭 사례 첫 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-02.png",
+        thumb: "/images/class-content/feedback/feedback-02-thumb.jpg",
+        caption: "구조와 다음 글쓰기 목표",
+        alt: "손글씨 에세이에 표현 수정과 글의 구조에 대한 코멘트가 표시된 첨삭 사례 두 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-03.png",
+        thumb: "/images/class-content/feedback/feedback-03-thumb.jpg",
+        caption: "에세이 문장과 표현 첨삭",
+        alt: "인물의 변화에 대한 손글씨 에세이에 문장 표현과 어휘 피드백이 표시된 첨삭 사례 세 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-04.png",
+        thumb: "/images/class-content/feedback/feedback-04-thumb.jpg",
+        caption: "문단 전개와 표현 피드백",
+        alt: "인물의 성격 변화에 대한 손글씨 에세이에 문단 전개와 표현 수정이 표시된 첨삭 사례 네 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-05.png",
+        thumb: "/images/class-content/feedback/feedback-05-thumb.jpg",
+        caption: "결론과 글의 변화 과정",
+        alt: "손글씨 에세이 결론에 문장 표현과 글의 발전 방향에 대한 피드백이 표시된 첨삭 사례 다섯 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-06.png",
+        thumb: "/images/class-content/feedback/feedback-06-thumb.jpg",
+        caption: "문장 표현과 어휘 첨삭",
+        alt: "손글씨 에세이에 문장 표현과 어휘 수정이 표시된 첨삭 사례 여섯 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-07.png",
+        thumb: "/images/class-content/feedback/feedback-07-thumb.jpg",
+        caption: "결론과 다음 글쓰기 목표",
+        alt: "손글씨 에세이 결론에 직접 인용, 문법, 표현 개선 목표가 정리된 첨삭 사례 일곱 번째 페이지"
+      }
+    ]
+  },
+  {
+    id: "workbook",
+    index: "02",
+    label: "ORIGINAL WORKBOOK",
+    title: "읽기에서 분석과 글쓰기로 이어지는 자체 교재",
+    description: "The Maze Runner를 바탕으로 Reading Comprehension, Critical Thinking & Analysis, Paragraph Writing, Vocabulary를 연결한 8페이지 구성입니다.",
+    tags: ["Reading Comprehension", "Critical Thinking", "Paragraph Writing", "Vocabulary"],
+    images: [
+      {
+        full: "/images/class-content/workbook/workbook-01.png",
+        thumb: "/images/class-content/workbook/workbook-01-thumb.jpg",
+        caption: "표지 · The Maze Runner",
+        alt: "The Maze Runner와 James Dashner가 표시된 4STEPS Book Club 워크북 표지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-02.png",
+        thumb: "/images/class-content/workbook/workbook-02-thumb.jpg",
+        caption: "Reading Comprehension · Chapters 1–12",
+        alt: "The Maze Runner Chapters 1–12의 Reading Comprehension 질문이 담긴 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-03.png",
+        thumb: "/images/class-content/workbook/workbook-03-thumb.jpg",
+        caption: "Reading Comprehension에서 분석으로",
+        alt: "The Maze Runner 내용 이해 질문과 Critical Thinking & Analysis가 함께 담긴 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-04.png",
+        thumb: "/images/class-content/workbook/workbook-04-thumb.jpg",
+        caption: "Critical Thinking & Analysis",
+        alt: "The Maze Runner 인물과 리더십에 대한 비판적 사고 질문이 담긴 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-05.png",
+        thumb: "/images/class-content/workbook/workbook-05-thumb.jpg",
+        caption: "근거를 바탕으로 생각 확장하기",
+        alt: "The Maze Runner의 긴 서술형 Critical Thinking 질문이 담긴 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-06.png",
+        thumb: "/images/class-content/workbook/workbook-06-thumb.jpg",
+        caption: "Paragraph Writing",
+        alt: "The Maze Runner를 바탕으로 한 Paragraph Writing 안내와 세 가지 글쓰기 주제가 담긴 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-07.png",
+        thumb: "/images/class-content/workbook/workbook-07-thumb.jpg",
+        caption: "Vocabulary List · Chapters 1–12",
+        alt: "The Maze Runner Chapters 1–12의 어휘, 뜻, 문맥, 예문이 표로 정리된 워크북 페이지"
+      },
+      {
+        full: "/images/class-content/workbook/workbook-08.png",
+        thumb: "/images/class-content/workbook/workbook-08-thumb.jpg",
+        caption: "Vocabulary List · continued",
+        alt: "The Maze Runner 어휘와 뜻, 정의, 문맥 예문이 이어지는 워크북 마지막 페이지"
+      }
+    ]
+  }
+];
+---
 <!doctype html>
 <html lang="ko"><head>
   <meta charset="UTF-8">
@@ -128,6 +246,7 @@
       background:linear-gradient(135deg, #833ab4 0%, #c13584 38%, #e1306c 62%, #f77737 100%);
       color:#fff;
     }
+    .threads { background:#111; color:#fff; }
     .nav-cta {
       padding:10px 15px;
       border-radius:7px;
@@ -442,30 +561,62 @@
       border-radius:18px;
       box-shadow:0 18px 50px rgba(16,42,67,.08);
     }
+    .example-gallery { min-width:0; }
+    .gallery-preview {
+      display:flex;
+      flex-direction:column;
+      background:#f7f9fb;
+      border-bottom:1px solid var(--line);
+    }
     .sample-media {
       position:relative;
       overflow:hidden;
-      background:#edf2f6;
-      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:0;
+      padding:14px;
+      background:linear-gradient(145deg, #eef3f6, #f9fbfc);
     }
-    .sample-card.featured .sample-media { min-height:360px; }
-    .sample-card:not(.featured) .sample-media { min-height:220px; }
+    .gallery-stage-button {
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      height:clamp(360px, 42vw, 500px);
+      min-height:0;
+      padding:0;
+      border:0;
+      background:transparent;
+      cursor:zoom-in;
+    }
     .sample-image {
       display:block;
-      width:100%;
+      width:auto;
       height:100%;
-      min-height:inherit;
-      object-fit:cover;
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      aspect-ratio:1192 / 1684;
+      background:#fff;
+      border:1px solid #e4ebf0;
+      border-radius:8px;
+      box-shadow:0 14px 30px rgba(16,42,67,.12);
       opacity:1;
       visibility:visible;
-      transition:transform .45s ease;
+      transition:transform .25s ease, box-shadow .25s ease;
     }
-    .sample-card:hover .sample-image { transform:scale(1.018); }
-    .sample-card.workbook .sample-image { object-fit:contain; background:#fff; padding:12px; }
-    .expand-button {
+    .gallery-stage-button:hover .sample-image,
+    .gallery-stage-button:focus-visible .sample-image {
+      transform:translateY(-3px);
+      box-shadow:0 18px 36px rgba(16,42,67,.18);
+    }
+    .gallery-stage-hint {
       position:absolute;
-      right:14px;
-      bottom:14px;
+      left:50%;
+      bottom:16px;
+      transform:translateX(-50%);
       display:inline-flex;
       align-items:center;
       gap:7px;
@@ -478,9 +629,87 @@
       line-height:1.4;
       cursor:pointer;
       box-shadow:0 8px 24px rgba(8,28,44,.2);
-      transition:.2s;
+      pointer-events:none;
     }
-    .expand-button:hover { transform:translateY(-2px); background:var(--navy); }
+    .gallery-meta {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 18px 0;
+      color:var(--muted);
+      font-size:var(--type-meta);
+      font-weight:800;
+    }
+    .gallery-meta-caption {
+      min-width:0;
+      flex:1 1 auto;
+      overflow-wrap:anywhere;
+      white-space:normal;
+      line-height:1.45;
+    }
+    .gallery-counter {
+      flex:0 0 auto;
+      color:var(--navy);
+      font-variant-numeric:tabular-nums;
+    }
+    .gallery-thumbnails,
+    .modal-thumbnails {
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding:12px 18px 18px;
+      scrollbar-width:thin;
+      scrollbar-color:#c7d2dc transparent;
+    }
+    .gallery-thumbnail,
+    .modal-thumbnail {
+      position:relative;
+      flex:0 0 58px;
+      width:58px;
+      height:78px;
+      padding:3px;
+      border:1px solid #d8e1e8;
+      border-radius:8px;
+      background:#fff;
+      cursor:pointer;
+      transition:border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .gallery-thumbnail:hover,
+    .gallery-thumbnail:focus-visible,
+    .modal-thumbnail:hover,
+    .modal-thumbnail:focus-visible {
+      transform:translateY(-2px);
+      border-color:var(--orange);
+    }
+    .gallery-thumbnail[aria-current="true"],
+    .modal-thumbnail[aria-current="true"] {
+      border-color:var(--orange);
+      box-shadow:0 0 0 2px rgba(207,122,56,.2);
+    }
+    .gallery-thumbnail img,
+    .modal-thumbnail img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:5px;
+    }
+    .gallery-thumbnail span,
+    .modal-thumbnail span {
+      position:absolute;
+      right:4px;
+      bottom:4px;
+      min-width:20px;
+      padding:1px 4px;
+      border-radius:4px;
+      background:rgba(8,28,44,.78);
+      color:#fff;
+      font-size:10px;
+      line-height:1.35;
+      font-weight:800;
+      text-align:center;
+    }
     .sample-copy { padding:25px 26px 27px; }
     .sample-index {
       display:inline-block;
@@ -493,6 +722,44 @@
     }
     .sample-copy h3 { font-size:var(--type-card-title); margin-bottom:9px; color:var(--navy); }
     .sample-copy p { color:var(--muted); font-size:var(--type-body-sm); line-height:1.65; }
+    .gallery-tags {
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-top:17px;
+    }
+    .gallery-tag {
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:4px 9px;
+      border:1px solid #dce6ed;
+      border-radius:999px;
+      background:#f7f9fb;
+      color:#486581;
+      font-size:var(--type-meta);
+      line-height:1.35;
+      font-weight:750;
+    }
+    .gallery-open-button {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      margin-top:20px;
+      padding:11px 15px;
+      border:1px solid var(--navy);
+      border-radius:8px;
+      background:var(--navy);
+      color:#fff;
+      font-size:var(--type-ui);
+      line-height:1.4;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .2s, background .2s;
+    }
+    .gallery-open-button:hover,
+    .gallery-open-button:focus-visible { transform:translateY(-2px); background:var(--blue); }
 
     .lesson-panel {
       margin-top:30px;
@@ -683,6 +950,14 @@
       flex-direction:column;
       align-items:flex-end;
       gap:8px;
+      transition:opacity .2s, visibility .2s, transform .2s;
+    }
+    .floating-actions.is-hidden,
+    body.modal-open .floating-actions {
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transform:translateY(8px);
     }
     .floating-button {
       position:relative;
@@ -752,28 +1027,135 @@
     .modal-dialog {
       position:relative;
       width:min(1120px, 100%);
-      max-height:calc(92 * min(var(--vh, 1vh), 1vh));
+      max-height:calc(94 * min(var(--vh, 1vh), 1vh));
       padding:18px;
       border-radius:18px;
       background:#fff;
       box-shadow:0 30px 90px rgba(0,0,0,.35);
       overflow:auto;
     }
+    .modal-header {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      padding:2px 4px 12px;
+    }
+    .modal-heading {
+      min-width:0;
+      flex:1 1 auto;
+    }
+    .modal-controls {
+      display:flex;
+      flex:0 0 auto;
+      align-items:center;
+      gap:8px;
+    }
+    .modal-eyebrow {
+      margin-bottom:4px;
+      color:var(--orange);
+      font-size:var(--type-meta);
+      line-height:1.4;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
     .modal-image {
       display:block;
-      width:100%;
-      max-height:calc(76 * min(var(--vh, 1vh), 1vh));
+      width:auto;
+      max-width:100%;
+      max-height:calc(66 * min(var(--vh, 1vh), 1vh));
       object-fit:contain;
       background:#f4f6f8;
       border-radius:10px;
     }
-    .modal-close {
+    .modal-stage {
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:260px;
+      padding:0 50px;
+      max-height:calc(70 * min(var(--vh, 1vh), 1vh));
+      overflow:hidden;
+      touch-action:pan-y;
+    }
+    .modal-stage.zoomed {
+      align-items:flex-start;
+      justify-content:flex-start;
+      overflow:auto;
+      cursor:zoom-out;
+      touch-action:pan-x pan-y pinch-zoom;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+    }
+    .modal-stage.zoomed .modal-image {
+      width:min(820px, 180vw);
+      max-width:none;
+      max-height:none;
+      cursor:zoom-out;
+      user-select:none;
+    }
+    .modal-stage.zoomed .modal-nav { display:none; }
+    .modal-nav {
       position:absolute;
-      top:27px;
-      right:27px;
+      top:50%;
       z-index:2;
       width:42px;
       height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #d8e1e8;
+      border-radius:50%;
+      background:#fff;
+      color:var(--navy);
+      cursor:pointer;
+      transform:translateY(-50%);
+      box-shadow:0 8px 24px rgba(16,42,67,.13);
+    }
+    .modal-nav:hover:not(:disabled),
+    .modal-nav:focus-visible:not(:disabled) { background:#f5f8fa; border-color:var(--orange); }
+    .modal-nav:disabled { opacity:.35; cursor:not-allowed; }
+    .modal-nav.prev { left:0; }
+    .modal-nav.next { right:0; }
+    .modal-gallery-meta {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+      padding:11px 4px 0;
+      color:var(--muted);
+      font-size:var(--type-meta);
+      line-height:1.4;
+      font-weight:750;
+    }
+    .modal-gallery-meta > span:first-child {
+      min-width:0;
+      overflow-wrap:anywhere;
+    }
+    .modal-counter { color:var(--navy); font-variant-numeric:tabular-nums; font-weight:900; }
+    .modal-thumbnails { padding:12px 4px 2px; }
+    .modal-zoom {
+      position:static;
+      min-width:72px;
+      min-height:44px;
+      padding:8px 12px;
+      border:1px solid #d8e1e8;
+      border-radius:999px;
+      background:#fff;
+      color:var(--navy);
+      font-size:var(--type-ui);
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 8px 24px rgba(16,42,67,.1);
+    }
+    .modal-zoom:hover,
+    .modal-zoom:focus-visible { border-color:var(--orange); background:#fffaf6; }
+    .modal-close {
+      position:static;
+      flex:0 0 44px;
+      width:44px;
+      height:44px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -783,7 +1165,7 @@
       color:#fff;
       cursor:pointer;
     }
-    .modal-caption { padding:15px 4px 2px; color:var(--navy); font-size:var(--type-body-sm); font-weight:800; }
+    .modal-caption { color:var(--navy); font-size:var(--type-body-sm); font-weight:800; }
 
     .toast {
       position:fixed;
@@ -831,7 +1213,9 @@
       .learning-flow { grid-template-columns:repeat(3, 1fr); row-gap:34px; }
       .flow-item::after { display:none; }
       .content-showcase { grid-template-columns:1fr; }
-      .sample-card.featured .sample-media { min-height:300px; }
+      .sample-media { min-height:0; }
+      .gallery-stage-button { height:420px; }
+      .sample-image { max-height:100%; }
       .weekly-steps { grid-template-columns:1fr; padding:10px 28px 30px; }
       .weekly-step {
         display:grid;
@@ -868,8 +1252,11 @@
       .curriculum-card { min-height:auto; }
       .learning-flow { grid-template-columns:repeat(2, 1fr); }
       .faculty-stats { gap:7px; }
-      .sample-card.featured .sample-media,
-      .sample-card:not(.featured) .sample-media { min-height:210px; }
+      .sample-media { min-height:0; padding:10px; }
+      .gallery-stage-button { height:clamp(270px, 78vw, 340px); min-height:0; }
+      .sample-image { max-height:100%; }
+      .gallery-meta { padding-inline:15px; }
+      .gallery-thumbnails { padding-inline:15px; }
       .sample-copy { padding:22px 20px 24px; }
       .lesson-panel-head { flex-direction:column; align-items:flex-start; padding:26px 22px; }
       .form-grid { grid-template-columns:1fr; }
@@ -877,12 +1264,40 @@
       .consult-panel { padding:28px 20px; }
       .footer-top { flex-direction:column; }
       .footer-right { align-items:flex-start; }
-      .floating-actions { right:14px; bottom:14px; }
-      .floating-button { width:44px; height:44px; }
+      .floating-actions {
+        right:12px;
+        bottom:calc(12px + env(safe-area-inset-bottom));
+        flex-direction:row;
+        align-items:center;
+        gap:6px;
+        padding:6px;
+        border:1px solid rgba(16,42,67,.12);
+        border-radius:999px;
+        background:rgba(255,255,255,.94);
+        backdrop-filter:blur(12px);
+        box-shadow:0 12px 30px rgba(16,42,67,.18);
+      }
+      .floating-button {
+        width:44px;
+        height:44px;
+      }
       .floating-button::before { display:none; }
       .image-modal { padding:10px; }
-      .modal-dialog { padding:10px; border-radius:12px; }
-      .modal-close { top:18px; right:18px; }
+      .modal-dialog { width:100%; padding:10px; border-radius:12px; }
+      .modal-header {
+        flex-direction:column;
+        align-items:stretch;
+        gap:8px;
+        padding:3px 2px 10px;
+      }
+      .modal-controls { width:100%; justify-content:flex-end; }
+      .modal-caption { line-height:1.5; overflow-wrap:anywhere; }
+      .modal-stage { min-height:230px; padding:0 50px; }
+      .modal-image { max-height:calc(68 * min(var(--vh, 1vh), 1vh)); }
+      .modal-nav { width:44px; height:44px; }
+      .modal-gallery-meta { padding-inline:2px; }
+      .modal-thumbnails { padding-inline:2px; }
+      .modal-zoom { min-height:44px; padding:8px 10px; }
     }
 
     /* Integrated Level & Roadmap section */
@@ -1097,11 +1512,12 @@
  </head>
  <body data-template-id="__page-root" style="background: rgb(255, 255, 255);">
   <div class="site-shell">
+   <div id="page-content">
    <header class="site-header">
     <div class="main-content navbar">
      <a href="#top" class="brand" aria-label="4STEPS Book Club 홈"> <img data-template-id="brand-logo" class="canva-image brand-logo" loading="lazy" src="images/logo.png" alt="네 개의 성장 막대와 4steps bookclub 글자가 있는 로고"> </a> <button id="menu-button" class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav"> <i data-lucide="menu"></i> </button>
      <nav id="site-nav" class="desktop-nav" aria-label="주요 메뉴">
-      <a href="#about" data-template-id="nav-about" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">ABOUT</a> <a href="#faculty" data-template-id="nav-faculty" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">FACULTY</a> <a href="#curriculum" data-template-id="nav-curriculum" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CURRICULUM</a> <a href="#level-system" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">LEVEL SYSTEM</a> <a href="#class-content" data-template-id="nav-class-content" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CLASS CONTENT</a> <a href="#management" data-template-id="nav-management" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">MANAGEMENT</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social naver" aria-label="네이버 블로그"><span aria-hidden="true" class="font-black">N</span></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="nav-social kakao" aria-label="카카오톡"><i data-lucide="message-circle" class="w-4 h-4"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social instagram" aria-label="인스타그램"><i data-lucide="instagram" class="w-4 h-4"></i></a> <a href="#consulting" data-template-id="nav-cta" class="canva-button nav-cta" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨테스트</a>
+      <a href="#about" data-template-id="nav-about" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">ABOUT</a> <a href="#faculty" data-template-id="nav-faculty" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">FACULTY</a> <a href="#curriculum" data-template-id="nav-curriculum" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CURRICULUM</a> <a href="#level-system" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">LEVEL SYSTEM</a> <a href="#class-content" data-template-id="nav-class-content" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">CLASS CONTENT</a> <a href="#management" data-template-id="nav-management" class="canva-link" style="color: rgb(82, 101, 121); font-weight: 700; font-style: normal;">MANAGEMENT</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social naver" aria-label="네이버 블로그"><span aria-hidden="true" class="font-black">N</span></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="nav-social kakao" aria-label="카카오톡"><i data-lucide="message-circle" class="w-4 h-4"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social instagram" aria-label="인스타그램"><i data-lucide="instagram" class="w-4 h-4"></i></a> <a href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" class="nav-social threads" aria-label="Threads"><i data-lucide="at-sign" class="w-4 h-4"></i></a> <a href="#consulting" data-template-id="nav-cta" class="canva-button nav-cta" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨테스트</a>
      </nav>
     </div>
    </header>
@@ -1117,7 +1533,7 @@
       <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal;">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽<br> </p>
        <p data-template-id="hero-description" class="canva-text hero-desc" style="color: rgb(208, 220, 230); font-weight: 400; font-style: normal;">국제학교 출신의 원어민급 영어실력과 검증된 최상위 공인성적을 보유한 서울대생 강사진들과 함께하는 4인 소수 관리형 프로그램<br></p>
       <div class="hero-actions">
-       <a href="#consulting" data-template-id="hero-primary-button" class="canva-button action-button primary-button" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨 테스트 신청하기 →</a> <a href="#class-content" data-template-id="hero-secondary-button" class="canva-button action-button outline-button" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">실제 수업 콘텐츠 보기</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-naver-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">네이버 블로그</a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" data-template-id="hero-kakao-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">카카오톡 상담</a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-instagram-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"><i data-lucide="instagram" class="w-4 h-4"></i> 인스타그램</a>
+       <a href="#consulting" data-template-id="hero-primary-button" class="canva-button action-button primary-button" style="background: rgb(207, 122, 56); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">무료 레벨 테스트 신청하기 →</a> <a href="#class-content" data-template-id="hero-secondary-button" class="canva-button action-button outline-button" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 800; font-style: normal;">실제 수업 콘텐츠 보기</a> <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-naver-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">네이버 블로그</a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" data-template-id="hero-kakao-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;">카카오톡 상담</a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-instagram-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"><i data-lucide="instagram" class="w-4 h-4"></i> 인스타그램</a> <a href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" data-template-id="hero-threads-button" class="canva-button action-button social-outline" style="background: rgba(255, 255, 255, 0.06); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"><i data-lucide="at-sign" class="w-4 h-4"></i> Threads</a>
       </div>
       <div class="hero-stats" aria-label="프로그램 핵심 정보">
        <div class="hero-stat">
@@ -1551,27 +1967,41 @@
        <p data-template-id="class-content-eyebrow" class="canva-text eyebrow" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">INSIDE THE CLASS</p>
        <h2 data-template-id="class-content-title" class="canva-text section-title" style="color: rgb(16, 42, 67); font-weight: 900; font-style: normal;">실제 수업에서는 무엇을 배우고, 글쓰기 첨삭을 어떻게 받나요? </h2>
       </div>
+      <AnnotatedEssay />
       <div class="content-showcase">
-       <article data-template-id="feedback-card" class="canva-card sample-card" style="background: rgb(255, 255, 255);">
-        <div class="sample-media">
-         <img data-template-id="feedback-example-image" class="canva-image sample-image" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시"> <button data-image-target="feedback-example-image" data-template-id="feedback-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"> 크게 보기</button>
-        </div>
-        <div class="sample-copy">
-         <span data-template-id="feedback-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">01 · ESSAY FEEDBACK</span>
-         <h3 data-template-id="feedback-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">수업 후에도 이어지는 구체적인 첨삭</h3>
-         <p data-template-id="feedback-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">주제 소개와 토론 후 충분한 글쓰기 시간을 제공합니다. 완성한 글에는 논리, 구조, 표현, 문법을 구분해 피드백하고 이후 수업에서 개선점을 다시 확인합니다.</p>
-        </div>
-       </article>
-       <article data-template-id="workbook-card" class="canva-card sample-card workbook" style="background: rgb(255, 255, 255);">
-        <div class="sample-media">
-         <img data-template-id="workbook-sample-image" class="canva-image sample-image" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 예시"> <button data-image-target="workbook-sample-image" data-template-id="workbook-expand-button" class="canva-button expand-button" type="button" style="background: rgba(8, 28, 44, 0.86); color: rgb(255, 255, 255); font-weight: 700; font-style: normal;"> 크게 보기</button>
-        </div>
-        <div class="sample-copy">
-         <span data-template-id="workbook-card-index" class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">02 · ORIGINAL WORKBOOK</span>
-         <h3 data-template-id="workbook-card-title" class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">질문이 생각과 글쓰기를 이끄는 자체 교재</h3>
-         <p data-template-id="workbook-card-description" class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">사실 확인에 그치지 않고 인물의 선택, 원인과 결과, 주제 해석을 묻는 주관식 문제와 Mini Essay Prompt로 구성됩니다.</p>
-        </div>
-       </article>
+       {classContentGalleries.map((gallery) => (
+        <article data-gallery={gallery.id} data-gallery-label={gallery.label} class:list={["canva-card", "sample-card", "example-gallery", gallery.id]} style="background: rgb(255, 255, 255);">
+         <div class="gallery-preview">
+          <div class="sample-media">
+           <button class="gallery-stage-button" data-gallery-open data-gallery-stage type="button" aria-label={`${gallery.label} · ${gallery.images[0].caption} 크게 보기`}>
+            <img data-gallery-main class="canva-image sample-image" loading="lazy" decoding="async" src={previewFor(gallery.images[0].full)} alt={gallery.images[0].alt} width="1192" height="1684" data-gallery-index="0">
+            <span class="gallery-stage-hint"><i data-lucide="maximize-2" aria-hidden="true"></i> 크게 보기</span>
+           </button>
+          </div>
+          <div class="gallery-meta">
+           <span class="gallery-meta-caption" data-gallery-caption>{gallery.images[0].caption}</span>
+           <span class="gallery-counter" data-gallery-counter>01 / {String(gallery.images.length).padStart(2, "0")}</span>
+          </div>
+          <div class="gallery-thumbnails" data-gallery-thumbnails role="group" aria-label={`${gallery.label} 페이지 선택`}>
+           {gallery.images.map((image, index) => (
+            <button class="gallery-thumbnail" data-gallery-thumbnail data-index={index} data-full={image.full} data-preview={previewFor(image.full)} data-thumb={image.thumb} data-caption={image.caption} data-alt={image.alt} type="button" aria-current={index === 0 ? "true" : "false"} aria-label={`${gallery.label} ${index + 1}페이지 · ${image.caption} 보기`}>
+             <img src={image.thumb} alt="" loading="lazy" decoding="async" width="58" height="78">
+             <span>{String(index + 1).padStart(2, "0")}</span>
+            </button>
+           ))}
+          </div>
+         </div>
+         <div class="sample-copy">
+          <span class="canva-text sample-index" style="color: rgb(207, 122, 56); font-weight: 900; font-style: normal;">{gallery.index} · {gallery.label}</span>
+          <h3 class="canva-text" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">{gallery.title}</h3>
+          <p class="canva-text" style="color: rgb(98, 125, 152); font-weight: 400; font-style: normal;">{gallery.description}</p>
+          <div class="gallery-tags" aria-label="학습 요소">
+           {gallery.tags.map((tag) => <span class="gallery-tag">{tag}</span>)}
+          </div>
+          <button class="gallery-open-button" data-gallery-open type="button">전체 {gallery.images.length}페이지 보기 <span aria-hidden="true">→</span></button>
+         </div>
+        </article>
+       ))}
       </div>
       <section class="lesson-panel" aria-labelledby="weekly-lesson-title">
        <div data-template-id="lesson-panel-header" class="canva-banner lesson-panel-head" style="background: linear-gradient(120deg, rgb(16, 42, 67), rgb(30, 78, 114));">
@@ -1675,6 +2105,12 @@
        style="color:#fff;">
       <i data-lucide="instagram" aria-hidden="true"></i>
     </a>
+    <a href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer"
+       data-template-id="floating-threads" class="canva-button floating-button threads"
+       data-label="Threads" aria-label="Threads"
+       style="color:#fff;">
+      <i data-lucide="at-sign" aria-hidden="true"></i>
+    </a>
     <a href="#consulting"
        data-template-id="floating-consult" class="canva-button floating-button"
        data-label="무료 상담 신청" aria-label="무료 상담 신청"
@@ -1694,7 +2130,7 @@
         <a href="#about" data-template-id="footer-about" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">About</a> <a href="#faculty" data-template-id="footer-faculty" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Faculty</a> <a href="#curriculum" data-template-id="footer-curriculum" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Curriculum</a> <a href="#class-content" data-template-id="footer-class-content" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Class Content</a> <a href="#consulting" data-template-id="footer-contact" class="canva-link" style="color: rgb(185, 201, 216); font-weight: 400; font-style: normal;">Contact</a>
        </nav>
        <div class="footer-socials">
-        <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social naver" aria-label="네이버 블로그"><strong>N</strong></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="footer-social kakao" aria-label="카카오톡"><i data-lucide="message-circle"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social instagram" aria-label="인스타그램"><i data-lucide="instagram"></i></a>
+        <a href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social naver" aria-label="네이버 블로그"><strong>N</strong></a> <a href="http://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" class="footer-social kakao" aria-label="카카오톡"><i data-lucide="message-circle"></i></a> <a href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social instagram" aria-label="인스타그램"><i data-lucide="instagram"></i></a> <a href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" class="footer-social threads" aria-label="Threads"><i data-lucide="at-sign"></i></a>
        </div>
       </div>
      </div>
@@ -1725,10 +2161,29 @@
      <p data-template-id="footer-copyright" class="canva-text copyright" style="color: rgb(130, 154, 177); font-weight: 400; font-style: normal;">© 2026 4STEPS BOOK CLUB. All Rights Reserved.</p>
     </div>
    </footer>
-   <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-hidden="true">
-    <div class="modal-dialog">
-     <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x"></i> </button> <img data-template-id="modal-feedback-image" data-modal-image="feedback-example-image" class="canva-image modal-image hidden" loading="lazy" src="images/feedback-example.png" alt="학생 에세이 세 편에 문장과 구조 피드백이 자세히 표시된 실제 첨삭 예시 확대 이미지"> <img data-template-id="modal-workbook-image" data-modal-image="workbook-sample-image" class="canva-image modal-image hidden" loading="lazy" src="images/workbook-sample.png" alt="Critical Thinking and Analysis 질문과 Mini Essay Writing 과제가 포함된 4STEPS 자체 교재 확대 이미지">
-     <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">4STEPS 실제 수업 자료</p>
+   </div>
+   <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-describedby="modal-page-caption" aria-hidden="true">
+    <div class="modal-dialog" tabindex="-1">
+     <div class="modal-header">
+      <div class="modal-heading">
+       <p id="modal-eyebrow" class="modal-eyebrow">INSIDE THE CLASS</p>
+       <p id="modal-caption" data-template-id="modal-caption" class="canva-text modal-caption" style="color: rgb(16, 42, 67); font-weight: 800; font-style: normal;">4STEPS 실제 수업 자료</p>
+      </div>
+      <div class="modal-controls" aria-label="이미지 보기 도구">
+       <button id="modal-zoom" class="modal-zoom" type="button" aria-pressed="false" aria-label="이미지 확대">확대</button>
+       <button id="modal-close" data-template-id="modal-close-button" class="canva-button modal-close" type="button" aria-label="이미지 닫기" style="background: rgba(8, 28, 44, 0.9); color: rgb(255, 255, 255);"> <i data-lucide="x" aria-hidden="true"></i> </button>
+      </div>
+     </div>
+     <div id="modal-stage" class="modal-stage">
+      <button id="modal-prev" class="modal-nav prev" type="button" aria-label="이전 페이지"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+      <img id="modal-image" class="canva-image modal-image" loading="lazy" decoding="async" src={previewFor(classContentGalleries[0].images[0].full)} alt={classContentGalleries[0].images[0].alt} width="1192" height="1684">
+      <button id="modal-next" class="modal-nav next" type="button" aria-label="다음 페이지"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+     </div>
+     <div class="modal-gallery-meta">
+      <span id="modal-page-caption">페이지를 선택하세요.</span>
+      <span id="modal-counter" class="modal-counter">01 / 01</span>
+     </div>
+     <div id="modal-thumbnails" class="modal-thumbnails" role="group" aria-label="갤러리 페이지 선택"></div>
     </div>
    </div>
    <div id="toast" data-template-id="success-toast" class="canva-banner toast" role="status" aria-live="polite" style="background: rgb(16, 42, 67); color: rgb(255, 255, 255); font-weight: 600; font-style: normal;">상담 내용을 담은 이메일 작성 화면을 열었습니다.</div>
@@ -1744,8 +2199,24 @@
       const toast = document.getElementById("toast");
       const modal = document.getElementById("image-modal");
       const modalClose = document.getElementById("modal-close");
-      const modalImages = [...modal.querySelectorAll("[data-modal-image]")];
+      const modalStage = document.getElementById("modal-stage");
+      const modalImage = document.getElementById("modal-image");
+      const modalCaption = document.getElementById("modal-caption");
+      const modalPageCaption = document.getElementById("modal-page-caption");
+      const modalCounter = document.getElementById("modal-counter");
+      const modalPrev = document.getElementById("modal-prev");
+      const modalNext = document.getElementById("modal-next");
+      const modalThumbnails = document.getElementById("modal-thumbnails");
+      const modalZoom = document.getElementById("modal-zoom");
+      const modalDialog = document.querySelector(".modal-dialog");
+      const pageContent = document.getElementById("page-content");
+      const floatingActions = document.querySelector(".floating-actions");
+      const galleries = [...document.querySelectorAll("[data-gallery]")];
+      let activeGallery = null;
+      let activeIndex = 0;
       let lastFocusedElement = null;
+      let touchStartX = null;
+      let touchStartY = null;
 
       menuButton.addEventListener("click", () => {
         const isOpen = navigation.classList.toggle("open");
@@ -1759,11 +2230,120 @@
         });
       });
 
-      function openImageModal(targetId, trigger) {
-        lastFocusedElement = trigger;
-        modalImages.forEach((image) => {
-          image.classList.toggle("hidden", image.dataset.modalImage !== targetId);
+      function getGalleryItems(gallery) {
+        return [...gallery.querySelectorAll("[data-gallery-thumbnail]")];
+      }
+
+      function pageNumber(value) {
+        return String(value).padStart(2, "0");
+      }
+
+      function getFocusableElements(container) {
+        return [...container.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )].filter((element) => element.getAttribute("aria-hidden") !== "true" && element.offsetParent !== null);
+      }
+
+      function setPageContentInert(isInert) {
+        pageContent.inert = isInert;
+        if (isInert) pageContent.setAttribute("inert", "");
+        else pageContent.removeAttribute("inert");
+        pageContent.setAttribute("aria-hidden", String(isInert));
+      }
+
+      function setGalleryPage(gallery, requestedIndex) {
+        const items = getGalleryItems(gallery);
+        if (!items.length) return 0;
+
+        const index = Math.max(0, Math.min(requestedIndex, items.length - 1));
+        const item = items[index];
+        const mainImage = gallery.querySelector("[data-gallery-main]");
+        const caption = gallery.querySelector("[data-gallery-caption]");
+        const counter = gallery.querySelector("[data-gallery-counter]");
+        const stageButton = gallery.querySelector("[data-gallery-stage]");
+
+        mainImage.src = item.dataset.preview;
+        mainImage.alt = item.dataset.alt;
+        mainImage.dataset.galleryIndex = String(index);
+        caption.textContent = item.dataset.caption;
+        counter.textContent = `${pageNumber(index + 1)} / ${pageNumber(items.length)}`;
+        stageButton.setAttribute("aria-label", `${gallery.dataset.galleryLabel} · ${item.dataset.caption} 크게 보기`);
+
+        items.forEach((thumbnail, thumbnailIndex) => {
+          thumbnail.setAttribute("aria-current", String(thumbnailIndex === index));
         });
+
+        item.scrollIntoView({ block: "nearest", inline: "nearest" });
+        return index;
+      }
+
+      function resetModalZoom() {
+        modalStage.classList.remove("zoomed");
+        modalStage.scrollLeft = 0;
+        modalStage.scrollTop = 0;
+        modalZoom.setAttribute("aria-pressed", "false");
+        modalZoom.setAttribute("aria-label", "이미지 확대");
+        modalZoom.textContent = "확대";
+      }
+
+      function updateModal({ restoreThumbnailFocus = false } = {}) {
+        if (!activeGallery) return;
+
+        const items = getGalleryItems(activeGallery);
+        const item = items[activeIndex];
+        if (!item) return;
+
+        resetModalZoom();
+        modalImage.src = item.dataset.full;
+        modalImage.loading = "eager";
+        modalImage.alt = item.dataset.alt;
+        modalCaption.textContent = `${activeGallery.dataset.galleryLabel} · ${item.dataset.caption}`;
+        modalPageCaption.textContent = item.dataset.caption;
+        modalCounter.textContent = `${pageNumber(activeIndex + 1)} / ${pageNumber(items.length)}`;
+        modalPrev.disabled = activeIndex === 0;
+        modalNext.disabled = activeIndex === items.length - 1;
+
+        modalThumbnails.innerHTML = "";
+        items.forEach((galleryItem, index) => {
+          const thumbnail = document.createElement("button");
+          thumbnail.className = "modal-thumbnail";
+          thumbnail.type = "button";
+          thumbnail.setAttribute("aria-current", String(index === activeIndex));
+          thumbnail.setAttribute("aria-label", `${activeGallery.dataset.galleryLabel} ${index + 1}페이지 · ${galleryItem.dataset.caption} 보기`);
+
+          const image = document.createElement("img");
+          image.src = galleryItem.dataset.thumb;
+          image.alt = "";
+          image.loading = index === activeIndex ? "eager" : "lazy";
+          image.decoding = "async";
+          image.width = 58;
+          image.height = 78;
+
+          const number = document.createElement("span");
+          number.textContent = pageNumber(index + 1);
+
+          thumbnail.append(image, number);
+          thumbnail.addEventListener("click", () => {
+            activeIndex = setGalleryPage(activeGallery, index);
+            updateModal({ restoreThumbnailFocus: true });
+          });
+          modalThumbnails.append(thumbnail);
+        });
+
+        const activeThumbnail = modalThumbnails.querySelector('[aria-current="true"]');
+        if (activeThumbnail) {
+          activeThumbnail.scrollIntoView({ block: "nearest", inline: "nearest" });
+          if (restoreThumbnailFocus) activeThumbnail.focus({ preventScroll: true });
+        }
+      }
+
+      function openGallery(gallery, trigger) {
+        const mainImage = gallery.querySelector("[data-gallery-main]");
+        activeGallery = gallery;
+        activeIndex = Number(mainImage.dataset.galleryIndex || 0);
+        lastFocusedElement = trigger;
+        updateModal();
+        setPageContentInert(true);
         modal.classList.add("open");
         modal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
@@ -1771,28 +2351,130 @@
       }
 
       function closeImageModal() {
+        resetModalZoom();
+        touchStartX = null;
+        touchStartY = null;
         modal.classList.remove("open");
         modal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
-        modalImages.forEach((image) => image.classList.add("hidden"));
-        if (lastFocusedElement) lastFocusedElement.focus();
+        setPageContentInert(false);
+        const focusTarget = lastFocusedElement;
+        lastFocusedElement = null;
+        if (focusTarget && focusTarget.isConnected) focusTarget.focus({ preventScroll: true });
+        activeGallery = null;
       }
 
-      document.querySelectorAll("[data-image-target]").forEach((button) => {
-        button.addEventListener("click", () => {
-          openImageModal(button.dataset.imageTarget, button);
+      function changeModalPage(delta) {
+        if (!activeGallery) return;
+        activeIndex = setGalleryPage(activeGallery, activeIndex + delta);
+        updateModal();
+      }
+
+      galleries.forEach((gallery) => {
+        gallery.querySelectorAll("[data-gallery-thumbnail]").forEach((thumbnail) => {
+          thumbnail.addEventListener("click", () => {
+            setGalleryPage(gallery, Number(thumbnail.dataset.index));
+          });
+        });
+
+        gallery.querySelectorAll("[data-gallery-open]").forEach((trigger) => {
+          trigger.addEventListener("click", () => openGallery(gallery, trigger));
         });
       });
 
       modalClose.addEventListener("click", closeImageModal);
 
+      modalPrev.addEventListener("click", () => changeModalPage(-1));
+      modalNext.addEventListener("click", () => changeModalPage(1));
+      modalZoom.addEventListener("click", () => {
+        const isZoomed = modalStage.classList.toggle("zoomed");
+        modalZoom.setAttribute("aria-pressed", String(isZoomed));
+        modalZoom.setAttribute("aria-label", isZoomed ? "이미지 축소" : "이미지 확대");
+        modalZoom.textContent = isZoomed ? "축소" : "확대";
+        if (isZoomed) {
+          modalStage.scrollLeft = 0;
+          modalStage.scrollTop = 0;
+        } else {
+          resetModalZoom();
+        }
+      });
+
       modal.addEventListener("click", (event) => {
         if (event.target === modal) closeImageModal();
       });
 
+      modalStage.addEventListener("touchstart", (event) => {
+        if (modalStage.classList.contains("zoomed")) {
+          touchStartX = null;
+          touchStartY = null;
+          return;
+        }
+        touchStartX = event.changedTouches[0].clientX;
+        touchStartY = event.changedTouches[0].clientY;
+      }, { passive: true });
+
+      modalStage.addEventListener("touchend", (event) => {
+        if (modalStage.classList.contains("zoomed") || touchStartX === null || touchStartY === null) {
+          touchStartX = null;
+          touchStartY = null;
+          return;
+        }
+        const distance = event.changedTouches[0].clientX - touchStartX;
+        const verticalDistance = event.changedTouches[0].clientY - touchStartY;
+        touchStartX = null;
+        touchStartY = null;
+        if (Math.abs(distance) < 45 || Math.abs(distance) <= Math.abs(verticalDistance)) return;
+        changeModalPage(distance < 0 ? 1 : -1);
+      }, { passive: true });
+
+      modalStage.addEventListener("touchcancel", () => {
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+
+      if (floatingActions && "IntersectionObserver" in window) {
+        const coveredTargets = new Set();
+        const floatingObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) coveredTargets.add(entry.target);
+            else coveredTargets.delete(entry.target);
+          });
+          floatingActions.classList.toggle("is-hidden", coveredTargets.size > 0);
+        }, { rootMargin: "-10% 0px -24% 0px", threshold: 0 });
+
+        ["#class-content", "#consulting", ".site-footer"].forEach((selector) => {
+          const target = document.querySelector(selector);
+          if (target) floatingObserver.observe(target);
+        });
+      }
+
       document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && modal.classList.contains("open")) {
+        if (!modal.classList.contains("open")) return;
+        if (event.key === "Tab") {
+          const focusableElements = getFocusableElements(modal);
+          if (!focusableElements.length) {
+            event.preventDefault();
+            modalDialog.focus();
+            return;
+          }
+
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          if (event.shiftKey && (document.activeElement === firstElement || !modal.contains(document.activeElement))) {
+            event.preventDefault();
+            lastElement.focus();
+          } else if (!event.shiftKey && (document.activeElement === lastElement || !modal.contains(document.activeElement))) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        } else if (event.key === "Escape") {
           closeImageModal();
+        } else if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          changeModalPage(-1);
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          changeModalPage(1);
         }
       });
 
