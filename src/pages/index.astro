@@ -247,6 +247,12 @@ const classContentGalleries = [
       color:#fff;
     }
     .threads { background:#111; color:#fff; }
+    :global(.threads-logo) {
+      display:block;
+      width:1em;
+      height:1em;
+      object-fit:contain;
+    }
     .nav-cta {
       padding:10px 15px;
       border-radius:7px;
@@ -976,6 +982,10 @@ const classContentGalleries = [
       width:21px;
       height:21px;
       stroke-width:2.2;
+    }
+    :global(.floating-button .threads-logo) {
+      width:21px;
+      height:21px;
     }
     .floating-button:hover {
       transform:translateY(-3px) scale(1.04);
@@ -2191,6 +2201,15 @@ const classContentGalleries = [
   <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
+
+      document.querySelectorAll('a[href*="threads.com"] [data-lucide="at-sign"]').forEach((icon) => {
+        const logo = document.createElement("img");
+        logo.className = "threads-logo";
+        logo.src = "/images/threads-logo-white.svg";
+        logo.alt = "";
+        logo.setAttribute("aria-hidden", "true");
+        icon.replaceWith(logo);
+      });
 
       const menuButton = document.getElementById("menu-button");
       const navigation = document.getElementById("site-nav");
