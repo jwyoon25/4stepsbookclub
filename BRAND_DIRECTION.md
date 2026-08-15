@@ -20,14 +20,14 @@ The visual and verbal sequence is:
 
 The identity turns the four stages of the program into ruled lines on a reading-and-writing page. The numeral `4` is drawn directly through those rules, while the coral fourth line becomes its crossbar. The result connects the name, the four-part method, and the act of writing in one academically grounded mark.
 
-The editorial serif wordmark keeps the identity warm and publication-like. A restrained capsule border gives each lockup the feeling of a considered bookplate instead of a generic app badge.
+The editorial serif wordmark keeps the identity warm and publication-like. A restrained rounded-rectangle border gives each logotype the feeling of a considered bookplate instead of a generic app badge.
 
-- Primary dark lockup: `public/images/brand/lockup-dark.svg`
-- Primary light lockup: `public/images/brand/lockup-light.svg`
-- Method lockups: `public/images/brand/lockup-method-dark.svg` and `public/images/brand/lockup-method-light.svg`
-- Compact marks: `public/images/brand/mark-dark.svg` and `public/images/brand/mark-light.svg`
+- Primary dark logotype: `public/images/brand/logotype-dark.svg`
+- Primary light logotype: `public/images/brand/logotype-light.svg`
+- Compact dark logomark: `public/images/brand/logomark-dark.svg`
+- Compact light logomark: `public/images/brand/logomark-light.svg`
 - Generated browser and device icons: `public/images/icons/`
-- Every lockup ends at its capsule border; the area outside the border is always transparent.
+- Every logotype ends at its rounded-rectangle border; the area outside the border is always transparent.
 - Light variants are fully transparent inside the capsule. Dark variants use Library Green only inside the capsule.
 - Compact marks use the same construction as a circle rather than a rectangular badge.
 - Keep clear space around a lockup equal to roughly one ruled-line interval.
