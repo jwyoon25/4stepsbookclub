@@ -251,7 +251,7 @@ const faqItems = [
       *, *::before, *::after { box-sizing: border-box; }
       html {
         scroll-behavior: smooth;
-        scroll-padding-top: calc(96px + env(safe-area-inset-top));
+        scroll-padding-top: calc(80px + env(safe-area-inset-top));
         overflow-x: hidden;
         overflow-x: clip;
       }
@@ -294,7 +294,7 @@ const faqItems = [
       }
       .skip-link:focus { transform: translateY(0); }
       .container { width: min(var(--container), calc(100% - 32px)); margin-inline: auto; }
-      .section { position: relative; padding: 72px 0; scroll-margin-top: calc(96px + env(safe-area-inset-top)); }
+      .section { position: relative; padding: 72px 0; scroll-margin-top: calc(80px + env(safe-area-inset-top)); }
       .section-kicker {
         display: inline-flex;
         align-items: center;
@@ -346,11 +346,12 @@ const faqItems = [
         z-index: 1200;
         padding-top: env(safe-area-inset-top);
         border-bottom: 1px solid rgba(23, 52, 47, 0.09);
-        background: rgba(247, 243, 234, 0.97);
+        background: rgba(247, 243, 234, 0.98);
+        box-shadow: 0 8px 28px rgba(23, 52, 47, 0.035);
       }
-      .site-header .header-inner { min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-      .brand-home { min-height: 44px; display: inline-flex; align-items: center; }
-      .brand-logo { display: block; width: 176px; height: auto; }
+      .site-header .header-inner { min-height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .brand-home { min-height: 44px; display: inline-flex; flex: 0 0 auto; align-items: center; border-radius: 4px; }
+      .brand-logo { display: block; width: 144px; height: auto; filter: drop-shadow(0 3px 7px rgba(23, 52, 47, 0.06)); }
       .menu-toggle {
         width: 46px;
         height: 46px;
@@ -368,7 +369,7 @@ const faqItems = [
       .menu-toggle[aria-expanded="true"] .menu-icon-close { display: block; }
       .nav-backdrop {
         position: fixed;
-        inset: calc(96px + env(safe-area-inset-top)) 0 0;
+        inset: calc(80px + env(safe-area-inset-top)) 0 0;
         z-index: 1090;
         opacity: 0;
         visibility: hidden;
@@ -378,7 +379,7 @@ const faqItems = [
       .nav-backdrop.open { opacity: 1; visibility: visible; }
       .site-nav {
         position: fixed;
-        top: calc(96px + env(safe-area-inset-top));
+        top: calc(80px + env(safe-area-inset-top));
         right: 0;
         bottom: 0;
         z-index: 1100;
@@ -409,7 +410,8 @@ const faqItems = [
       .nav-links > a:not(.nav-cta)::after { content: "↘"; color: var(--coral); font-family: var(--font-sans); font-size: 15px; }
       .nav-cta { width: 100%; margin-top: 22px; }
       .nav-socials { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 22px; }
-      .nav-socials .social-chip { min-width: 0; justify-content: center; padding-inline: 6px; font-size: 11px; }
+      .nav-socials .social-chip { width: 100%; min-width: 0; justify-content: center; padding: 0; font-size: 11px; }
+      .nav-socials .social-label { display: none; }
       .nav-socials .threads-chip { background: #111; border-color: #111; color: var(--white); }
       .social-chip {
         min-height: 44px;
@@ -823,11 +825,13 @@ const faqItems = [
 
       .site-footer { padding: 52px 0 calc(98px + env(safe-area-inset-bottom)); background: #102722; color: white; }
       .footer-grid { display: grid; gap: 31px; }
-      .footer-logo { display: flex; align-items: center; gap: 12px; }
-      .footer-mark { width: 44px; height: 44px; }
-      .footer-wordmark b { display: block; font-size: 17px; letter-spacing: -0.03em; }
-      .footer-wordmark span { display: block; margin-top: 1px; color: rgba(255, 255, 255, 0.51); font-size: 8px; font-weight: 700; letter-spacing: 0.25em; }
-      .footer-tagline { margin-top: 17px; color: rgba(255, 255, 255, 0.64); font-family: var(--font-display); font-size: 18px; }
+      .footer-brand { display: inline-flex; flex-direction: column; align-items: flex-start; border-radius: 4px; }
+      .footer-logo { display: flex; align-items: center; gap: 14px; }
+      .footer-mark { width: 56px; height: 56px; border-radius: 2px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14); }
+      .footer-wordmark b { display: block; color: var(--paper); font-family: var(--font-display); font-size: 24px; line-height: 1; letter-spacing: -0.05em; }
+      .footer-wordmark span { display: block; margin-top: 5px; color: rgba(255, 255, 255, 0.56); font-size: 9px; font-weight: 700; letter-spacing: 0.24em; }
+      .footer-method { margin-top: 14px; color: #a9b5ac; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; }
+      .footer-tagline { margin-top: 11px; color: rgba(255, 255, 255, 0.68); font-family: var(--font-display); font-size: 18px; }
       .footer-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; }
       .footer-links a { min-height: 44px; display: flex; align-items: center; color: rgba(255, 255, 255, 0.68); font-size: 13px; }
       .footer-socials { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -996,17 +1000,12 @@ const faqItems = [
         .feedback-note { right: -5%; }
       }
 
-      @media (min-width: 900px) {
-        html { scroll-padding-top: calc(112px + env(safe-area-inset-top)); }
-        .section { scroll-margin-top: calc(112px + env(safe-area-inset-top)); }
-        .site-header .header-inner { min-height: 112px; }
-        .brand-logo { width: 200px; }
-        .nav-backdrop { inset: calc(112px + env(safe-area-inset-top)) 0 0; }
-        .site-nav { top: calc(112px + env(safe-area-inset-top)); }
-      }
-
       @media (min-width: 980px) {
+        html { scroll-padding-top: calc(88px + env(safe-area-inset-top)); }
         body { padding-bottom: 0; }
+        .section { scroll-margin-top: calc(88px + env(safe-area-inset-top)); }
+        .site-header .header-inner { min-height: 88px; }
+        .brand-logo { width: 154px; }
         .menu-toggle, .nav-backdrop, .nav-label { display: none; }
         .site-nav { position: static; width: auto; display: flex; align-items: center; gap: 10px; padding: 0; overflow: visible; background: transparent; transform: none; visibility: visible; pointer-events: auto; }
         .nav-links { display: flex; align-items: center; gap: 17px; }
@@ -1049,24 +1048,7 @@ const faqItems = [
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand-home" href="#top" aria-label="4steps Book Club 홈">
-          <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 220" role="img" aria-labelledby="header-logo-title header-logo-desc">
-            <title id="header-logo-title">4steps Book Club</title>
-            <desc id="header-logo-desc">Four ruled lines with the writing line in coral; the numeral four is drawn out of the rules.</desc>
-            <g aria-hidden="true">
-              <rect x="0" y="0" width="430" height="220" rx="6" fill="#17342F"></rect>
-              <rect x="12" y="12" width="406" height="196" rx="2" fill="none" stroke="#F7F3EA" stroke-opacity="0.32" stroke-width="1.4"></rect>
-              <g stroke="#F7F3EA" stroke-opacity="0.24" stroke-width="1.4">
-                <line x1="30" y1="52" x2="400" y2="52"></line>
-                <line x1="30" y1="88" x2="400" y2="88"></line>
-                <line x1="30" y1="160" x2="400" y2="160"></line>
-              </g>
-              <line x1="30" y1="124" x2="400" y2="124" stroke="#EF6B4A" stroke-width="2"></line>
-              <line x1="42" y1="124" x2="112" y2="124" stroke="#EF6B4A" stroke-width="9"></line>
-              <path d="M52 124 L90 52 V160" fill="none" stroke="#F7F3EA" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"></path>
-              <text x="130" y="124" font-family="Gowun Batang, serif" font-weight="700" font-size="78" letter-spacing="-1" fill="#F7F3EA">steps</text>
-              <text x="132" y="160" font-family="IBM Plex Sans KR, sans-serif" font-weight="600" font-size="16" letter-spacing="3" fill="#a9b5ac">BOOK CLUB</text>
-            </g>
-          </svg>
+          <img class="brand-logo" src="/images/brand/lockup-light.svg" alt="" width="430" height="220" />
         </a>
         <button id="menu-toggle" class="menu-toggle" type="button" aria-label="메뉴 열기" aria-controls="site-nav" aria-expanded="false">
           <i class="menu-icon-open" data-lucide="menu" aria-hidden="true"></i>
@@ -1406,7 +1388,10 @@ const faqItems = [
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <div class="footer-logo"><img class="footer-mark" src="/images/brand/mark-dark.svg" alt="" width="60" height="60" /><div class="footer-wordmark"><b>4steps book club</b><span>READ · THINK · SPEAK · WRITE</span></div></div>
+          <a class="footer-brand" href="#top" aria-label="4steps Book Club 홈">
+            <span class="footer-logo"><img class="footer-mark" src="/images/brand/mark-light.svg" alt="" width="120" height="120" /><span class="footer-wordmark"><b>4steps</b><span>BOOK CLUB</span></span></span>
+            <span class="footer-method">READ · THINK · SPEAK · WRITE</span>
+          </a>
           <p class="footer-tagline">읽은 책이, 아이의 문장이 되도록.</p>
         </div>
         <div>
