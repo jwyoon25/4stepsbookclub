@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="l-title l-desc">
+  <title id="l-title">4steps Book Club</title>
+  <desc id="l-desc">Four ruled lines frame a numeral four; the active writing line is coral.</desc>
+  <g aria-hidden="true">
+      <rect x="0" y="0" width="120" height="120" rx="4" fill="#F7F3EA"></rect>
+      <rect x="7" y="7" width="106" height="106" rx="1.5" fill="none" stroke="#17342F" stroke-opacity="0.45" stroke-width="1.6"></rect>
+      <g stroke="#17342F" stroke-opacity="0.2" stroke-width="2.2">
+        <line x1="22" y1="34" x2="98" y2="34"></line>
+        <line x1="22" y1="53" x2="98" y2="53"></line>
+        <line x1="22" y1="91" x2="98" y2="91"></line>
+      </g>
+      <line x1="22" y1="72" x2="98" y2="72" stroke="#EF6B4A" stroke-width="2.4"></line>
+      <line x1="30" y1="72" x2="88" y2="72" stroke="#EF6B4A" stroke-width="8.5"></line>
+      <path d="M38 72 L72 34 V91" fill="none" stroke="#17342F" stroke-width="8.5" stroke-linejoin="round" stroke-linecap="round"></path>
+  </g>
+</svg>

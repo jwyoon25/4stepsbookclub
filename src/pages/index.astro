@@ -208,11 +208,13 @@ const faqItems = [
     <meta name="description" content="읽은 책이 아이의 문장이 되도록. G1–G9 영어 리딩, 토론, 라이팅을 연결하는 4인 소수 관리형 4steps Book Club." />
     <meta name="theme-color" content="#f7f3ea" />
     <title>4steps Book Club | 읽은 책이 아이의 문장이 되도록</title>
-    <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192.png" />
-    <link rel="shortcut icon" href="/images/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-180.png" />
+    <link rel="icon" type="image/svg+xml" href="/images/brand/mark-dark.svg" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icons/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/images/icons/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/icons/favicon-192.png" />
+    <link rel="shortcut icon" href="/images/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -249,7 +251,7 @@ const faqItems = [
       *, *::before, *::after { box-sizing: border-box; }
       html {
         scroll-behavior: smooth;
-        scroll-padding-top: calc(70px + env(safe-area-inset-top));
+        scroll-padding-top: calc(96px + env(safe-area-inset-top));
         overflow-x: hidden;
         overflow-x: clip;
       }
@@ -292,7 +294,7 @@ const faqItems = [
       }
       .skip-link:focus { transform: translateY(0); }
       .container { width: min(var(--container), calc(100% - 32px)); margin-inline: auto; }
-      .section { position: relative; padding: 72px 0; scroll-margin-top: calc(70px + env(safe-area-inset-top)); }
+      .section { position: relative; padding: 72px 0; scroll-margin-top: calc(96px + env(safe-area-inset-top)); }
       .section-kicker {
         display: inline-flex;
         align-items: center;
@@ -346,9 +348,9 @@ const faqItems = [
         border-bottom: 1px solid rgba(23, 52, 47, 0.09);
         background: rgba(247, 243, 234, 0.97);
       }
-      .header-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .site-header .header-inner { min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
       .brand-home { min-height: 44px; display: inline-flex; align-items: center; }
-      .brand-logo { width: 169px; height: auto; }
+      .brand-logo { display: block; width: 176px; height: auto; }
       .menu-toggle {
         width: 46px;
         height: 46px;
@@ -366,7 +368,7 @@ const faqItems = [
       .menu-toggle[aria-expanded="true"] .menu-icon-close { display: block; }
       .nav-backdrop {
         position: fixed;
-        inset: calc(70px + env(safe-area-inset-top)) 0 0;
+        inset: calc(96px + env(safe-area-inset-top)) 0 0;
         z-index: 1090;
         opacity: 0;
         visibility: hidden;
@@ -376,7 +378,7 @@ const faqItems = [
       .nav-backdrop.open { opacity: 1; visibility: visible; }
       .site-nav {
         position: fixed;
-        top: calc(70px + env(safe-area-inset-top));
+        top: calc(96px + env(safe-area-inset-top));
         right: 0;
         bottom: 0;
         z-index: 1100;
@@ -994,11 +996,17 @@ const faqItems = [
         .feedback-note { right: -5%; }
       }
 
+      @media (min-width: 900px) {
+        html { scroll-padding-top: calc(112px + env(safe-area-inset-top)); }
+        .section { scroll-margin-top: calc(112px + env(safe-area-inset-top)); }
+        .site-header .header-inner { min-height: 112px; }
+        .brand-logo { width: 200px; }
+        .nav-backdrop { inset: calc(112px + env(safe-area-inset-top)) 0 0; }
+        .site-nav { top: calc(112px + env(safe-area-inset-top)); }
+      }
+
       @media (min-width: 980px) {
-        html { scroll-padding-top: 82px; }
         body { padding-bottom: 0; }
-        .header-inner { min-height: 82px; }
-        .brand-logo { width: 190px; }
         .menu-toggle, .nav-backdrop, .nav-label { display: none; }
         .site-nav { position: static; width: auto; display: flex; align-items: center; gap: 10px; padding: 0; overflow: visible; background: transparent; transform: none; visibility: visible; pointer-events: auto; }
         .nav-links { display: flex; align-items: center; gap: 17px; }
@@ -1041,7 +1049,24 @@ const faqItems = [
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand-home" href="#top" aria-label="4steps Book Club 홈">
-          <img class="brand-logo" src="/images/logo-new.svg" alt="4steps Book Club" width="244" height="60" />
+          <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 220" role="img" aria-labelledby="header-logo-title header-logo-desc">
+            <title id="header-logo-title">4steps Book Club</title>
+            <desc id="header-logo-desc">Four ruled lines with the writing line in coral; the numeral four is drawn out of the rules.</desc>
+            <g aria-hidden="true">
+              <rect x="0" y="0" width="430" height="220" rx="6" fill="#17342F"></rect>
+              <rect x="12" y="12" width="406" height="196" rx="2" fill="none" stroke="#F7F3EA" stroke-opacity="0.32" stroke-width="1.4"></rect>
+              <g stroke="#F7F3EA" stroke-opacity="0.24" stroke-width="1.4">
+                <line x1="30" y1="52" x2="400" y2="52"></line>
+                <line x1="30" y1="88" x2="400" y2="88"></line>
+                <line x1="30" y1="160" x2="400" y2="160"></line>
+              </g>
+              <line x1="30" y1="124" x2="400" y2="124" stroke="#EF6B4A" stroke-width="2"></line>
+              <line x1="42" y1="124" x2="112" y2="124" stroke="#EF6B4A" stroke-width="9"></line>
+              <path d="M52 124 L90 52 V160" fill="none" stroke="#F7F3EA" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"></path>
+              <text x="130" y="124" font-family="Gowun Batang, serif" font-weight="700" font-size="78" letter-spacing="-1" fill="#F7F3EA">steps</text>
+              <text x="132" y="160" font-family="IBM Plex Sans KR, sans-serif" font-weight="600" font-size="16" letter-spacing="3" fill="#a9b5ac">BOOK CLUB</text>
+            </g>
+          </svg>
         </a>
         <button id="menu-toggle" class="menu-toggle" type="button" aria-label="메뉴 열기" aria-controls="site-nav" aria-expanded="false">
           <i class="menu-icon-open" data-lucide="menu" aria-hidden="true"></i>
@@ -1092,7 +1117,7 @@ const faqItems = [
               <p class="hero-detail">서울대학교에 재학 중이며 원어민급 영어 역량을 갖춘 검증된 강사진과 함께하는 4인 소수 관리형 프로그램입니다.</p>
               <div class="hero-credential">
                 <span class="hero-credential-seal">
-                  <img class="hero-credential-crest" src="/images/snu-crest.png" width="53" height="55" alt="서울대학교 심볼마크" />
+                  <img class="hero-credential-crest" src="/images/credentials/snu-crest.png" width="53" height="55" alt="서울대학교 심볼마크" />
                 </span>
                 <span class="hero-credential-copy">
                   <small>SNU · 4STEPS FACULTY</small>
@@ -1381,7 +1406,7 @@ const faqItems = [
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <div class="footer-logo"><img class="footer-mark" src="/images/logo-mark.svg" alt="" width="60" height="60" /><div class="footer-wordmark"><b>4steps book club</b><span>READ · THINK · SPEAK · WRITE</span></div></div>
+          <div class="footer-logo"><img class="footer-mark" src="/images/brand/mark-dark.svg" alt="" width="60" height="60" /><div class="footer-wordmark"><b>4steps book club</b><span>READ · THINK · SPEAK · WRITE</span></div></div>
           <p class="footer-tagline">읽은 책이, 아이의 문장이 되도록.</p>
         </div>
         <div>

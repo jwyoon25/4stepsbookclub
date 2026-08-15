@@ -16,18 +16,20 @@ The visual and verbal sequence is:
 
 ## Logo
 
-**Concept: Page to sentence.**
+**Concept: Four lines. One method.**
 
-The symbol is not a separate education icon: it is the `4` in the 4steps name. Its open counter is drawn as a turned page, and the crossbar continues as a coral writing line ending in a period. It translates the brand promise directly: the book becomes the child's sentence.
+The identity turns the four stages of the program into ruled lines on a reading-and-writing page. The numeral `4` is drawn directly through those rules, while the coral fourth line becomes its crossbar. The result connects the name, the four-part method, and the act of writing in one academically grounded mark.
 
-The sturdy numeral represents the four-part method; the editorial serif wordmark gives the identity the character of a thoughtful publisher rather than an app or cram school. The lettering is converted to vector outlines so the logo renders consistently on every device.
+The editorial serif wordmark keeps the identity warm and publication-like. A fine inset rule gives each lockup the feeling of a considered bookplate instead of a generic app badge.
 
-- Primary lockup: `public/images/logo-new.svg`
-- Compact mark / favicon: `public/images/logo-mark.svg`
-- Keep clear space around the mark equal to roughly one quarter of its width.
-- Use Library Green as the core mark color. Coral is reserved for the page crease, writing line, and period.
-- Do not remove the period: it completes the idea of a written sentence.
-- The compact mark uses a Warm Paper field so it stays visible on the dark footer and receives predictable favicon and Apple touch icon matting.
+- Primary dark lockup: `public/images/brand/lockup-dark.svg`
+- Primary light lockup: `public/images/brand/lockup-light.svg`
+- Method lockups: `public/images/brand/lockup-method-dark.svg` and `public/images/brand/lockup-method-light.svg`
+- Compact marks: `public/images/brand/mark-dark.svg` and `public/images/brand/mark-light.svg`
+- Generated browser and device icons: `public/images/icons/`
+- Keep clear space around a lockup equal to roughly one ruled-line interval.
+- Use the light lockup on Warm Paper and pale surfaces; use the dark lockup when a stronger brand anchor is needed.
+- Library Green carries the identity. Coral is reserved for the active writing line and the crossbar of the `4`.
 - Use the compact mark when the full wordmark would render below 120px wide.
 
 ## Color palette
