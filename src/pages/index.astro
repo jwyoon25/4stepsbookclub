@@ -1,26 +1,63 @@
 ---
+import AnnotatedEssay from "../components/AnnotatedEssay.astro";
+
 const classContentGalleries = [
   {
     id: "feedback",
     index: "01",
-    label: "ESSAY FEEDBACK",
-    title: "빨간 펜보다 중요한 건, 다음 문장을 쓰는 힘",
-    description: "문법과 어휘 교정에 그치지 않고 표현, 구조, 근거, 글의 방향까지 짚어 주는 실제 첨삭 과정입니다.",
+    label: "REAL FEEDBACK PAGES",
+    title: "실제 첨삭 원본도 함께 확인해보세요",
+    description: "학생이 작성한 글 위에 남긴 문법·어휘·표현·구조 피드백과 다음 개선 목표를 원본 페이지로 보여드립니다.",
     tags: ["문법·어휘", "표현·구조", "개선 방향"],
     images: [
       {
         full: "/images/class-content/feedback/feedback-01.png",
         thumb: "/images/class-content/feedback/feedback-01-thumb.jpg",
-        preview: "/images/class-content/feedback/feedback-01-preview.jpg",
+        preview: "/images/class-content/feedback/feedback-01-preview.webp",
         caption: "문법·어휘·표현 첨삭",
         alt: "손글씨 에세이에 문법, 어휘, 표현, 문장 구조 피드백이 표시된 첨삭 사례 첫 페이지"
       },
       {
         full: "/images/class-content/feedback/feedback-02.png",
         thumb: "/images/class-content/feedback/feedback-02-thumb.jpg",
-        preview: "/images/class-content/feedback/feedback-02-preview.jpg",
+        preview: "/images/class-content/feedback/feedback-02-preview.webp",
         caption: "구조와 다음 글쓰기 목표",
         alt: "손글씨 에세이에 표현 수정과 글의 구조에 대한 코멘트가 표시된 첨삭 사례 두 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-03.png",
+        thumb: "/images/class-content/feedback/feedback-03-thumb.jpg",
+        preview: "/images/class-content/feedback/feedback-03-preview.webp",
+        caption: "에세이 문장과 표현 첨삭",
+        alt: "인물의 변화에 대한 손글씨 에세이에 문장 표현과 어휘 피드백이 표시된 첨삭 사례 세 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-04.png",
+        thumb: "/images/class-content/feedback/feedback-04-thumb.jpg",
+        preview: "/images/class-content/feedback/feedback-04-preview.webp",
+        caption: "문단 전개와 표현 피드백",
+        alt: "인물의 성격 변화에 대한 손글씨 에세이에 문단 전개와 표현 수정이 표시된 첨삭 사례 네 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-05.png",
+        thumb: "/images/class-content/feedback/feedback-05-thumb.jpg",
+        preview: "/images/class-content/feedback/feedback-05-preview.webp",
+        caption: "결론과 글의 변화 과정",
+        alt: "손글씨 에세이 결론에 문장 표현과 글의 발전 방향에 대한 피드백이 표시된 첨삭 사례 다섯 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-06.png",
+        thumb: "/images/class-content/feedback/feedback-06-thumb.jpg",
+        preview: "/images/class-content/feedback/feedback-06-preview.webp",
+        caption: "문장 표현과 어휘 첨삭",
+        alt: "손글씨 에세이에 문장 표현과 어휘 수정이 표시된 첨삭 사례 여섯 번째 페이지"
+      },
+      {
+        full: "/images/class-content/feedback/feedback-07.png",
+        thumb: "/images/class-content/feedback/feedback-07-thumb.jpg",
+        preview: "/images/class-content/feedback/feedback-07-preview.webp",
+        caption: "결론과 다음 글쓰기 목표",
+        alt: "손글씨 에세이 결론에 직접 인용, 문법, 표현 개선 목표가 정리된 첨삭 사례 일곱 번째 페이지"
       }
     ]
   },
@@ -28,63 +65,63 @@ const classContentGalleries = [
     id: "workbook",
     index: "02",
     label: "ORIGINAL WORKBOOK",
-    title: "읽고, 분석하고, 쓰는 흐름을 한 권에",
-    description: "The Maze Runner를 바탕으로 내용 이해에서 비판적 사고, 문단 쓰기, 어휘까지 연결한 자체 워크북입니다.",
-    tags: ["Comprehension", "Critical Thinking", "Writing", "Vocabulary"],
+    title: "읽기에서 분석과 글쓰기로 이어지는 자체 교재",
+    description: "The Maze Runner를 바탕으로 Reading Comprehension, Critical Thinking & Analysis, Paragraph Writing, Vocabulary를 연결한 8페이지 구성입니다.",
+    tags: ["Reading Comprehension", "Critical Thinking", "Paragraph Writing", "Vocabulary"],
     images: [
       {
         full: "/images/class-content/workbook/workbook-01.png",
         thumb: "/images/class-content/workbook/workbook-01-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-01-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-01-preview.webp",
         caption: "표지 · The Maze Runner",
         alt: "The Maze Runner와 James Dashner가 표시된 4steps Book Club 워크북 표지"
       },
       {
         full: "/images/class-content/workbook/workbook-02.png",
         thumb: "/images/class-content/workbook/workbook-02-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-02-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-02-preview.webp",
         caption: "Reading Comprehension · Chapters 1–12",
         alt: "The Maze Runner Chapters 1–12의 Reading Comprehension 질문이 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-03.png",
         thumb: "/images/class-content/workbook/workbook-03-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-03-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-03-preview.webp",
         caption: "Reading Comprehension에서 분석으로",
         alt: "The Maze Runner 내용 이해 질문과 Critical Thinking and Analysis가 함께 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-04.png",
         thumb: "/images/class-content/workbook/workbook-04-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-04-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-04-preview.webp",
         caption: "Critical Thinking & Analysis",
         alt: "The Maze Runner 인물과 리더십에 대한 비판적 사고 질문이 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-05.png",
         thumb: "/images/class-content/workbook/workbook-05-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-05-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-05-preview.webp",
         caption: "근거를 바탕으로 생각 확장하기",
         alt: "The Maze Runner의 긴 서술형 Critical Thinking 질문이 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-06.png",
         thumb: "/images/class-content/workbook/workbook-06-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-06-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-06-preview.webp",
         caption: "Paragraph Writing",
         alt: "The Maze Runner를 바탕으로 한 Paragraph Writing 안내와 세 가지 글쓰기 주제가 담긴 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-07.png",
         thumb: "/images/class-content/workbook/workbook-07-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-07-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-07-preview.webp",
         caption: "Vocabulary List · Chapters 1–12",
         alt: "The Maze Runner Chapters 1–12의 어휘, 뜻, 문맥, 예문이 표로 정리된 워크북 페이지"
       },
       {
         full: "/images/class-content/workbook/workbook-08.png",
         thumb: "/images/class-content/workbook/workbook-08-thumb.jpg",
-        preview: "/images/class-content/workbook/workbook-08-preview.jpg",
+        preview: "/images/class-content/workbook/workbook-08-preview.webp",
         caption: "Vocabulary List · continued",
         alt: "The Maze Runner 어휘와 뜻, 정의, 문맥 예문이 이어지는 워크북 마지막 페이지"
       }
@@ -254,7 +291,7 @@ const faqItems = [
       }
       .skip-link:focus { transform: translateY(0); }
       .container { width: min(var(--container), calc(100% - 32px)); margin-inline: auto; }
-      .section { position: relative; padding: 72px 0; }
+      .section { position: relative; padding: 72px 0; scroll-margin-top: calc(70px + env(safe-area-inset-top)); }
       .section-kicker {
         display: inline-flex;
         align-items: center;
@@ -1148,8 +1185,10 @@ const faqItems = [
           <div class="section-heading">
             <p class="section-kicker">Inside the Class</p>
             <h2 class="section-title">설명보다 먼저,<br />실제 수업을 보여드립니다</h2>
-            <p class="section-copy">작은 글씨도 휴대폰에서 확인할 수 있도록 페이지를 선택하고 크게 볼 수 있습니다.</p>
+            <p class="section-copy">튜터의 질문, 학생의 생각, 실제 교재의 흐름을 한 화면에서 살펴보세요. 페이지를 선택하면 작은 글씨도 크게 볼 수 있습니다.</p>
           </div>
+
+          <AnnotatedEssay />
 
           <div class="gallery-grid">
             {classContentGalleries.map((gallery) => (

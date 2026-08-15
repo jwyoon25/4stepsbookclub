@@ -1,0 +1,687 @@
+---
+import {
+  wonderEssayExcerpts,
+  wonderHomepageComments,
+  type WonderFeedbackId
+} from "../data/wonder-feedback";
+
+const defaultCommentId: WonderFeedbackId = "thesis";
+const commentById = new Map(wonderHomepageComments.map((comment) => [comment.id, comment]));
+const commentNumberById = new Map(
+  wonderHomepageComments.map((comment, index) => [comment.id, String(index + 1).padStart(2, "0")])
+);
+const splitHighlightText = (text: string) => {
+  const lastSpace = text.lastIndexOf(" ");
+  if (lastSpace < 0) return ["", text];
+  return [text.slice(0, lastSpace + 1), text.slice(lastSpace + 1)];
+};
+---
+
+<article
+  class="annotated-essay"
+  data-annotated-essay
+  data-default-comment={defaultCommentId}
+  aria-labelledby="wonder-feedback-title"
+>
+  <header class="feedback-feature-head">
+    <span class="feedback-feature-index">01 · ESSAY FEEDBACK</span>
+    <div class="feedback-feature-copy">
+      <h3 id="wonder-feedback-title">좋은 글은 좋은 생각에서 시작됩니다.</h3>
+      <p>튜터가 글을 대신 고치지 않고, 학생 스스로 논리와 근거를 강화하도록 질문합니다.</p>
+    </div>
+  </header>
+
+  <div class="annotated-layout">
+    <section class="essay-paper" aria-labelledby="wonder-essay-title">
+      <header class="essay-document-head">
+        <div>
+          <span class="artifact-label">STUDENT ESSAY</span>
+          <h4 id="wonder-essay-title"><em>Wonder</em> — Literary Analysis</h4>
+        </div>
+        <span class="artifact-meta">Grade 7 · Full essay</span>
+      </header>
+
+      <div class="essay-body">
+        {wonderEssayExcerpts.map((paragraph) => (
+          <div class="essay-paragraph-group" data-essay-paragraph={paragraph.id}>
+            <div class="essay-paragraph" role="paragraph">
+              {paragraph.segments.map((segment) => {
+                const mobileCommentId = segment.mobileCommentAfter;
+                const mobileComment = mobileCommentId ? commentById.get(mobileCommentId) : undefined;
+                let segmentContent;
+
+                if (segment.commentId && commentById.has(segment.commentId)) {
+                  const number = commentNumberById.get(segment.commentId);
+                  const [highlightLead, highlightTail] = splitHighlightText(segment.text);
+                  segmentContent = (
+                    <span
+                      id={`wonder-highlight-${segment.commentId}`}
+                      class="essay-highlight"
+                      role="button"
+                      tabindex="0"
+                      data-comment-trigger={segment.commentId}
+                      data-mobile-panel-id={`wonder-mobile-comment-${segment.commentId}`}
+                      aria-controls={`wonder-mobile-comment-${segment.commentId}`}
+                      aria-expanded="false"
+                      aria-label={`튜터 코멘트 ${number} 보기: ${segment.text}`}
+                    >
+                      <span class="highlight-copy">{highlightLead}<span class="highlight-tail">{highlightTail}<span class="annotation-chip" aria-hidden="true">{number}</span></span></span>
+                    </span>
+                  );
+                } else if (segment.italic) {
+                  segmentContent = <em>{segment.text}</em>;
+                } else {
+                  segmentContent = segment.text;
+                }
+
+                return (
+                  <>
+                    {segmentContent}
+                    {mobileCommentId && mobileComment && (
+                      <div
+                        id={`wonder-mobile-comment-${mobileCommentId}`}
+                        class="essay-mobile-comment-panel"
+                        data-mobile-panel={mobileCommentId}
+                        hidden
+                      >
+                        <article data-mobile-comment={mobileCommentId}>
+                          <span>TUTOR COMMENT {commentNumberById.get(mobileCommentId)}</span>
+                          <p>{mobileComment.text}</p>
+                        </article>
+                      </div>
+                    )}
+                  </>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <aside class="annotation-rail" data-annotation-rail aria-label="튜터 코멘트">
+      <header class="annotation-rail-head">
+        <span class="artifact-label">TUTOR COMMENTS</span>
+        <p>문장과 같은 번호를 선택해보세요.</p>
+      </header>
+
+      <ol class="annotation-marker-list">
+        {wonderHomepageComments.map((comment, index) => (
+          <li data-rail-marker={comment.id}>
+            <button
+              class="annotation-marker"
+              type="button"
+              data-comment-marker={comment.id}
+              aria-controls={`wonder-desktop-comment-${comment.id}`}
+              aria-pressed="false"
+              aria-label={`튜터 코멘트 ${String(index + 1).padStart(2, "0")}: ${comment.text}`}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <div class="desktop-comment-panel" data-desktop-panel hidden>
+        {wonderHomepageComments.map((comment, index) => (
+          <article id={`wonder-desktop-comment-${comment.id}`} data-desktop-comment={comment.id} hidden>
+            <span>TUTOR COMMENT {String(index + 1).padStart(2, "0")}</span>
+            <p>{comment.text}</p>
+          </article>
+        ))}
+      </div>
+    </aside>
+
+    <noscript>
+      <section class="annotation-fallback" aria-label="튜터 코멘트">
+        <span class="artifact-label">TUTOR COMMENTS</span>
+        <ol>
+          {wonderHomepageComments.map((comment, index) => (
+            <li><strong>{String(index + 1).padStart(2, "0")}</strong><p>{comment.text}</p></li>
+          ))}
+        </ol>
+      </section>
+    </noscript>
+  </div>
+</article>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-annotated-essay]").forEach((root) => {
+      if (root.dataset.enhanced === "true") return;
+      root.dataset.enhanced = "true";
+      root.classList.add("is-enhanced");
+
+      const desktopQuery = window.matchMedia("(min-width: 901px)");
+      const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const paper = root.querySelector(".essay-paper");
+      const rail = root.querySelector("[data-annotation-rail]");
+      const desktopPanel = root.querySelector("[data-desktop-panel]");
+      const triggers = [...root.querySelectorAll("[data-comment-trigger]")];
+      const markers = [...root.querySelectorAll("[data-comment-marker]")];
+      const markerItems = [...root.querySelectorAll("[data-rail-marker]")];
+      const desktopComments = [...root.querySelectorAll("[data-desktop-comment]")];
+      const mobilePanels = [...root.querySelectorAll("[data-mobile-panel]")];
+      const defaultId = root.dataset.defaultComment || "thesis";
+      let activeId = desktopQuery.matches ? defaultId : null;
+      let lastActiveId = defaultId;
+      let positionFrame = 0;
+
+      const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
+      const triggerFor = (id) => triggers.find((trigger) => trigger.dataset.commentTrigger === id);
+
+      const positionRail = () => {
+        if (!desktopQuery.matches || !paper || !rail) return;
+        const paperRect = paper.getBoundingClientRect();
+        const railRect = rail.getBoundingClientRect();
+        const railHeight = railRect.height;
+
+        markerItems.forEach((item) => {
+          const trigger = triggerFor(item.dataset.railMarker);
+          if (!trigger) return;
+          const triggerRect = trigger.getBoundingClientRect();
+          const center = triggerRect.top - paperRect.top + (triggerRect.height / 2);
+          item.style.setProperty("--marker-top", `${clamp(center - 22, 48, railHeight - 44)}px`);
+        });
+
+        if (!activeId || !desktopPanel || desktopPanel.hidden) return;
+        const activeTrigger = triggerFor(activeId);
+        if (!activeTrigger) return;
+        const activeRect = activeTrigger.getBoundingClientRect();
+        const activeCenter = activeRect.top - paperRect.top + (activeRect.height / 2);
+        const panelHeight = desktopPanel.getBoundingClientRect().height;
+        const preferredTop = activeCenter - Math.min(30, panelHeight * .18);
+        desktopPanel.style.setProperty("--panel-top", `${clamp(preferredTop, 48, railHeight - panelHeight)}px`);
+      };
+
+      const scheduleRailPosition = () => {
+        cancelAnimationFrame(positionFrame);
+        positionFrame = requestAnimationFrame(() => requestAnimationFrame(positionRail));
+      };
+
+      const keepMobilePanelVisible = (panel) => {
+        requestAnimationFrame(() => {
+          const rect = panel.getBoundingClientRect();
+          const safeBottom = window.innerHeight - 20;
+          const visiblePanelTop = safeBottom - 88;
+          if (rect.top <= visiblePanelTop) return;
+          window.scrollBy({
+            top: rect.top - visiblePanelTop,
+            behavior: reducedMotionQuery.matches ? "auto" : "smooth"
+          });
+        });
+      };
+
+      const render = ({ ensureVisible = false } = {}) => {
+        const desktop = desktopQuery.matches;
+        if (activeId) root.dataset.activeComment = activeId;
+        else delete root.dataset.activeComment;
+
+        triggers.forEach((trigger) => {
+          const selected = trigger.dataset.commentTrigger === activeId;
+          const controlledPanel = desktop
+            ? `wonder-desktop-comment-${trigger.dataset.commentTrigger}`
+            : trigger.dataset.mobilePanelId;
+          trigger.classList.toggle("is-active", selected);
+          trigger.setAttribute("aria-controls", controlledPanel || "");
+          trigger.setAttribute("aria-expanded", String(Boolean(selected)));
+        });
+
+        markers.forEach((marker) => {
+          const selected = marker.dataset.commentMarker === activeId;
+          marker.classList.toggle("is-active", selected);
+          marker.setAttribute("aria-pressed", String(selected));
+        });
+
+        desktopComments.forEach((comment) => {
+          comment.hidden = !desktop || comment.dataset.desktopComment !== activeId;
+        });
+        if (desktopPanel) desktopPanel.hidden = !desktop || !activeId;
+
+        let openMobilePanel = null;
+        mobilePanels.forEach((panel) => {
+          const open = !desktop && Boolean(activeId) && panel.dataset.mobilePanel === activeId;
+          panel.hidden = !open;
+          if (open) openMobilePanel = panel;
+        });
+
+        if (desktop) scheduleRailPosition();
+        else if (ensureVisible && openMobilePanel) keepMobilePanelVisible(openMobilePanel);
+      };
+
+      const activate = (id, ensureVisible = false) => {
+        if (!id) return;
+        activeId = id;
+        lastActiveId = id;
+        render({ ensureVisible });
+      };
+
+      const toggleMobile = (id) => {
+        if (!id) return;
+        if (activeId === id) {
+          activeId = null;
+          render();
+          return;
+        }
+        activate(id, true);
+      };
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("focus", () => {
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+        });
+        trigger.addEventListener("click", () => {
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+          else toggleMobile(trigger.dataset.commentTrigger);
+        });
+        trigger.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          if (desktopQuery.matches) activate(trigger.dataset.commentTrigger);
+          else toggleMobile(trigger.dataset.commentTrigger);
+        });
+      });
+
+      markers.forEach((marker) => {
+        marker.addEventListener("focus", () => activate(marker.dataset.commentMarker));
+        marker.addEventListener("click", () => activate(marker.dataset.commentMarker));
+      });
+
+      const handleBreakpointChange = () => {
+        activeId = desktopQuery.matches ? (lastActiveId || defaultId) : null;
+        render();
+      };
+
+      if (desktopQuery.addEventListener) desktopQuery.addEventListener("change", handleBreakpointChange);
+      else desktopQuery.addListener(handleBreakpointChange);
+
+      const observer = new ResizeObserver(scheduleRailPosition);
+      if (paper) observer.observe(paper);
+      if (rail) observer.observe(rail);
+      window.addEventListener("resize", scheduleRailPosition, { passive: true });
+      if (document.fonts?.ready) document.fonts.ready.then(scheduleRailPosition);
+
+      render();
+    });
+  });
+</script>
+
+<style>
+  .annotated-essay {
+    --navy: var(--ink);
+    --orange: var(--coral);
+    --cream: var(--canvas);
+    --soft: #dfe8df;
+    --type-micro: 10px;
+    --type-meta: 12px;
+    --type-body-sm: 14px;
+    --type-subheading: 24px;
+    margin-bottom:20px;
+    overflow:hidden;
+    border:1px solid var(--line-dark);
+    border-radius:var(--radius-md);
+    background:#fffdf8;
+    color:var(--text);
+  }
+  .feedback-feature-head {
+    display:grid;
+    grid-template-columns:190px minmax(0,1fr);
+    align-items:flex-start;
+    gap:20px;
+    padding:21px 18px 22px;
+    border-bottom:1px solid var(--line);
+    background:var(--cream);
+  }
+  .feedback-feature-index {
+    flex:0 0 auto;
+    padding-top:4px;
+    color:var(--orange);
+    font-size:11px;
+    line-height:1.4;
+    font-weight:700;
+    letter-spacing:.13em;
+  }
+  .feedback-feature-copy {
+    max-width:760px;
+    padding-left:24px;
+    border-left:1px solid rgba(23,52,47,.14);
+  }
+  .feedback-feature-copy h3 {
+    margin-bottom:5px;
+    color:var(--navy);
+    font-family:var(--font-display);
+    font-size:var(--type-subheading);
+    line-height:1.45;
+    font-weight:700;
+    word-break:keep-all;
+  }
+  .feedback-feature-copy p {
+    color:var(--muted);
+    font-size:var(--type-body-sm);
+    line-height:1.75;
+    word-break:keep-all;
+  }
+  .annotated-layout {
+    padding:12px;
+    background:var(--soft);
+  }
+  .annotated-essay.is-enhanced .annotated-layout {
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) 250px;
+    gap:12px;
+    align-items:stretch;
+  }
+  .essay-paper {
+    min-width:0;
+    overflow:hidden;
+    border:1px solid rgba(23,52,47,.12);
+    border-radius:13px;
+    background:var(--canvas);
+    box-shadow:0 14px 35px rgba(23,52,47,.16);
+  }
+  .essay-document-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+    padding:16px 22px 13px;
+    border-bottom:1px solid var(--line);
+  }
+  .artifact-label {
+    display:block;
+    margin-bottom:4px;
+    color:var(--orange);
+    font-size:var(--type-micro);
+    line-height:1.4;
+    font-weight:900;
+    letter-spacing:.14em;
+  }
+  .essay-document-head h4 {
+    color:var(--navy);
+    font-family:var(--font-display);
+    font-size:20px;
+    line-height:1.3;
+    font-weight:700;
+  }
+  .artifact-meta {
+    flex:0 0 auto;
+    padding-top:17px;
+    color:#7b8794;
+    font-size:var(--type-meta);
+    line-height:1.4;
+    font-weight:700;
+  }
+  .essay-body { padding:19px 23px 22px; }
+  .essay-paragraph-group + .essay-paragraph-group { margin-top:11px; }
+  .essay-paragraph {
+    color:var(--text);
+    font-family:var(--font-display);
+    font-size:15.25px;
+    line-height:1.69;
+  }
+  .essay-highlight {
+    display:inline;
+    margin:0;
+    padding:0;
+    border:0;
+    border-radius:3px;
+    background:transparent;
+    color:inherit;
+    font:inherit;
+    line-height:inherit;
+    text-align:left;
+    cursor:pointer;
+    transition:text-decoration-color .18s ease;
+  }
+  .highlight-copy {
+    padding:0 .035em .04em;
+    border-radius:2px;
+    background:linear-gradient(
+      to bottom,
+      transparent 55%,
+      rgba(242,197,92,.3) 55%,
+      rgba(242,197,92,.4) 91%,
+      transparent 91%
+    );
+    box-decoration-break:clone;
+    -webkit-box-decoration-break:clone;
+  }
+  .essay-highlight:hover .highlight-copy {
+    background:linear-gradient(
+      to bottom,
+      transparent 52%,
+      rgba(242,197,92,.38) 52%,
+      rgba(242,197,92,.5) 92%,
+      transparent 92%
+    );
+  }
+  .highlight-tail {
+    display:inline-flex;
+    align-items:center;
+    white-space:nowrap;
+    vertical-align:baseline;
+  }
+  .essay-highlight.is-active {
+    text-decoration:underline;
+    text-decoration-color:var(--orange);
+    text-decoration-thickness:1.5px;
+    text-underline-offset:3px;
+  }
+  .essay-highlight.is-active .highlight-copy,
+  .essay-highlight:focus-visible .highlight-copy {
+    background:linear-gradient(
+      to bottom,
+      transparent 48%,
+      rgba(242,197,92,.46) 48%,
+      rgba(242,197,92,.6) 93%,
+      transparent 93%
+    );
+  }
+  .essay-highlight:focus-visible {
+    outline:none;
+  }
+  .essay-highlight:focus-visible .annotation-chip {
+    outline:2px solid var(--navy);
+    outline-offset:2px;
+    box-shadow:0 0 0 4px var(--canvas);
+  }
+  .annotation-chip {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:24px;
+    height:20px;
+    margin-left:4px;
+    padding:0 5px;
+    border:1px solid rgba(239,107,74,.68);
+    border-radius:999px;
+    background:#fff0e9;
+    color:var(--coral-dark);
+    font-family:var(--font-sans);
+    font-size:9px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.06em;
+    vertical-align:.22em;
+  }
+  .essay-highlight.is-active .annotation-chip {
+    border-color:var(--orange);
+    background:var(--orange);
+    color:#fff;
+  }
+  .annotation-rail {
+    display:none;
+    position:relative;
+    min-width:0;
+    min-height:100%;
+  }
+  .annotated-essay.is-enhanced .annotation-rail { display:block; }
+  .annotation-rail-head {
+    position:absolute;
+    z-index:3;
+    top:2px;
+    left:2px;
+    right:0;
+  }
+  .annotation-rail-head p {
+    color:var(--muted);
+    font-size:var(--type-micro);
+    line-height:1.45;
+  }
+  .annotation-marker-list {
+    position:absolute;
+    inset:0;
+    list-style:none;
+  }
+  .annotation-marker-list li {
+    position:absolute;
+    z-index:4;
+    top:var(--marker-top, 58px);
+    left:0;
+    transition:top .18s ease;
+  }
+  .annotation-marker {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    padding:0;
+    border:1px solid var(--line);
+    border-radius:50%;
+    background:#fff;
+    color:var(--navy);
+    box-shadow:var(--shadow-sm);
+    font-size:10px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .annotation-marker:hover { transform:translateX(2px); border-color:var(--orange); }
+  .annotation-marker.is-active {
+    border-color:var(--orange);
+    background:var(--orange);
+    color:#fff;
+  }
+  .annotation-marker:focus-visible {
+    outline:3px solid rgba(23,52,47,.3);
+    outline-offset:3px;
+  }
+  .desktop-comment-panel {
+    position:absolute;
+    z-index:3;
+    top:var(--panel-top, 58px);
+    left:52px;
+    right:0;
+    padding:15px 16px;
+    border:1px solid var(--line);
+    border-left:3px solid var(--orange);
+    border-radius:var(--radius-sm);
+    background:var(--canvas);
+    box-shadow:var(--shadow-sm);
+    transition:top .18s ease;
+  }
+  .desktop-comment-panel > article > span,
+  .essay-mobile-comment-panel article > span {
+    display:block;
+    margin-bottom:6px;
+    color:var(--orange);
+    font-size:var(--type-micro);
+    line-height:1.4;
+    font-weight:900;
+    letter-spacing:.12em;
+  }
+  .desktop-comment-panel p {
+    color:var(--text);
+    font-size:13px;
+    line-height:1.58;
+    font-weight:550;
+  }
+  .essay-mobile-comment-panel { display:none; }
+  .annotation-fallback {
+    margin-top:18px;
+    padding:18px;
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    background:var(--canvas);
+  }
+  .annotation-fallback ol { display:grid; gap:12px; list-style:none; }
+  .annotation-fallback li {
+    display:grid;
+    grid-template-columns:32px minmax(0,1fr);
+    gap:9px;
+    color:var(--text);
+    font-size:13px;
+    line-height:1.55;
+  }
+  .annotation-fallback strong { color:var(--orange); }
+
+  @media (max-width:900px) {
+    .feedback-feature-head {
+      display:block;
+      padding:21px 18px 22px;
+    }
+    .feedback-feature-index {
+      display:block;
+      margin-bottom:7px;
+      padding-top:0;
+    }
+    .feedback-feature-copy {
+      max-width:none;
+      padding-left:0;
+      border-left:0;
+    }
+    .annotated-essay.is-enhanced .annotated-layout {
+      display:block;
+      padding:12px;
+    }
+    .annotated-essay.is-enhanced .annotation-rail { display:none; }
+    .essay-mobile-comment-panel:not([hidden]) {
+      display:block;
+      margin:12px 0 3px;
+      padding:14px 15px;
+      border:1px solid var(--line);
+      border-left:3px solid var(--orange);
+      border-radius:var(--radius-sm);
+      background:var(--canvas);
+      box-shadow:var(--shadow-sm);
+    }
+    .essay-mobile-comment-panel p {
+      color:var(--text);
+      font-size:var(--type-body-sm);
+      line-height:1.58;
+    }
+    .annotation-chip {
+      min-width:28px;
+      height:24px;
+      font-size:10px;
+      vertical-align:.16em;
+    }
+  }
+
+  @media (max-width:700px) {
+    .annotated-essay { border-radius:var(--radius-md); }
+    .feedback-feature-copy h3 { font-size:23px; }
+    .essay-paper { border-radius:13px; }
+    .essay-document-head {
+      flex-direction:column;
+      gap:4px;
+      padding:16px 16px 13px;
+    }
+    .artifact-meta { padding-top:0; }
+    .essay-document-head h4 { font-size:18px; }
+    .essay-body { padding:18px 16px 21px; }
+    .essay-paragraph-group + .essay-paragraph-group { margin-top:12px; }
+    .essay-paragraph { font-size:15px; line-height:1.72; }
+    .essay-highlight { padding:0; }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    .essay-highlight,
+    .annotation-marker,
+    .annotation-marker-list li,
+    .desktop-comment-panel { transition:none; }
+  }
+</style>
