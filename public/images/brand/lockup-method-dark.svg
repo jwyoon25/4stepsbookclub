@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 220" role="img" aria-labelledby="l-title l-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 16 470 188" role="img" aria-labelledby="l-title l-desc">
   <title id="l-title">4steps Book Club — Read, Think, Speak, Write</title>
   <desc id="l-desc">Four ruled lines frame a numeral four; the active writing line is coral.</desc>
   <g aria-hidden="true">
-      <rect x="0" y="0" width="470" height="220" rx="6" fill="#17342F"></rect>
-      <rect x="12" y="12" width="446" height="196" rx="2" fill="none" stroke="#F7F3EA" stroke-opacity="0.32" stroke-width="1.4"></rect>
+      <rect x="2" y="24" width="466" height="172" rx="86" fill="#17342F" stroke="#F7F3EA" stroke-opacity="0.36" stroke-width="1.8"></rect>
       <g stroke="#F7F3EA" stroke-opacity="0.24" stroke-width="1.4">
         <line x1="30" y1="52" x2="440" y2="52"></line>
         <line x1="30" y1="88" x2="440" y2="88"></line>
