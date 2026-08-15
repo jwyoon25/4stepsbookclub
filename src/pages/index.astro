@@ -412,7 +412,7 @@ const faqItems = [
       .nav-socials { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 22px; }
       .nav-socials .social-chip { width: 100%; min-width: 0; justify-content: center; padding: 0; font-size: 11px; }
       .nav-socials .social-label { display: none; }
-      .nav-socials .threads-chip { background: #111; border-color: #111; color: var(--white); }
+      .nav-socials .threads-chip, .footer-socials .threads-chip { background: #111; border-color: #111; color: var(--white); }
       .social-chip {
         min-height: 44px;
         display: inline-flex;
@@ -1079,7 +1079,7 @@ const faqItems = [
               <span class="social-label">인스타</span>
             </a>
             <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="Threads 열기 (새 창)" title="Threads">
-              <i data-lucide="at-sign" aria-hidden="true"></i>
+              <img class="brand-icon" src="/images/social/threads.png" width="20" height="20" alt="" />
               <span class="social-label">Threads</span>
             </a>
           </div>
@@ -1400,7 +1400,7 @@ const faqItems = [
             <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" /> 네이버 블로그</a>
             <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" /> 카카오톡</a>
             <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" /> Instagram</a>
-            <a class="social-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer"><i data-lucide="at-sign" aria-hidden="true"></i> Threads</a>
+            <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/threads.png" width="20" height="20" alt="" /> Threads</a>
           </div>
         </div>
         <div class="business-info">
