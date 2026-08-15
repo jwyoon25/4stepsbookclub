@@ -406,8 +406,9 @@ const faqItems = [
       }
       .nav-links > a:not(.nav-cta)::after { content: "↘"; color: var(--coral); font-family: var(--font-sans); font-size: 15px; }
       .nav-cta { width: 100%; margin-top: 22px; }
-      .nav-socials { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 22px; }
+      .nav-socials { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 22px; }
       .nav-socials .social-chip { min-width: 0; justify-content: center; padding-inline: 6px; font-size: 11px; }
+      .nav-socials .threads-chip { background: #111; border-color: #111; color: var(--white); }
       .social-chip {
         min-height: 44px;
         display: inline-flex;
@@ -423,6 +424,7 @@ const faqItems = [
         white-space: nowrap;
       }
       .brand-icon { width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
+      .social-chip > svg { width: 20px; height: 20px; flex: 0 0 auto; }
 
       .hero {
         position: relative;
@@ -1008,6 +1010,7 @@ const faqItems = [
         .nav-socials .social-chip { width: 38px; height: 38px; min-height: 38px; justify-content: center; padding: 0; overflow: hidden; border: 0; border-radius: 50%; background: transparent; }
         .nav-socials .social-label { display: none; }
         .nav-socials .brand-icon { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .nav-socials .threads-chip { background: #111; color: var(--white); }
         .hero { min-height: 720px; display: flex; align-items: center; }
         .hero-grid { grid-template-columns: 1.13fr .87fr; gap: 64px; }
         .intro-card { padding: 34px; }
@@ -1067,6 +1070,10 @@ const faqItems = [
             <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 열기 (새 창)" title="인스타그램">
               <img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" />
               <span class="social-label">인스타</span>
+            </a>
+            <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="Threads 열기 (새 창)" title="Threads">
+              <i data-lucide="at-sign" aria-hidden="true"></i>
+              <span class="social-label">Threads</span>
             </a>
           </div>
         </nav>
@@ -1383,6 +1390,7 @@ const faqItems = [
             <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" /> 네이버 블로그</a>
             <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" /> 카카오톡</a>
             <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" /> Instagram</a>
+            <a class="social-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer"><i data-lucide="at-sign" aria-hidden="true"></i> Threads</a>
           </div>
         </div>
         <div class="business-info">
