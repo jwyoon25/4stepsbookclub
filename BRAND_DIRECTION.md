@@ -24,8 +24,11 @@ The editorial serif wordmark keeps the identity warm and publication-like. A res
 
 - Primary dark logotype: `public/images/brand/logotype-dark.svg`
 - Primary light logotype: `public/images/brand/logotype-light.svg`
-- Compact dark logomark: `public/images/brand/logomark-dark.svg`
-- Compact light logomark: `public/images/brand/logomark-light.svg`
+- Compact dark `4s` logomark: `public/images/brand/logomark-small-dark.svg`
+- Compact light `4s` logomark: `public/images/brand/logomark-small-light.svg`
+- Large dark complete logomark: `public/images/brand/logomark-large-dark.svg`
+- Large light complete logomark: `public/images/brand/logomark-large-light.svg`
+- Archived legacy logomarks: `public/images/brand/archive/logomark-dark-legacy.svg` and `public/images/brand/archive/logomark-light-legacy.svg`
 - Generated browser and device icons: `public/images/icons/`
 - Every logotype ends at its rounded-rectangle border; the area outside the border is always transparent.
 - Light variants are fully transparent inside the capsule. Dark variants use Library Green only inside the capsule.

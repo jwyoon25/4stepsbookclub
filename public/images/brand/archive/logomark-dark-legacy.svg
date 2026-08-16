@@ -8,8 +8,8 @@
         <line x1="22" y1="53" x2="98" y2="53"></line>
         <line x1="22" y1="91" x2="98" y2="91"></line>
       </g>
-      <line x1="22" y1="72" x2="98" y2="72" stroke="#EF6B4A" stroke-width="2.4"></line>
-      <line x1="30" y1="72" x2="88" y2="72" stroke="#EF6B4A" stroke-width="8.5"></line>
+      <line x1="22" y1="72" x2="98" y2="72" stroke="#B84431" stroke-width="2.4"></line>
+      <line x1="30" y1="72" x2="88" y2="72" stroke="#B84431" stroke-width="8.5"></line>
       <path d="M38 72 L72 34 V91" fill="none" stroke="#F7F3EA" stroke-width="8.5" stroke-linejoin="round" stroke-linecap="round"></path>
   </g>
 </svg>

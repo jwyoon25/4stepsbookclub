@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 31 351 150" role="img" aria-labelledby="l-title l-desc">
-  <title id="l-title">4steps Book Club — Logotype light</title>
-  <desc id="l-desc">A light 4steps Book Club logotype using Gowun Batang Bold 700 for the wordmark and an outlined Gowun Batang Bold 700 numeral four centered on and in front of the orange intersection rules.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 275 275" role="img" aria-labelledby="l-title l-desc">
+  <title id="l-title">4steps Book Club — Large logomark light</title>
+  <desc id="l-desc">A large circular light 4steps Book Club logomark with the complete outlined lockup and a continued pattern of solid and dashed rules.</desc>
   <style>
     .steps-letter-1 { transform: translateX(var(--steps-letter-spacing)); }
     .steps-letter-2 { transform: translateX(calc(var(--steps-letter-spacing) * 2)); }
@@ -16,20 +16,28 @@
     g > path:not([class])[d^="M133.732 144.295"] { display: none; }
   </style>
   <g aria-hidden="true">
-    <rect x="35" y="35.7" width="275" height="140.6" rx="65" fill="none"></rect>
-    <g transform="translate(2 0)">
+    <circle cx="137.5" cy="137.5" r="136.6" fill="none"></circle>
+    <g transform="translate(-33 31.5)">
       <g stroke="#17342F" stroke-opacity="0.30" stroke-width="1.4">
-        <line x1="54.95" y1="52" x2="286.05" y2="52"></line>
-        <line x1="40.71" y1="70" x2="300.29" y2="70" stroke-dasharray="8 6"></line>
-        <line x1="34.25" y1="88" x2="306.75" y2="88"></line>
-        <line x1="33" y1="106.08" x2="308" y2="106.08" stroke-dasharray="8 6"></line>
-        <line x1="40.75" y1="142.08" x2="300.25" y2="142.08" stroke-dasharray="8 6"></line>
-        <line x1="54.95" y1="160" x2="286.05" y2="160"></line>
+        <line x1="117.7405" y1="-20" x2="223.2595" y2="-20"></line>
+        <line x1="86.8605" y1="-2" x2="254.1395" y2="-2" stroke-dasharray="8 6"></line>
+        <line x1="67.7403" y1="16" x2="273.2597" y2="16"></line>
+        <line x1="54.4157" y1="34" x2="286.5843" y2="34" stroke-dasharray="8 6"></line>
+        <line x1="45.0267" y1="52" x2="295.9733" y2="52"></line>
+        <line x1="38.7291" y1="70" x2="302.2709" y2="70" stroke-dasharray="8 6"></line>
+        <line x1="35.0911" y1="88" x2="305.9089" y2="88"></line>
+        <line x1="33.9" y1="106.08" x2="307.1" y2="106.08" stroke-dasharray="8 6"></line>
+        <line x1="38.751" y1="142.08" x2="302.249" y2="142.08" stroke-dasharray="8 6"></line>
+        <line x1="45.0267" y1="160" x2="295.9733" y2="160"></line>
+        <line x1="54.4157" y1="178" x2="286.5843" y2="178" stroke-dasharray="8 6"></line>
+        <line x1="67.7403" y1="196" x2="273.2597" y2="196"></line>
+        <line x1="86.8605" y1="214" x2="254.1395" y2="214" stroke-dasharray="8 6"></line>
+        <line x1="117.7405" y1="232" x2="223.2595" y2="232"></line>
       </g>
-      <line x1="34.29" y1="124.16" x2="306.71" y2="124.16" stroke="#B84431" stroke-width="2"></line>
+      <line x1="35.1125" y1="124.16" x2="305.8875" y2="124.16" stroke="#B84431" stroke-width="2"></line>
       <!-- Grouped lockup: the vertical orange line, “4”, “steps”, and “BOOK CLUB” are centered together; the horizontal orange rule stays outside. -->
       <g transform="translate(15.98 0)">
-        <line x1="90" y1="35.7" x2="90" y2="176.3" stroke="#B84431" stroke-width="2"></line>
+        <line x1="90" y1="-14.4024" x2="90" y2="226.4024" stroke="#B84431" stroke-width="2"></line>
       <!-- Embedded Gowun Batang Bold 700 numeral 4 outline from the website font. -->
       <!-- “4” controls: translate(x y) = position; scale(size) = overall size, anchored to the orange intersection. -->
       <g transform="translate(90 124.9) scale(1.04) translate(-90 -124.16)">
@@ -72,5 +80,5 @@
       </g>
     </g>
   </g>
-  <rect x="35" y="35.7" width="275" height="140.6" rx="65" fill="none" stroke="#17342F" stroke-opacity="1" stroke-width="1.8"></rect>
+  <circle cx="137.5" cy="137.5" r="136.6" fill="none" stroke="#17342F" stroke-width="1.8"></circle>
 </svg>
