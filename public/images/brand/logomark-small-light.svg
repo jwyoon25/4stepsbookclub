@@ -3,6 +3,7 @@
   <desc id="small-light-desc">A compact light 4s logomark with alternating ruled and dashed lines, intersecting coral rules, and the numeral four overlaid at their intersection.</desc>
   <g aria-hidden="true">
     <!-- The circle's visible diameter is exactly the finalized pill's 140.6-unit height. -->
+    <circle cx="70.3" cy="70.3" r="69.4" fill="#F7F3EA"></circle>
     <!-- The horizontal rules terminate on the circular border. -->
     <g fill="none" stroke="#17342F" stroke-opacity="0.30" stroke-width="1.4">
       <line x1="26.7069" y1="16.3" x2="113.8931" y2="16.3"></line>

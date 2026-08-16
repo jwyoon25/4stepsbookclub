@@ -31,7 +31,7 @@ The editorial serif wordmark keeps the identity warm and publication-like. A res
 - Archived legacy logomarks: `public/images/brand/archive/logomark-dark-legacy.svg` and `public/images/brand/archive/logomark-light-legacy.svg`
 - Generated browser and device icons: `public/images/icons/`
 - Every logotype ends at its rounded-rectangle border; the area outside the border is always transparent.
-- Light variants are fully transparent inside the capsule. Dark variants use Library Green only inside the capsule.
+- Light variants use Warm Paper inside their border. Dark variants use Library Green inside their border.
 - Compact marks use the same construction as a circle rather than a rectangular badge.
 - Keep clear space around a lockup equal to roughly one ruled-line interval.
 - Use the light lockup on Warm Paper and pale surfaces; use the dark lockup when a stronger brand anchor is needed.

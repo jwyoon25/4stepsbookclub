@@ -16,7 +16,7 @@
     g > path:not([class])[d^="M133.732 144.295"] { display: none; }
   </style>
   <g aria-hidden="true">
-    <circle cx="137.5" cy="137.5" r="136.6" fill="none"></circle>
+    <circle cx="137.5" cy="137.5" r="136.6" fill="#F7F3EA"></circle>
     <g transform="translate(-33 31.5)">
       <g stroke="#17342F" stroke-opacity="0.30" stroke-width="1.4">
         <line x1="117.7405" y1="-20" x2="223.2595" y2="-20"></line>
