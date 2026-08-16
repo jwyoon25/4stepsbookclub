@@ -22,13 +22,13 @@ The identity turns the four stages of the program into ruled lines on a reading-
 
 The editorial serif wordmark keeps the identity warm and publication-like. A restrained rounded-rectangle border gives each logotype the feeling of a considered bookplate instead of a generic app badge.
 
-- Primary dark logotype: `public/images/brand/logotype-dark.svg`
-- Primary light logotype: `public/images/brand/logotype-light.svg`
-- Compact dark `4s` logomark: `public/images/brand/logomark-small-dark.svg`
-- Compact light `4s` logomark: `public/images/brand/logomark-small-light.svg`
-- Large dark complete logomark: `public/images/brand/logomark-large-dark.svg`
-- Large light complete logomark: `public/images/brand/logomark-large-light.svg`
-- Archived legacy logomarks: `public/images/brand/archive/logomark-dark-legacy.svg` and `public/images/brand/archive/logomark-light-legacy.svg`
+- Primary dark logotype: `public/images/logo/logotype-dark.svg`
+- Primary light logotype: `public/images/logo/logotype-light.svg`
+- Compact dark `4s` logomark: `public/images/logo/logomark-small-dark.svg`
+- Compact light `4s` logomark: `public/images/logo/logomark-small-light.svg`
+- Large dark complete logomark: `public/images/logo/logomark-large-dark.svg`
+- Large light complete logomark: `public/images/logo/logomark-large-light.svg`
+- High-resolution PNG exports: `public/images/logo/png/`
 - Generated browser and device icons: `public/images/icons/`
 - Every logotype ends at its rounded-rectangle border; the area outside the border is always transparent.
 - Light variants use Warm Paper inside their border. Dark variants use Library Green inside their border.
