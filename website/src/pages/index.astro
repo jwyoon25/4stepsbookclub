@@ -235,7 +235,6 @@ const levelStages = [
     name: "FOUNDATION",
     grades: "G1–G2",
     focus: "읽기 습관 형성",
-    duration: "6개월 ~ 8개월",
     content: ["파닉스·사이트워드·챕터북", "기초 문장 작성", "읽기 습관"],
     color: "#52765d",
     tint: "#e4ede3"
@@ -245,7 +244,6 @@ const levelStages = [
     name: "BUILD-UP",
     grades: "G3–G4",
     focus: "어휘 & 사고 확장",
-    duration: "8개월 ~ 10개월",
     content: ["어휘 확장·주니어 소설", "추론적 사고", "단락 에세이"],
     color: "#b84431",
     tint: "#f7ddd5"
@@ -255,7 +253,6 @@ const levelStages = [
     name: "GROWTH",
     grades: "G5–G6",
     focus: "비판적 사고 & 표현",
-    duration: "10개월 ~ 12개월",
     content: ["장편 노블·인물 관점 분석", "비판적 토론", "멀티 에세이"],
     color: "#327b78",
     tint: "#dcefed"
@@ -265,7 +262,6 @@ const levelStages = [
     name: "ADVANCE",
     grades: "G7–G9",
     focus: "학술 독해 & 입시 기초",
-    duration: "12개월 ~ 18개월",
     content: ["현대문학·역사·과학 도서 탐구", "학술적 독해", "입시 기초 에세이"],
     color: "#725d9d",
     tint: "#e8e2f1"
@@ -665,24 +661,6 @@ const faqItems = [
       }
       .hero-grid { position: relative; z-index: 1; display: grid; gap: 30px; }
       .hero-copy { position: relative; z-index: 2; }
-      .hero-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        max-width: 100%;
-        margin-bottom: 16px;
-        padding: 10px 16px 10px 13px;
-        border: 1px solid var(--ink);
-        border-radius: 999px;
-        background: var(--butter);
-        color: var(--ink);
-        font-size: var(--type-small);
-        font-weight: var(--weight-bold);
-        line-height: var(--leading-label);
-        letter-spacing: -0.025em;
-        word-break: keep-all;
-      }
-      .hero-kicker-dot { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral-dark); box-shadow: 0 0 0 4px rgba(184, 68, 49, 0.16); }
       .hero-title {
         max-width: 700px;
         color: var(--ink);
@@ -742,7 +720,6 @@ const faqItems = [
       .hero-credential-copy > small { color: #1f3762; font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: 0.1em; }
       .hero-credential-copy > strong { color: var(--ink); font-size: var(--type-body); line-height: 1.4; word-break: keep-all; }
       .hero-credential-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 2px; color: var(--muted); font-size: var(--type-label); line-height: 1.4; word-break: keep-all; }
-      .hero-credential-proof { display: inline-flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 999px; background: #1f3762; color: white; font-size: var(--type-label); font-style: normal; font-weight: var(--weight-bold); }
       .hero-actions { display: grid; gap: 9px; margin-top: 22px; }
       .hero-actions .button { width: 100%; }
       .hero-art { position: relative; width: min(100%, 440px); margin-inline: auto; padding: 10px 8px 26px; }
@@ -1505,9 +1482,8 @@ const faqItems = [
         <div class="container">
           <div class="hero-grid">
             <div class="hero-copy">
-              <p class="hero-kicker"><span class="hero-kicker-dot" aria-hidden="true"></span> 국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽</p>
               <h1 class="hero-title">읽은 책이, 아이의<br /><span class="marker">문장</span>이 되도록.</h1>
-              <p class="hero-lead">영어 원서를 깊이 읽고, 근거로 생각하고, 말한 뒤 쓰는 수업.</p>
+              <p class="hero-lead">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽</p>
               <p class="hero-detail">국제학교 출신이며 서울대학교에 재학 중인, 원어민급 영어 역량과 최상위 공인성적을 갖춘 검증된 강사진의 4인 소수 관리형 프로그램입니다.</p>
               <div class="hero-credential">
                 <span class="hero-credential-seal">
@@ -1516,7 +1492,7 @@ const faqItems = [
                 <span class="hero-credential-copy">
                   <small>SNU · 4STEPS FACULTY</small>
                   <strong>국제학교 출신 · 서울대학교 재학 강사진</strong>
-                  <span class="hero-credential-meta"><em class="hero-credential-proof">✓ 재학 확인</em><span>원어민급 영어 역량</span></span>
+                  <span class="hero-credential-meta">원어민급 영어 역량</span>
                 </span>
               </div>
               <div class="hero-actions">
@@ -1755,7 +1731,6 @@ const faqItems = [
                   <h3>{stage.name}</h3>
                   <p class="stage-focus">{stage.focus}</p>
                   <dl class="stage-meta">
-                    <div><dt>권장 소요 기간</dt><dd>{stage.duration}</dd></div>
                     <div><dt>중심 학습 내용</dt><dd>{stage.content.join(" · ")}</dd></div>
                   </dl>
                 </article>
