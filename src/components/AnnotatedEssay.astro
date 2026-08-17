@@ -308,9 +308,9 @@ const splitHighlightText = (text: string) => {
 
 <style>
   .annotated-essay {
-    --accent: var(--coral-dark);
-    --annotation: var(--coral);
-    --annotation-wash: color-mix(in srgb, var(--coral) 10%, var(--white));
+    --accent: var(--class-accent, var(--coral-dark));
+    --annotation: var(--class-accent, var(--coral-dark));
+    --annotation-wash: color-mix(in srgb, var(--annotation) 10%, var(--white));
     --type-micro: 10px;
     --type-meta: 12px;
     --type-body-sm: 14px;
@@ -319,7 +319,7 @@ const splitHighlightText = (text: string) => {
     overflow:hidden;
     border:1px solid var(--line-dark);
     border-radius:var(--radius-md);
-    background:#fffdf8;
+    background:var(--canvas);
     color:var(--text);
   }
   .feedback-feature-head {
@@ -343,7 +343,7 @@ const splitHighlightText = (text: string) => {
   .feedback-feature-copy {
     max-width:760px;
     padding-left:24px;
-    border-left:1px solid rgba(23,52,47,.14);
+    border-left:1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   }
   .feedback-feature-copy h3 {
     margin-bottom:5px;
@@ -373,10 +373,10 @@ const splitHighlightText = (text: string) => {
   .essay-paper {
     min-width:0;
     overflow:hidden;
-    border:1px solid rgba(23,52,47,.12);
+    border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);
     border-radius:5px;
     background:var(--white);
-    box-shadow:0 14px 35px rgba(23,52,47,.16);
+    box-shadow:0 14px 35px color-mix(in srgb, var(--ink) 16%, transparent);
   }
   .essay-document-head {
     display:flex;
@@ -438,8 +438,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 55%,
-      rgba(242,197,92,.3) 55%,
-      rgba(242,197,92,.4) 91%,
+      color-mix(in srgb, var(--butter) 30%, transparent) 55%,
+      color-mix(in srgb, var(--butter) 40%, transparent) 91%,
       transparent 91%
     );
     box-decoration-break:clone;
@@ -449,8 +449,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 52%,
-      rgba(242,197,92,.38) 52%,
-      rgba(242,197,92,.5) 92%,
+      color-mix(in srgb, var(--butter) 38%, transparent) 52%,
+      color-mix(in srgb, var(--butter) 50%, transparent) 92%,
       transparent 92%
     );
   }
@@ -471,8 +471,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 48%,
-      rgba(242,197,92,.46) 48%,
-      rgba(242,197,92,.6) 93%,
+      color-mix(in srgb, var(--butter) 46%, transparent) 48%,
+      color-mix(in srgb, var(--butter) 60%, transparent) 93%,
       transparent 93%
     );
   }
@@ -506,7 +506,7 @@ const splitHighlightText = (text: string) => {
   .essay-highlight.is-active .annotation-chip {
     border-color:var(--annotation);
     background:var(--annotation);
-    color:#fff;
+    color:var(--white);
   }
   .annotation-rail {
     display:none;
@@ -562,10 +562,10 @@ const splitHighlightText = (text: string) => {
   .annotation-marker.is-active {
     border-color:var(--annotation);
     background:var(--annotation);
-    color:#fff;
+    color:var(--white);
   }
   .annotation-marker:focus-visible {
-    outline:3px solid rgba(23,52,47,.3);
+    outline:3px solid color-mix(in srgb, var(--ink) 30%, transparent);
     outline-offset:3px;
   }
   .desktop-comment-panel {
@@ -576,7 +576,6 @@ const splitHighlightText = (text: string) => {
     right:0;
     padding:15px 16px;
     border:1px solid var(--line);
-    border-left:3px solid var(--annotation);
     border-radius:var(--radius-sm);
     background:var(--canvas);
     box-shadow:var(--shadow-sm);
@@ -587,6 +586,7 @@ const splitHighlightText = (text: string) => {
     display:block;
     margin-bottom:6px;
     color:var(--accent);
+    font-family:var(--font-sans);
     font-size:var(--type-micro);
     line-height:1.4;
     font-weight:900;
@@ -594,6 +594,7 @@ const splitHighlightText = (text: string) => {
   }
   .desktop-comment-panel p {
     color:var(--text);
+    font-family:var(--font-sans);
     font-size:13px;
     line-height:1.58;
     font-weight:550;
@@ -642,15 +643,16 @@ const splitHighlightText = (text: string) => {
       margin:12px 0 3px;
       padding:14px 15px;
       border:1px solid var(--line);
-      border-left:3px solid var(--annotation);
       border-radius:var(--radius-sm);
       background:var(--canvas);
       box-shadow:var(--shadow-sm);
     }
     .essay-mobile-comment-panel p {
       color:var(--text);
+      font-family:var(--font-sans);
       font-size:var(--type-body-sm);
       line-height:1.58;
+      font-weight:550;
     }
     .annotation-chip {
       min-width:28px;

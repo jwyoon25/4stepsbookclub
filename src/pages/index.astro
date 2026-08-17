@@ -134,7 +134,8 @@ const methodSteps = [
     number: "01",
     verb: "READ",
     title: "깊이 읽기",
-    description: "줄거리를 훑는 데서 멈추지 않고 인물, 사건, 맥락을 정확히 짚습니다.",
+    description: "자체 교재의 주관식 문제로 인물, 사건, 주제와 숨은 맥락까지 정확하게 이해합니다.",
+    promise: "매주 어휘 시험으로 책의 핵심 어휘를 익혀 Academic Vocabulary로 확장합니다.",
     note: "Reading · Vocabulary",
     color: "#17342f",
     tint: "#dfe9df"
@@ -143,7 +144,8 @@ const methodSteps = [
     number: "02",
     verb: "THINK",
     title: "근거로 생각하기",
-    description: "왜 그렇게 생각하는지 텍스트 속 근거를 찾고 질문을 확장합니다.",
+    description: "교재에서 생각한 질문과 문제를 바탕으로 본문 속 근거를 찾고 질문을 확장합니다.",
+    promise: "왜 그렇게 생각하는지 논리적으로 검토하며 비판적 사고력을 키웁니다.",
     note: "Analysis · Evidence",
     color: "#c84f37",
     tint: "#f7d9ce"
@@ -152,7 +154,8 @@ const methodSteps = [
     number: "03",
     verb: "SPEAK",
     title: "말로 정리하기",
-    description: "친구의 관점을 듣고 자신의 생각을 분명한 영어로 설명합니다.",
+    description: "근거를 들어 자신의 생각을 논리적인 영어로 말하고 서로 다른 관점을 검토합니다.",
+    promise: "질문과 응답을 거치며 생각을 분명하고 설득력 있게 표현합니다.",
     note: "Discussion · Response",
     color: "#327b78",
     tint: "#d4ece8"
@@ -161,7 +164,8 @@ const methodSteps = [
     number: "04",
     verb: "WRITE",
     title: "문장으로 완성하기",
-    description: "토론에서 다듬은 생각을 문단과 에세이로 구조화하고 첨삭받습니다.",
+    description: "토론한 생각을 Paragraph로 쓰고, 책 한 권을 완독할 때마다 에세이를 완성합니다.",
+    promise: "구조와 문장을 꼼꼼히 첨삭해 다음 글쓰기 목표로 연결합니다.",
     note: "Paragraph · Essay",
     color: "#725d9d",
     tint: "#e5ddf0"
@@ -179,7 +183,7 @@ const aboutProblems = [
 const comparisonRows = [
   {
     label: "강사진",
-    steps: "서울대학교 + 원어민급 Bilingual",
+    steps: "국제학교 출신 + 서울대학교 + 원어민급 Bilingual",
     general: "검증 기준이 불명확한 외국인·교포·해외대학 출신 강사진"
   },
   {
@@ -212,7 +216,7 @@ const weeklySteps = [
 const facultyProofs = [
   "최상위 공인성적을 보유한 서울대생 강사진들로 구성",
   "원어민 수준의 영어 구사력을 갖춘 Bilingual Teacher",
-  "국제학교·해외 유학 환경에 대한 높은 이해도",
+  "국제학교 출신으로 국제학교·해외 유학 환경에 대한 높은 이해도",
   "서류 검증과 인터뷰, 시강을 거친 선별 과정",
   "각종 국제 토론대회 및 MUN 참가 및 Writing Award 수상경력 다수 보유"
 ];
@@ -355,7 +359,7 @@ const faqItems = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="읽은 책이 아이의 문장이 되도록. G1–G9 영어 리딩, 토론, 라이팅을 연결하는 4인 소수 관리형 4steps Book Club." />
+    <meta name="description" content="국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽. G1–G9 영어 리딩, 토론, 라이팅을 연결하는 4인 소수 관리형 4steps Book Club." />
     <meta name="theme-color" content="#f7f3ea" />
     <title>4steps Book Club | 읽은 책이 아이의 문장이 되도록</title>
     <link rel="icon" type="image/svg+xml" href="/images/logo/logomark-small-dark.svg" />
@@ -648,7 +652,8 @@ const faqItems = [
         background: var(--butter);
         transform: rotate(-1deg);
       }
-      .hero-lead { max-width: 620px; margin-top: 20px; color: var(--text); font-size: 16px; font-weight: 600; line-height: 1.68; word-break: keep-all; }
+      .hero-audience { max-width: 620px; margin-top: 20px; color: var(--coral-dark); font-size: 13px; font-weight: 700; line-height: 1.6; letter-spacing: -0.01em; word-break: keep-all; }
+      .hero-lead { max-width: 620px; margin-top: 7px; color: var(--text); font-size: 16px; font-weight: 600; line-height: 1.68; word-break: keep-all; }
       .hero-detail { max-width: 670px; margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.72; word-break: keep-all; }
       .hero-credential {
         position: relative;
@@ -664,14 +669,6 @@ const faqItems = [
         border-radius: 20px;
         background: rgba(255, 253, 248, 0.96);
         box-shadow: 0 16px 36px rgba(23, 52, 47, 0.14);
-      }
-      .hero-credential::before {
-        content: "";
-        position: absolute;
-        inset: 13px auto 13px 0;
-        width: 5px;
-        border-radius: 0 999px 999px 0;
-        background: #1f3762;
       }
       .hero-credential-seal {
         width: 56px;
@@ -819,7 +816,7 @@ const faqItems = [
         --tint: var(--paper-deep);
         position: relative;
         flex: 0 0 min(82vw, 310px);
-        min-height: 332px;
+        min-height: 410px;
         display: flex;
         flex-direction: column;
         padding: 25px 22px;
@@ -835,16 +832,19 @@ const faqItems = [
       .method-verb { margin-top: 36px; color: var(--step); font-size: 12px; font-weight: 700; letter-spacing: 0.16em; }
       .method-card h3 { margin-top: 5px; color: var(--ink); font-family: var(--font-display); font-size: 27px; }
       .method-card p { margin-top: 14px; color: var(--muted); font-size: 14px; line-height: 1.75; word-break: keep-all; }
+      .method-promise { position: relative; z-index: 1; margin-top: 16px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--step) 18%, white); }
+      .method-promise > span { color: var(--step); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; }
+      .method-promise > p { margin-top: 6px; color: var(--text); font-size: 12px; line-height: 1.65; }
       .method-card small { position: relative; z-index: 1; margin-top: auto; padding-top: 26px; color: var(--step); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
       .swipe-hint { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--muted); font-size: 11px; }
       .swipe-hint::before { content: "←"; color: var(--coral); }
 
-      .class-section { overflow: hidden; background: var(--ink); color: var(--white); }
+      .class-section { --class-accent: var(--coral-dark); overflow: hidden; background: var(--ink); color: var(--white); }
       .class-section .section-kicker { color: var(--butter); }
       .class-section .section-title { color: var(--white); }
-      .class-section .section-copy { color: rgba(255, 255, 255, 0.68); }
+      .class-section .section-copy { color: color-mix(in srgb, var(--white) 68%, transparent); }
       .gallery-grid { display: grid; gap: 20px; }
-      .gallery-card { overflow: hidden; border: 1px solid var(--line-dark); border-radius: var(--radius-md); background: #fffdf8; color: var(--text); }
+      .gallery-card { overflow: hidden; border: 1px solid var(--line-dark); border-radius: var(--radius-md); background: var(--canvas); color: var(--text); }
       .gallery-stage-wrap { padding: 12px 12px 0; background: var(--stage-surface); }
       .gallery-stage {
         position: relative;
@@ -856,34 +856,34 @@ const faqItems = [
         padding: 8px;
         border: 0;
         border-radius: 13px;
-        background: rgba(255, 255, 255, 0.42);
+        background: color-mix(in srgb, var(--white) 42%, transparent);
         cursor: zoom-in;
       }
-      .gallery-main { width: auto; max-width: 100%; max-height: 354px; border: 1px solid rgba(23, 52, 47, 0.12); border-radius: 5px; background: white; box-shadow: 0 14px 35px rgba(23, 52, 47, 0.16); }
-      .zoom-label { position: absolute; right: 14px; bottom: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; background: rgba(23, 52, 47, 0.9); color: white; font-size: 11px; font-weight: 700; }
+      .gallery-main { width: auto; max-width: 100%; max-height: 354px; border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); border-radius: 5px; background: var(--white); box-shadow: 0 14px 35px color-mix(in srgb, var(--ink) 16%, transparent); }
+      .zoom-label { position: absolute; right: 14px; bottom: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 90%, transparent); color: var(--white); font-size: 11px; font-weight: 700; }
       .zoom-label svg { width: 14px; height: 14px; }
       .gallery-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 2px 9px; color: var(--muted); font-size: 11px; font-weight: 600; }
       .gallery-counter { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
       .gallery-thumbs { display: flex; gap: 8px; padding: 0 0 12px; overflow-x: auto; scroll-padding-inline: 1px; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-      .gallery-thumb { position: relative; flex: 0 0 54px; width: 54px; height: 72px; padding: 3px; border: 1px solid rgba(23, 52, 47, 0.16); border-radius: 8px; background: white; cursor: pointer; }
-      .gallery-thumb[aria-current="true"] { border-color: var(--coral); box-shadow: 0 0 0 2px rgba(239, 107, 74, 0.22); }
+      .gallery-thumb { position: relative; flex: 0 0 54px; width: 54px; height: 72px; padding: 3px; border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); border-radius: 8px; background: var(--white); cursor: pointer; }
+      .gallery-thumb[aria-current="true"] { border-color: var(--class-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--class-accent) 22%, transparent); }
       .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
       .gallery-copy { padding: 21px 18px 22px; }
-      .gallery-index { color: var(--coral-dark); font-size: 11px; font-weight: 700; letter-spacing: 0.13em; }
+      .gallery-index { color: var(--class-accent); font-size: 11px; font-weight: 700; letter-spacing: 0.13em; }
       .gallery-copy h3 { margin-top: 8px; color: var(--ink); font-family: var(--font-display); font-size: 23px; line-height: 1.43; word-break: keep-all; }
       .gallery-copy > p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.75; word-break: keep-all; }
       .gallery-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
       .gallery-tag { padding: 6px 9px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 11px; font-weight: 600; }
-      .gallery-open { width: 100%; margin-top: 19px; border-color: rgba(23, 52, 47, 0.18); background: transparent; color: var(--ink); }
-      .weekly-panel { margin-top: 18px; padding: 22px 18px 18px; border: 1px solid var(--line-dark); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.055); }
+      .gallery-open { width: 100%; margin-top: 19px; border-color: color-mix(in srgb, var(--ink) 18%, transparent); background: transparent; color: var(--ink); }
+      .weekly-panel { margin-top: 18px; padding: 22px 18px 18px; border: 1px solid var(--line-dark); border-radius: var(--radius-md); background: color-mix(in srgb, var(--white) 5.5%, transparent); }
       .weekly-head p { color: var(--butter); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; }
       .weekly-head h3 { margin-top: 7px; color: var(--white); font-family: var(--font-display); font-size: 24px; line-height: 1.45; word-break: keep-all; }
       .weekly-flow { display: flex; gap: 10px; margin-top: 18px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1px; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; list-style: none; }
       .weekly-flow::-webkit-scrollbar { display: none; }
-      .week-card { flex: 0 0 min(74vw, 230px); min-height: 172px; padding: 17px 15px; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 14px; background: rgba(255, 255, 255, 0.09); scroll-snap-align: start; }
+      .week-card { flex: 0 0 min(74vw, 230px); min-height: 172px; padding: 17px 15px; border: 1px solid color-mix(in srgb, var(--white) 9%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--white) 9%, transparent); scroll-snap-align: start; }
       .week-card span { color: var(--butter); font-size: 11px; font-weight: 700; }
       .week-card h4 { margin-top: 20px; font-size: 14px; line-height: 1.4; }
-      .week-card p { margin-top: 8px; color: rgba(255, 255, 255, 0.76); font-size: 12px; line-height: 1.6; word-break: keep-all; }
+      .week-card p { margin-top: 8px; color: color-mix(in srgb, var(--white) 76%, transparent); font-size: 12px; line-height: 1.6; word-break: keep-all; }
 
       .faculty-section { background: var(--canvas); }
       .faculty-panel { overflow: hidden; border-radius: 24px; background: #a83f2d; color: white; }
@@ -904,7 +904,7 @@ const faqItems = [
 
       .level-section { background: var(--paper); }
       .level-hero { display: grid; gap: 22px; margin-bottom: 32px; }
-      .grade-badge { align-self: start; display: inline-grid; justify-items: center; padding: 21px 25px; border: 1px solid rgba(23, 52, 47, 0.15); border-radius: var(--radius-md); background: var(--butter); color: var(--ink); transform: rotate(2deg); }
+      .grade-badge { align-self: start; display: inline-grid; justify-items: center; padding: 21px 25px; border: 1px solid rgba(23, 52, 47, 0.15); border-radius: var(--radius-md); background: var(--butter); color: var(--ink); }
       .grade-badge strong { font-family: var(--font-display); font-size: 34px; line-height: 1; }
       .grade-badge span { margin-top: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; }
       .assessment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -945,15 +945,92 @@ const faqItems = [
       .grade-details-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; padding-bottom: 13px; border-bottom: 1px solid rgba(23, 52, 47, 0.18); }
       .grade-details-head h3 { color: var(--ink); font-family: var(--font-display); font-size: 27px; }
       .grade-details-head span { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; }
-      .grade-grid { display: grid; gap: 12px; }
-      .grade-card { --stage: var(--ink); --stage-tint: var(--paper-deep); min-width: 0; padding: 20px 18px; border: 1px solid color-mix(in srgb, var(--stage) 23%, white); border-top: 4px solid var(--stage); border-radius: var(--radius-md); background: var(--white); box-shadow: var(--shadow-sm); }
-      .grade-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-      .grade-card-head strong { display: inline-flex; width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 50%; background: var(--stage-tint); color: var(--stage); font-family: var(--font-display); font-size: 19px; }
-      .grade-card-head span { color: var(--stage); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; }
-      .grade-description { min-height: 0; margin-top: 18px; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.72; word-break: keep-all; }
-      .grade-outcomes { display: grid; gap: 11px; margin-top: 19px; padding-top: 17px; border-top: 1px solid var(--line); }
-      .grade-outcomes div { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 9px; }
-      .grade-outcomes dt { color: var(--stage); font-size: 11px; font-weight: 700; }
+      .grade-grid { display: grid; gap: 14px; }
+      .grade-card {
+        --stage: var(--ink);
+        --stage-tint: var(--paper-deep);
+        position: relative;
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 22px 20px 20px 24px;
+        border: 1px solid color-mix(in srgb, var(--stage) 21%, white);
+        border-radius: 24px;
+        background: linear-gradient(145deg, color-mix(in srgb, var(--stage-tint) 68%, var(--white)), var(--white) 66%);
+        box-shadow: 0 10px 28px rgba(23, 52, 47, 0.06);
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      }
+      .grade-card::after {
+        content: "";
+        position: absolute;
+        right: -54px;
+        bottom: -58px;
+        width: 142px;
+        height: 142px;
+        border: 1px solid color-mix(in srgb, var(--stage) 17%, transparent);
+        border-radius: 50%;
+        box-shadow: 0 0 0 13px color-mix(in srgb, var(--stage) 5%, transparent);
+        pointer-events: none;
+      }
+      .grade-card-head,
+      .grade-description,
+      .grade-outcomes { position: relative; z-index: 1; }
+      .grade-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+      .grade-card-head strong {
+        display: inline-flex;
+        width: 56px;
+        height: 56px;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px 18px 18px 7px;
+        background: var(--stage);
+        color: var(--white);
+        font-family: var(--font-display);
+        font-size: 21px;
+        box-shadow: 0 8px 16px color-mix(in srgb, var(--stage) 24%, transparent);
+      }
+      .grade-card-head span {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        max-width: calc(100% - 68px);
+        padding: 5px 9px;
+        border: 1px solid color-mix(in srgb, var(--stage) 16%, white);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.68);
+        color: var(--stage);
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1.35;
+        letter-spacing: 0.1em;
+        text-align: right;
+      }
+      .grade-description { min-height: 0; margin-top: 20px; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.72; word-break: keep-all; }
+      .grade-outcomes {
+        display: grid;
+        gap: 10px;
+        margin-top: 22px;
+        padding: 13px;
+        border: 1px solid color-mix(in srgb, var(--stage) 14%, white);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.62);
+      }
+      .grade-outcomes div { display: grid; grid-template-columns: 45px minmax(0, 1fr); gap: 9px; align-items: start; }
+      .grade-outcomes div + div { padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--stage) 12%, white); }
+      .grade-outcomes dt {
+        display: inline-flex;
+        min-height: 22px;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 5px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--stage-tint) 72%, var(--white));
+        color: var(--stage);
+        font-size: 10px;
+        font-weight: 700;
+      }
       .grade-outcomes dd { color: var(--muted); font-size: 12px; line-height: 1.65; word-break: keep-all; }
 
       .management { background: var(--canvas); }
@@ -1030,6 +1107,7 @@ const faqItems = [
       .footer-wordmark b { display: block; color: var(--paper); font-family: var(--font-display); font-size: 24px; line-height: 1; letter-spacing: -0.05em; }
       .footer-wordmark span { display: block; margin-top: 5px; color: rgba(255, 255, 255, 0.56); font-size: 9px; font-weight: 700; letter-spacing: 0.24em; }
       .footer-method { margin-top: 14px; color: #a9b5ac; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; }
+      .footer-audience { max-width: 390px; margin-top: 12px; color: rgba(255, 255, 255, 0.62); font-size: 12px; font-weight: 600; line-height: 1.65; word-break: keep-all; }
       .footer-tagline { margin-top: 11px; color: rgba(255, 255, 255, 0.68); font-family: var(--font-display); font-size: 18px; }
       .footer-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; }
       .footer-links a { min-height: 44px; display: flex; align-items: center; color: rgba(255, 255, 255, 0.68); font-size: 13px; }
@@ -1088,8 +1166,8 @@ const faqItems = [
       .modal-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px 7px; color: var(--muted); font-size: 10px; }
       .modal-counter { color: var(--ink); font-weight: 700; }
       .modal-thumbs { display: flex; gap: 7px; overflow-x: auto; padding: 2px 2px 5px; }
-      :global(.modal-thumb) { flex: 0 0 48px; width: 48px; height: 64px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: white; cursor: pointer; }
-      :global(.modal-thumb[aria-current="true"]) { border-color: var(--coral); box-shadow: 0 0 0 2px rgba(239, 107, 74, 0.18); }
+      :global(.modal-thumb) { flex: 0 0 48px; width: 48px; height: 64px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); cursor: pointer; }
+      :global(.modal-thumb[aria-current="true"]) { border-color: var(--class-accent, var(--coral-dark)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--class-accent, var(--coral-dark)) 18%, transparent); }
       :global(.modal-thumb img) { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
       .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 4000; width: max-content; max-width: calc(100% - 30px); padding: 12px 17px; border-radius: 999px; background: var(--butter); color: var(--ink); font-size: 12px; font-weight: 700; text-align: center; opacity: 0; transform: translate(-50%, 20px); pointer-events: none; transition: 200ms ease; box-shadow: var(--shadow-lg); }
@@ -1098,6 +1176,7 @@ const faqItems = [
       @media (hover: hover) {
         .button:hover { transform: translateY(-2px); }
         .button-primary:hover { background: #a83f2d; }
+        .grade-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--stage) 38%, white); box-shadow: 0 18px 36px rgba(23, 52, 47, 0.11); }
       }
 
       @media (hover: none) {
@@ -1215,7 +1294,7 @@ const faqItems = [
         .comparison-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
         .comparison-card { padding: 22px; }
         .method-track { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .method-card { min-height: 400px; padding: 28px 24px; }
+          .method-card { min-height: 485px; padding: 28px 24px; }
         .method-card:nth-child(even) { margin-top: 38px; }
         .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .weekly-flow { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -1293,17 +1372,18 @@ const faqItems = [
         <div class="container">
           <div class="hero-grid">
             <div class="hero-copy">
-              <p class="hero-kicker"><span class="hero-kicker-dot" aria-hidden="true"></span> G1–G9 · ONLINE JUNIOR BOOK CLUB</p>
+              <p class="hero-kicker"><span class="hero-kicker-dot" aria-hidden="true"></span> G1–G9 · PREMIUM JUNIOR BOOK CLUB</p>
               <h1 class="hero-title">읽은 책이,<br />아이의 <span class="marker">문장</span>이 되도록.</h1>
+              <p class="hero-audience">국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽</p>
               <p class="hero-lead">영어 원서를 깊이 읽고, 근거로 생각하고, 말한 뒤 쓰는 수업.</p>
-              <p class="hero-detail">서울대학교에 재학 중이며 원어민급 영어 역량을 갖춘 검증된 강사진과 함께하는 4인 소수 관리형 프로그램입니다.</p>
+              <p class="hero-detail">국제학교 출신이며 서울대학교에 재학 중인, 원어민급 영어 역량과 최상위 공인성적을 갖춘 검증된 강사진의 4인 소수 관리형 프로그램입니다.</p>
               <div class="hero-credential">
                 <span class="hero-credential-seal">
                   <img class="hero-credential-crest" src="/images/credentials/snu-crest.png" width="53" height="55" alt="서울대학교 심볼마크" />
                 </span>
                 <span class="hero-credential-copy">
                   <small>SNU · 4STEPS FACULTY</small>
-                  <strong>서울대학교 재학 강사진</strong>
+                  <strong>국제학교 출신 · 서울대학교 재학 강사진</strong>
                   <span class="hero-credential-meta"><em class="hero-credential-proof">✓ 재학 확인</em><span>원어민급 영어 역량</span></span>
                 </span>
               </div>
@@ -1399,6 +1479,10 @@ const faqItems = [
                 <p class="method-verb">{step.verb}</p>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
+                <div class="method-promise">
+                  <span>CURRICULUM PROMISE</span>
+                  <p>{step.promise}</p>
+                </div>
                 <small>{step.note}</small>
               </article>
             ))}
@@ -1482,10 +1566,10 @@ const faqItems = [
             <div class="faculty-main">
               <p class="section-kicker">Verified Faculty</p>
               <h2>아이의 영어를 맡기는 선생님,<br />4steps는 기준부터 다릅니다</h2>
-              <p>4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 서울대학교 재학 여부와 원어민 수준의 영어 구사력, 그리고 실제 수업 역량을 함께 검증하여 선별합니다.</p>
+              <p>4STEPS의 강사진은 단순히 영어를 잘하는 선생님이 아닙니다. 국제학교 출신이면서 서울대학교에 재학 중이고, 원어민 수준의 영어 구사력과 실제 수업 역량을 함께 검증한 선생님만 선별합니다.</p>
               <div class="faculty-credential">
                 <img src="/images/credentials/snu-crest.png" width="53" height="55" alt="서울대학교 심볼마크" />
-                <span><small>SNU · VERIFIED FACULTY</small><strong>서울대학교 재학 강사진</strong></span>
+                <span><small>SNU · VERIFIED FACULTY</small><strong>국제학교 출신 · 서울대학교 재학 강사진</strong></span>
               </div>
             </div>
             <div class="faculty-proof" aria-label="강사진 선별 기준">
@@ -1647,6 +1731,7 @@ const faqItems = [
             <span class="footer-logo"><img class="footer-mark" src="/images/logo/logomark-small-dark.svg" alt="" width="141" height="141" /><span class="footer-wordmark"><b>4steps</b><span>BOOK CLUB</span></span></span>
             <span class="footer-method">READ · THINK · SPEAK · WRITE</span>
           </a>
+          <p class="footer-audience">국제학교·해외 유학생을 위한 프리미엄 주니어 Reading &amp; Writing Club</p>
           <p class="footer-tagline">읽은 책이, 아이의 문장이 되도록.</p>
         </div>
         <div>
