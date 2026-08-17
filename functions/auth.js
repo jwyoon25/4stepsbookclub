@@ -1,4 +1,9 @@
+const oauthOrigin = "https://4stepsbookclub.com";
 const stateCookieName = "decap_oauth_state";
+const allowedAdminOrigins = new Map([
+  ["4stepsbookclub.com", oauthOrigin],
+  ["www.4stepsbookclub.com", "https://www.4stepsbookclub.com"]
+]);
 
 function randomHex(bytes = 16) {
   const values = new Uint8Array(bytes);
@@ -10,9 +15,27 @@ function serializeJson(value) {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
-function handshakeResponse({ authorizationUrl, origin, stateCookie }) {
+function resolveAdminOrigin(url) {
+  const siteId = (url.searchParams.get("site_id") || "4stepsbookclub.com").toLowerCase();
+  return allowedAdminOrigins.get(siteId) || "";
+}
+
+function canonicalRedirect(url) {
+  const canonicalUrl = new URL(`${url.pathname}${url.search}`, oauthOrigin);
+  return new Response(null, {
+    status: 307,
+    headers: {
+      "Cache-Control": "no-store",
+      Location: canonicalUrl.toString(),
+      "Referrer-Policy": "no-referrer"
+    }
+  });
+}
+
+function handshakeResponse({ authorizationUrl, adminOrigin, stateCookie }) {
+  const nonce = randomHex();
   const safeAuthorizationUrl = serializeJson(authorizationUrl);
-  const safeOrigin = serializeJson(origin);
+  const safeAdminOrigin = serializeJson(adminOrigin);
 
   return new Response(
     `<!doctype html>
@@ -20,18 +43,18 @@ function handshakeResponse({ authorizationUrl, origin, stateCookie }) {
   <head><meta charset="utf-8"><title>Authorizing GitHub</title></head>
   <body>
     <p>Connecting to GitHub...</p>
-    <script>
+    <script nonce="${nonce}">
       const authorizationUrl = ${safeAuthorizationUrl};
-      const origin = ${safeOrigin};
+      const adminOrigin = ${safeAdminOrigin};
 
       window.addEventListener("message", (event) => {
-        if (event.source === window.opener && event.origin === origin && event.data === "authorizing:github") {
+        if (event.source === window.opener && event.origin === adminOrigin && event.data === "authorizing:github") {
           window.location.replace(authorizationUrl);
         }
       });
 
       if (window.opener) {
-        window.opener.postMessage("authorizing:github", origin);
+        window.opener.postMessage("authorizing:github", adminOrigin);
       }
     </script>
   </body>
@@ -39,8 +62,13 @@ function handshakeResponse({ authorizationUrl, origin, stateCookie }) {
     {
       headers: {
         "Cache-Control": "no-store",
+        "Content-Security-Policy": `default-src 'none'; script-src 'nonce-${nonce}'; base-uri 'none'; frame-ancestors 'none'`,
         "Content-Type": "text/html; charset=utf-8",
-        "Set-Cookie": stateCookie
+        "Permissions-Policy": "camera=(), geolocation=(), microphone=()",
+        "Referrer-Policy": "no-referrer",
+        "Set-Cookie": stateCookie,
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY"
       }
     }
   );
@@ -53,13 +81,22 @@ export function onRequest({ request, env }) {
     return new Response("Invalid provider", { status: 400 });
   }
 
-  if (!env.GITHUB_OAUTH_ID) {
+  const adminOrigin = resolveAdminOrigin(url);
+  if (!adminOrigin) {
+    return new Response("Invalid site", { status: 400 });
+  }
+
+  if (url.origin !== oauthOrigin) {
+    return canonicalRedirect(url);
+  }
+
+  if (!env.GITHUB_OAUTH_ID || !env.GITHUB_OAUTH_SECRET) {
     return new Response("GitHub OAuth is not configured", { status: 500 });
   }
 
   const state = randomHex();
-  const callbackUrl = `${url.origin}/callback?provider=github`;
-  const scope = env.GITHUB_REPO_PRIVATE === "1" ? "repo,user" : "public_repo,user";
+  const callbackUrl = `${oauthOrigin}/callback?provider=github`;
+  const scope = env.GITHUB_REPO_PRIVATE === "1" ? "repo" : "public_repo";
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
 
   authorizationUrl.search = new URLSearchParams({
@@ -69,9 +106,10 @@ export function onRequest({ request, env }) {
     state
   });
 
+  const cookieValue = encodeURIComponent(JSON.stringify({ state, adminOrigin }));
   return handshakeResponse({
     authorizationUrl: authorizationUrl.toString(),
-    origin: url.origin,
-    stateCookie: `${stateCookieName}=${state}; Max-Age=600; Path=/callback; HttpOnly; Secure; SameSite=Lax`
+    adminOrigin,
+    stateCookie: `${stateCookieName}=${cookieValue}; Max-Age=600; Path=/callback; HttpOnly; Secure; SameSite=Lax`
   });
 }

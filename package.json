@@ -5,6 +5,7 @@
     "website"
   ],
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "dev": "npm run website:dev",
     "build": "npm run website:build",
     "preview": "npm run website:preview",
