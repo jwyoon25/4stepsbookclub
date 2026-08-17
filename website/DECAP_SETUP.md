@@ -28,7 +28,7 @@ and Secrets:
 
 - `GITHUB_OAUTH_ID` — the GitHub OAuth App client ID
 - `GITHUB_OAUTH_SECRET` — the GitHub OAuth App client secret, stored as an encrypted secret
-- `GITHUB_REPO_PRIVATE` — `0` for the current public repository, or `1` if the repository becomes private
+- `GITHUB_REPO_PRIVATE` — `1` for the current private repository; use `0` only if the repository becomes public. If omitted, OAuth defaults to the private-repository `repo` scope.
 
 The OAuth Functions accept Decap login requests only for these admin origins:
 

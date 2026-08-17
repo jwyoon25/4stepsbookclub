@@ -104,6 +104,16 @@ test("authorization validates configuration, sites, canonical host, and private 
   });
   const privateUrl = new URL(scriptLiteral(await privateResponse.text(), "authorizationUrl"));
   assert.equal(privateUrl.searchParams.get("scope"), "repo");
+
+  const defaultPrivateResponse = await authorize({
+    request: new Request("https://4stepsbookclub.com/auth?provider=github"),
+    env: {
+      GITHUB_OAUTH_ID: configuredEnv.GITHUB_OAUTH_ID,
+      GITHUB_OAUTH_SECRET: configuredEnv.GITHUB_OAUTH_SECRET
+    }
+  });
+  const defaultPrivateUrl = new URL(scriptLiteral(await defaultPrivateResponse.text(), "authorizationUrl"));
+  assert.equal(defaultPrivateUrl.searchParams.get("scope"), "repo");
 });
 
 test("successful callback sends only the token to the state-bound exact origin", async () => {
