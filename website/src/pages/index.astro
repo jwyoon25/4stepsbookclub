@@ -1124,34 +1124,7 @@ const faqItems = [
       .consult-copy > p { margin-top: 18px; color: rgba(255, 255, 255, 0.66); line-height: 1.8; word-break: keep-all; }
       .consult-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
       .consult-form { padding: 22px 16px; border-radius: 20px; background: var(--canvas); color: var(--text); box-shadow: var(--shadow-lg); }
-      .form-head { margin-bottom: 22px; }
-      .form-head h3 { color: var(--ink); font-family: var(--font-display); font-size: var(--type-heading); line-height: var(--leading-heading); }
-      .form-head p { margin-top: 5px; color: var(--muted); font-size: var(--type-label); }
-      .form-grid { display: grid; gap: 14px; }
-      .field { display: grid; gap: 7px; }
-      .field label { color: var(--ink); font-size: var(--type-label); font-weight: var(--weight-bold); }
-      .field label span { margin-left: 5px; color: var(--muted); font-size: var(--type-label); font-weight: var(--weight-regular); }
-      .field input, .field select, .field textarea {
-        width: 100%;
-        min-height: 50px;
-        padding: 12px 13px;
-        border: 1px solid #cfd8d0;
-        border-radius: 12px;
-        background: white;
-        color: var(--text);
-        font-size: var(--type-body);
-      }
-      .field textarea { min-height: 96px; resize: vertical; }
-      .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--coral-dark); outline: 2px solid var(--ink); outline-offset: 1px; }
-      .optional-fields { padding-top: 2px; }
-      .optional-fields > summary { position: relative; min-height: 52px; display: flex; align-items: center; padding: 12px 46px 12px 14px; border: 1px solid #cfd8d0; border-radius: 12px; background: var(--paper); color: var(--ink); font-size: var(--type-small); font-weight: var(--weight-bold); cursor: pointer; list-style: none; }
-      .optional-fields > summary::-webkit-details-marker { display: none; }
-      .optional-fields > summary::after { content: "+"; position: absolute; right: 14px; color: var(--coral-dark); font-size: var(--type-heading); font-weight: var(--weight-regular); transition: transform 180ms ease; }
-      .optional-fields[open] > summary::after { transform: rotate(45deg); }
-      .optional-fields > summary span { margin-left: 6px; color: var(--muted); font-size: var(--type-label); font-weight: var(--weight-regular); }
-      .optional-grid { display: grid; gap: 14px; padding-top: 14px; }
-      .submit-button { width: 100%; margin-top: 18px; border: 0; }
-      .form-note { margin-top: 11px; color: var(--muted); font-size: var(--type-label); line-height: 1.6; text-align: center; word-break: keep-all; }
+      .tally-embed { display: block; width: 100%; border: 0; }
 
       .site-footer {
         position: relative;
@@ -1255,8 +1228,6 @@ const faqItems = [
       :global(.modal-thumb[aria-current="true"]) { border-color: var(--class-accent, var(--coral-dark)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--class-accent, var(--coral-dark)) 18%, transparent); }
       :global(.modal-thumb img) { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
 
-      .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 4000; width: max-content; max-width: calc(100% - 30px); padding: 12px 17px; border-radius: 999px; background: var(--butter); color: var(--ink); font-size: var(--type-label); font-weight: var(--weight-bold); text-align: center; opacity: 0; transform: translate(-50%, 20px); pointer-events: none; transition: 200ms ease; box-shadow: var(--shadow-lg); }
-      .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
       @media (hover: hover) {
         .button:hover { transform: translateY(-2px); }
@@ -1295,9 +1266,6 @@ const faqItems = [
         .comparison-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .stage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .grade-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .form-grid { grid-template-columns: repeat(2, 1fr); }
-        .field.full { grid-column: 1 / -1; }
-        .optional-grid { grid-template-columns: repeat(2, 1fr); }
       }
 
       @media (min-width: 760px) {
@@ -1395,7 +1363,6 @@ const faqItems = [
         .management-card { min-height: 330px; padding: 30px; }
         .site-footer { padding-bottom: 42px; }
         .mobile-cta { display: none; }
-        .toast { bottom: 28px; }
       }
 
       /* Keep iPad-width headers on the drawer pattern so nav labels do not wrap into narrow columns. */
@@ -1848,32 +1815,16 @@ const faqItems = [
           <div class="consult-copy">
             <p class="section-kicker">Start with 4steps</p>
             <h2>우리 아이에게 맞는<br />첫 번째 step을 찾아보세요</h2>
-            <p>간단한 정보를 남기면 상담과 무료 레벨 테스트 안내를 위한 이메일이 준비됩니다. 카카오톡으로 바로 문의해도 좋습니다.</p>
+            <p>간단한 정보를 남기면 상담 신청이 접수되고, 우리 아이에게 맞는 무료 레벨 테스트 안내를 받을 수 있습니다. 카카오톡으로 바로 문의해도 좋습니다.</p>
             <div class="consult-quick">
               <a class="button button-light" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="19" height="19" alt="" /> 카카오톡 상담</a>
               <a class="button button-light" href="mailto:4stepsbookclub@gmail.com"><i data-lucide="mail" aria-hidden="true"></i> 이메일 문의</a>
             </div>
           </div>
 
-          <form id="consult-form" class="consult-form" novalidate>
-            <div class="form-head"><h3>무료 레벨테스트 상담</h3><p><strong>*</strong> 표시는 필수 입력 항목입니다.</p></div>
-            <div class="form-grid">
-              <div class="field"><label for="student">학생 이름 *</label><input id="student" name="student" type="text" autocomplete="off" placeholder="학생 이름" required /></div>
-              <div class="field"><label for="grade">현재 학년 *</label><select id="grade" name="grade" required><option value="">선택해 주세요</option><option>초등학교 1학년</option><option>초등학교 2학년</option><option>초등학교 3학년</option><option>초등학교 4학년</option><option>초등학교 5학년</option><option>초등학교 6학년</option><option>중학교 1학년</option><option>중학교 2학년</option><option>중학교 3학년</option><option>기타</option></select></div>
-              <details class="optional-fields field full">
-                <summary>추가 정보 입력 <span>선택</span></summary>
-                <div class="optional-grid">
-                  <div class="field"><label for="birth-month">출생 연도 및 월</label><input id="birth-month" name="birthMonth" type="month" autocomplete="off" /></div>
-                  <div class="field"><label for="school">학교명</label><input id="school" name="school" type="text" autocomplete="off" placeholder="현재 학교명" /></div>
-                  <div class="field"><label for="region">거주 지역</label><input id="region" name="region" type="text" autocomplete="off" placeholder="예: 서울 강남구 / 해외" /></div>
-                  <div class="field"><label for="overseas">해외 거주 기간</label><input id="overseas" name="overseasResidence" type="text" autocomplete="off" placeholder="예: 2년 / 경험 없음" /></div>
-                  <div class="field full"><label for="message">상담 시 참고할 내용</label><textarea id="message" name="message" placeholder="현재 읽는 영어책, 글쓰기 경험 등"></textarea></div>
-                </div>
-              </details>
-            </div>
-            <button id="submit-button" class="button button-primary submit-button" type="submit">상담 이메일 작성하기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></button>
-            <p class="form-note">버튼을 누르면 입력 내용이 담긴 이메일 작성 화면이 열립니다. 내용을 확인한 뒤 직접 전송해 주세요.</p>
-          </form>
+          <div id="consult-form" class="consult-form">
+            <iframe class="tally-embed" data-tally-src="https://tally.so/embed/ob86yM?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" loading="lazy" width="100%" height="200" frameborder="0" marginheight="0" marginwidth="0" title="무료 레벨테스트 상담 신청"></iframe>
+          </div>
         </div>
       </section>
     </main>
@@ -1934,8 +1885,6 @@ const faqItems = [
         <div id="modal-thumbs" class="modal-thumbs" role="group" aria-label="갤러리 페이지 선택"></div>
       </div>
     </div>
-
-    <div id="toast" class="toast" role="status" aria-live="polite">이메일 앱을 열었습니다. 전송을 완료해 주세요.</div>
 
     <script is:inline>
       document.addEventListener("DOMContentLoaded", () => {
@@ -2160,30 +2109,6 @@ const faqItems = [
           }
         });
 
-        const form = document.getElementById("consult-form");
-        const toast = document.getElementById("toast");
-        form?.addEventListener("submit", (event) => {
-          event.preventDefault();
-          if (!form.checkValidity()) { form.reportValidity(); return; }
-          const data = new FormData(form);
-          const values = Object.fromEntries(data.entries());
-          const lines = [
-            `학생 이름: ${values.student || ""}`,
-            `현재 학년: ${values.grade || ""}`,
-            `출생 연도 및 월: ${values.birthMonth || "미입력"}`,
-            `학교명: ${values.school || "미입력"}`,
-            `거주 지역: ${values.region || "미입력"}`,
-            `해외 거주 기간: ${values.overseasResidence || "미입력"}`,
-            "",
-            "상담 시 참고할 내용:",
-            values.message || "미입력"
-          ];
-          const subject = `[무료 레벨테스트 상담] ${values.student}`;
-          window.location.href = `mailto:4stepsbookclub@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
-          toast?.classList.add("show");
-          window.setTimeout(() => toast?.classList.remove("show"), 3600);
-        });
-
         if (mobileCta && heroSection && consultingSection && footer && "IntersectionObserver" in window) {
           const visible = new Set();
           const observer = new IntersectionObserver((entries) => {
@@ -2195,6 +2120,22 @@ const faqItems = [
           observer.observe(footer);
         }
       });
+    </script>
+    <script is:inline>
+      var d = document;
+      var w = "https://tally.so/widgets/embed.js";
+      var v = function () {
+        if (typeof Tally !== "undefined") Tally.loadEmbeds();
+        else d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach(function (e) { e.src = e.dataset.tallySrc; });
+      };
+      if (typeof Tally !== "undefined") v();
+      else if (d.querySelector('script[src="' + w + '"]') == null) {
+        var s = d.createElement("script");
+        s.src = w;
+        s.onload = v;
+        s.onerror = v;
+        d.body.appendChild(s);
+      }
     </script>
   </body>
 </html>
