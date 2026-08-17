@@ -1,6 +1,14 @@
 ---
 import AnnotatedEssay from "../components/AnnotatedEssay.astro";
 
+// Shared page metadata. Title and description feed both the document head and
+// the Open Graph / Twitter link preview so they can never drift apart.
+const pageTitle = "4steps Book Club | 읽은 책이 아이의 문장이 되도록";
+const pageDescription =
+  "국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽. G1–G9 영어 리딩, 토론, 라이팅을 연결하는 4인 소수 관리형 4steps Book Club.";
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL("/images/og/og-default.png", Astro.site);
+
 const classContentGalleries = [
   {
     id: "feedback",
@@ -359,9 +367,32 @@ const faqItems = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="국제학교 학생과 해외 유학생을 위한 프리미엄 주니어 북클럽. G1–G9 영어 리딩, 토론, 라이팅을 연결하는 4인 소수 관리형 4steps Book Club." />
+    <meta name="description" content={pageDescription} />
     <meta name="theme-color" content="#f7f3ea" />
-    <title>4steps Book Club | 읽은 책이 아이의 문장이 되도록</title>
+    <title>{pageTitle}</title>
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Link preview card (KakaoTalk, Naver, Facebook, iMessage, Slack). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="4steps Book Club" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="4steps Book Club 로고와 브랜드 문구 ‘읽은 책이, 아이의 문장이 되도록.’, 그리고 READ · THINK · SPEAK · WRITE 4단계 태그"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="icon" type="image/svg+xml" href="/images/logo/logomark-small-dark.svg" />
     <link rel="icon" type="image/png" sizes="16x16" href="/images/icons/favicon-16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/images/icons/favicon-32.png" />
