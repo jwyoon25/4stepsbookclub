@@ -1123,8 +1123,8 @@ const faqItems = [
       .consult-copy h2 { color: white; font-family: var(--font-display); font-size: var(--type-section); line-height: var(--leading-heading); letter-spacing: var(--tracking-display); word-break: keep-all; }
       .consult-copy > p { margin-top: 18px; color: rgba(255, 255, 255, 0.66); line-height: 1.8; word-break: keep-all; }
       .consult-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-      .consult-form { padding: 22px 16px; border-radius: 20px; background: var(--canvas); color: var(--text); box-shadow: var(--shadow-lg); }
-      .tally-embed { display: block; width: 100%; border: 0; }
+      .consult-form { height: clamp(480px, calc(100dvh - 160px), 600px); overflow: hidden; padding: 22px 16px; border-radius: 20px; background: var(--canvas); color: var(--text); box-shadow: var(--shadow-lg); }
+      .tally-embed { display: block; width: 100%; height: 100%; border: 0; }
 
       .site-footer {
         position: relative;
@@ -1823,7 +1823,7 @@ const faqItems = [
           </div>
 
           <div id="consult-form" class="consult-form">
-            <iframe class="tally-embed" data-tally-src="https://tally.so/embed/ob86yM?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" loading="lazy" width="100%" height="200" frameborder="0" marginheight="0" marginwidth="0" title="무료 레벨테스트 상담 신청"></iframe>
+            <iframe class="tally-embed" data-tally-src="https://tally.so/embed/ob86yM?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1" loading="lazy" width="100%" height="560" scrolling="auto" frameborder="0" marginheight="0" marginwidth="0" title="무료 레벨테스트 상담 신청"></iframe>
           </div>
         </div>
       </section>
