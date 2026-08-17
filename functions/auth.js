@@ -6,6 +6,46 @@ function randomHex(bytes = 16) {
   return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
 }
 
+function serializeJson(value) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
+function handshakeResponse({ authorizationUrl, origin, stateCookie }) {
+  const safeAuthorizationUrl = serializeJson(authorizationUrl);
+  const safeOrigin = serializeJson(origin);
+
+  return new Response(
+    `<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Authorizing GitHub</title></head>
+  <body>
+    <p>Connecting to GitHub...</p>
+    <script>
+      const authorizationUrl = ${safeAuthorizationUrl};
+      const origin = ${safeOrigin};
+
+      window.addEventListener("message", (event) => {
+        if (event.source === window.opener && event.origin === origin && event.data === "authorizing:github") {
+          window.location.replace(authorizationUrl);
+        }
+      });
+
+      if (window.opener) {
+        window.opener.postMessage("authorizing:github", origin);
+      }
+    </script>
+  </body>
+</html>`,
+    {
+      headers: {
+        "Cache-Control": "no-store",
+        "Content-Type": "text/html; charset=utf-8",
+        "Set-Cookie": stateCookie
+      }
+    }
+  );
+}
+
 export function onRequest({ request, env }) {
   const url = new URL(request.url);
 
@@ -29,11 +69,9 @@ export function onRequest({ request, env }) {
     state
   });
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: authorizationUrl.toString(),
-      "Set-Cookie": `${stateCookieName}=${state}; Max-Age=600; Path=/callback; HttpOnly; Secure; SameSite=Lax`
-    }
+  return handshakeResponse({
+    authorizationUrl: authorizationUrl.toString(),
+    origin: url.origin,
+    stateCookie: `${stateCookieName}=${state}; Max-Age=600; Path=/callback; HttpOnly; Secure; SameSite=Lax`
   });
 }
