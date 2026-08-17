@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 2020" role="img" aria-labelledby="title desc">
+  <title id="title">4steps Book Club — mobile logo proposal board</title>
+  <desc id="desc">Three new logo directions shown at phone review size.</desc>
+  <rect width="390" height="2020" fill="#f7f3ea" />
+  <g font-family="Arial, sans-serif" fill="#17342f">
+    <text x="20" y="36" font-size="10" font-weight="700" letter-spacing="1.6" fill="#c84f37">4STEPS · LOGO PROPOSAL 02</text>
+    <text x="20" y="82" font-family="Georgia, serif" font-size="30" font-weight="700">Three different</text>
+    <text x="20" y="117" font-family="Georgia, serif" font-size="30" font-weight="700">answers to the brand.</text>
+    <text x="20" y="148" font-size="14" fill="#66766f">Method · Community · Editorial authorship</text>
+
+    <g transform="translate(16 185)">
+      <rect width="358" height="500" rx="24" fill="#fffdf8" />
+      <text x="22" y="34" font-size="11" font-weight="700" letter-spacing="1.5" fill="#c84f37">01 · METHOD</text>
+      <text x="22" y="74" font-family="Georgia, serif" font-size="27" font-weight="700">Four Beats</text>
+      <image href="01-four-beats-lockup.svg" x="22" y="105" width="314" height="77" />
+      <rect x="0" y="215" width="358" height="70" fill="#f7f3ea" />
+      <image href="01-four-beats-lockup.svg" x="16" y="229" width="169" height="42" />
+      <circle cx="322" cy="250" r="21" fill="#fff" stroke="#d7ddd5" />
+      <path d="M315 244h14M315 250h14M315 256h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <image href="01-four-beats-mark.svg" x="22" y="318" width="72" height="72" />
+      <image href="01-four-beats-mark.svg" x="116" y="338" width="32" height="32" />
+      <text x="22" y="424" font-size="13" font-weight="700">STRENGTH</text>
+      <text x="22" y="448" font-size="14" fill="#66766f">Clearest brand name in a mobile header.</text>
+      <text x="22" y="478" font-size="13" font-weight="700">RISK · Beats may feel decorative at first.</text>
+    </g>
+
+    <g transform="translate(16 715)">
+      <rect width="358" height="500" rx="24" fill="#fffdf8" />
+      <text x="22" y="34" font-size="11" font-weight="700" letter-spacing="1.5" fill="#c84f37">02 · COMMUNITY</text>
+      <text x="22" y="74" font-family="Georgia, serif" font-size="27" font-weight="700">The Reading Table</text>
+      <image href="02-reading-table-lockup.svg" x="22" y="105" width="314" height="77" />
+      <rect x="0" y="215" width="358" height="70" fill="#f7f3ea" />
+      <image href="02-reading-table-lockup.svg" x="16" y="229" width="169" height="42" />
+      <circle cx="322" cy="250" r="21" fill="#fff" stroke="#d7ddd5" />
+      <path d="M315 244h14M315 250h14M315 256h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <image href="02-reading-table-mark.svg" x="22" y="318" width="72" height="72" />
+      <image href="02-reading-table-mark.svg" x="116" y="338" width="32" height="32" />
+      <text x="22" y="424" font-size="13" font-weight="700">STRENGTH</text>
+      <text x="22" y="448" font-size="14" fill="#66766f">Owns the maximum-four live class format.</text>
+      <text x="22" y="478" font-size="13" font-weight="700">RISK · May first read as a table or flower.</text>
+    </g>
+
+    <g transform="translate(16 1245)">
+      <rect width="358" height="500" rx="24" fill="#fffdf8" />
+      <text x="22" y="34" font-size="11" font-weight="700" letter-spacing="1.5" fill="#c84f37">03 · AUTHORSHIP</text>
+      <text x="22" y="74" font-family="Georgia, serif" font-size="27" font-weight="700">The Imprint</text>
+      <image href="03-imprint-lockup.svg" x="22" y="105" width="314" height="77" />
+      <rect x="0" y="215" width="358" height="70" fill="#f7f3ea" />
+      <image href="03-imprint-lockup.svg" x="16" y="229" width="169" height="42" />
+      <circle cx="322" cy="250" r="21" fill="#fff" stroke="#d7ddd5" />
+      <path d="M315 244h14M315 250h14M315 256h14" stroke="#17342f" stroke-width="2" stroke-linecap="round" />
+      <image href="03-imprint-mark.svg" x="22" y="318" width="72" height="72" />
+      <image href="03-imprint-mark.svg" x="116" y="338" width="32" height="32" />
+      <text x="22" y="424" font-size="13" font-weight="700">STRENGTH</text>
+      <text x="22" y="448" font-size="14" fill="#66766f">Most literary and academically credible.</text>
+      <text x="22" y="478" font-size="13" font-weight="700">RISK · Says editorial craft before class size.</text>
+    </g>
+
+    <line x1="20" y1="1810" x2="370" y2="1810" stroke="#d7ddd5" />
+    <text x="20" y="1860" font-family="Georgia, serif" font-size="23" font-weight="700">Choose the meaning first.</text>
+    <text x="20" y="1891" font-family="Georgia, serif" font-size="23" font-weight="700">Refine the drawing second.</text>
+    <text x="20" y="1940" font-size="13" fill="#66766f">Production assets remain unchanged until</text>
+    <text x="20" y="1962" font-size="13" fill="#66766f">one direction is selected.</text>
+  </g>
+</svg>

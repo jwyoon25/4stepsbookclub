@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 2260" role="img" aria-labelledby="title desc">
+  <title id="title">4steps Book Club — mobile academic logo revision</title>
+  <desc id="desc">Three academic logo directions shown at phone review size: The Reader's Margin, Evidence [4], and The Syllabus.</desc>
+  <rect width="390" height="2260" fill="#f7f3ea" />
+  <g font-family="Arial, sans-serif" fill="#17342f">
+    <text x="20" y="34" font-size="10" font-weight="700" letter-spacing="1.5" fill="#8a3b32">IDENTITY PROPOSAL 03 · ACADEMIC</text>
+    <text x="20" y="78" font-family="Georgia, serif" font-size="30" font-weight="700">Academic, without</text>
+    <text x="20" y="113" font-family="Georgia, serif" font-size="30" font-weight="700">borrowed prestige.</text>
+    <text x="20" y="145" font-size="13" fill="#5f716a">Evidence · Annotation · Curriculum</text>
+
+    <g transform="translate(16 180)">
+      <rect width="358" height="570" rx="3" fill="#fffdf8" stroke="#bcc8c0" />
+      <text x="22" y="34" font-size="10" font-weight="700" letter-spacing="1.5" fill="#8a3b32">01 · TEACHER FEEDBACK</text>
+      <text x="22" y="72" font-family="Georgia, serif" font-size="27" font-weight="700">The Reader's Margin</text>
+      <text x="22" y="101" font-size="13" fill="#5f716a">A margin note turns feedback into the next sentence.</text>
+      <image href="01-readers-margin-lockup.svg" x="22" y="130" width="314" height="77" />
+      <rect x="0" y="235" width="358" height="70" fill="#f7f3ea" />
+      <image href="01-readers-margin-lockup.svg" x="16" y="249" width="169" height="42" />
+      <rect x="298" y="248" width="44" height="44" rx="2" fill="#fffdf8" stroke="#bcc8c0" />
+      <path d="M311 263H329M311 270H329M311 277H329" stroke="#17342f" stroke-width="2" />
+      <image href="01-readers-margin-mark.svg" x="22" y="337" width="72" height="72" />
+      <image href="01-readers-margin-mark.svg" x="122" y="357" width="32" height="32" />
+      <line x1="22" y1="440" x2="336" y2="440" stroke="#d7ddd5" />
+      <text x="22" y="473" font-size="12" font-weight="700">STRENGTH</text>
+      <text x="22" y="497" font-size="13" fill="#5f716a">Most specific to the real teaching and feedback.</text>
+      <text x="22" y="531" font-size="12" font-weight="700">RISK · The insertion caret needs brief context.</text>
+    </g>
+
+    <g transform="translate(16 780)">
+      <rect width="358" height="570" rx="3" fill="#fffdf8" stroke="#bcc8c0" />
+      <text x="22" y="34" font-size="10" font-weight="700" letter-spacing="1.5" fill="#8a3b32">02 · TEXTUAL EVIDENCE</text>
+      <text x="22" y="72" font-family="Georgia, serif" font-size="27" font-weight="700">Evidence [4]</text>
+      <text x="22" y="101" font-size="13" fill="#5f716a">A citation marker makes close reading the premise.</text>
+      <image href="02-evidence-lockup.svg" x="22" y="130" width="314" height="77" />
+      <rect x="0" y="235" width="358" height="70" fill="#f7f3ea" />
+      <image href="02-evidence-lockup.svg" x="16" y="249" width="169" height="42" />
+      <rect x="298" y="248" width="44" height="44" rx="2" fill="#fffdf8" stroke="#bcc8c0" />
+      <path d="M311 263H329M311 270H329M311 277H329" stroke="#17342f" stroke-width="2" />
+      <image href="02-evidence-mark.svg" x="22" y="337" width="72" height="72" />
+      <image href="02-evidence-mark.svg" x="122" y="357" width="32" height="32" />
+      <line x1="22" y1="440" x2="336" y2="440" stroke="#d7ddd5" />
+      <text x="22" y="473" font-size="12" font-weight="700">STRENGTH</text>
+      <text x="22" y="497" font-size="13" fill="#5f716a">Clearest academic cue and strongest favicon.</text>
+      <text x="22" y="531" font-size="12" font-weight="700">RISK · Could first read as “reference four.”</text>
+    </g>
+
+    <g transform="translate(16 1380)">
+      <rect width="358" height="570" rx="3" fill="#fffdf8" stroke="#bcc8c0" />
+      <text x="22" y="34" font-size="10" font-weight="700" letter-spacing="1.5" fill="#8a3b32">03 · COURSE STRUCTURE</text>
+      <text x="22" y="72" font-family="Georgia, serif" font-size="27" font-weight="700">The Syllabus</text>
+      <text x="22" y="101" font-size="13" fill="#5f716a">A numbered section presents 4steps as curriculum.</text>
+      <image href="03-syllabus-lockup.svg" x="22" y="130" width="314" height="77" />
+      <rect x="0" y="235" width="358" height="70" fill="#f7f3ea" />
+      <image href="03-syllabus-lockup.svg" x="16" y="249" width="169" height="42" />
+      <rect x="298" y="248" width="44" height="44" rx="2" fill="#fffdf8" stroke="#bcc8c0" />
+      <path d="M311 263H329M311 270H329M311 277H329" stroke="#17342f" stroke-width="2" />
+      <image href="03-syllabus-mark.svg" x="22" y="337" width="72" height="72" />
+      <image href="03-syllabus-mark.svg" x="122" y="357" width="32" height="32" />
+      <line x1="22" y1="440" x2="336" y2="440" stroke="#d7ddd5" />
+      <text x="22" y="473" font-size="12" font-weight="700">STRENGTH</text>
+      <text x="22" y="497" font-size="13" fill="#5f716a">Most disciplined and least “logo-like.”</text>
+      <text x="22" y="531" font-size="12" font-weight="700">RISK · Cooler and less immediately warm.</text>
+    </g>
+
+    <line x1="20" y1="2012" x2="370" y2="2012" stroke="#bcc8c0" />
+    <text x="20" y="2059" font-family="Georgia, serif" font-size="23" font-weight="700">Academic cues come from</text>
+    <text x="20" y="2088" font-family="Georgia, serif" font-size="23" font-weight="700">the work itself.</text>
+    <text x="20" y="2130" font-size="12" fill="#5f716a">Citation · margin annotation · course structure.</text>
+    <text x="20" y="2155" font-size="12" fill="#5f716a">No crest, seal, laurel, motto, or false affiliation.</text>
+    <text x="20" y="2205" font-size="10" font-weight="700" letter-spacing="1" fill="#8a3b32">PRODUCTION LOGO REMAINS UNCHANGED.</text>
+  </g>
+</svg>
