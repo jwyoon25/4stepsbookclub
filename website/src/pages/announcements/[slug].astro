@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from "astro:content";
+import NoticeLayout from "../../components/NoticeLayout.astro";
+import { formatNoticeDate, noticeImageAlt } from "../../data/notices";
+
+export async function getStaticPaths() {
+  const notices = await getCollection("notices");
+  return notices.map((notice) => ({
+    params: { slug: notice.id },
+    props: { notice }
+  }));
+}
+
+const { notice } = Astro.props;
+const { Content } = await render(notice);
+const pageTitle = `${notice.data.title} | 4steps Book Club`;
+const pageDescription = `${notice.data.title} — 4steps Book Club 공지사항`;
+---
+
+<NoticeLayout title={pageTitle} description={pageDescription} image={notice.data.images[0]}>
+  <article class="notice-detail">
+    <a class="notice-detail-back" href="/announcements/">← 공지사항 목록</a>
+    <header class="notice-detail-header">
+      <time class="notice-meta" datetime={notice.data.postedAt.toISOString()}>{formatNoticeDate(notice.data.postedAt)}</time>
+      <h1 class="notice-detail-title">{notice.data.title}</h1>
+    </header>
+    <div class="notice-detail-body"><Content /></div>
+    {notice.data.images.length > 0 && (
+      <div class="notice-detail-images" aria-label="공지사항 이미지">
+        {notice.data.images.map((image, index) => (
+          <img src={image} alt={noticeImageAlt(notice.data.title, index)} width="1200" height="900" loading={index === 0 ? "eager" : "lazy"} decoding="async" />
+        ))}
+      </div>
+    )}
+  </article>
+</NoticeLayout>

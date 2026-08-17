@@ -4,6 +4,8 @@ node_modules/
 dist/
 .astro/
 .type-system.md
+.dev.vars*
+.wrangler/
 
 # Generated Typst workbook PDFs
 workbooks/output/*.pdf

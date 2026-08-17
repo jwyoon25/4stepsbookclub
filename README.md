@@ -8,6 +8,9 @@ workbook publishing system.
 - `website/` — the Astro-powered customer-facing website.
 - `workbooks/` — the Typst-based workbook generation scaffold.
 
+The website includes a Decap CMS announcement editor. One-time Cloudflare and
+GitHub OAuth setup is documented in [website/DECAP_SETUP.md](website/DECAP_SETUP.md).
+
 The root package provides convenient commands for both projects while keeping
 their source files and build systems separate.
 

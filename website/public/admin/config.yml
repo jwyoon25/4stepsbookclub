@@ -1,0 +1,59 @@
+backend:
+  name: github
+  repo: jwyoon25/4stepsbookclub
+  branch: main
+  base_url: https://4stepsbookclub.com
+  auth_endpoint: /auth
+
+site_url: https://4stepsbookclub.com
+display_url: https://4stepsbookclub.com
+locale: ko
+publish_mode: simple
+
+media_folder: website/public/images/notices
+public_folder: /images/notices
+
+collections:
+  - name: notices
+    label: 공지사항
+    label_singular: 공지
+    folder: website/src/content/notices
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: announcements/{{slug}}
+    fields:
+      - label: 제목
+        name: title
+        widget: string
+        hint: 공지사항 제목을 입력해 주세요.
+      - label: 게시일
+        name: postedAt
+        widget: datetime
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+        default: "{{now}}"
+      - label: 내용
+        name: body
+        widget: richtext
+        minimal: true
+        modes:
+          - rich_text
+      - label: 이미지
+        name: images
+        widget: list
+        required: false
+        label_singular: 이미지
+        hint: 이미지가 필요할 때만 추가해 주세요. 이미지 한 장당 최대 2MB입니다.
+        min: 0
+        max: 5
+        field:
+          label: 이미지
+          name: image
+          widget: image
+          choose_url: false
+          media_library:
+            config:
+              max_file_size: 2097152
