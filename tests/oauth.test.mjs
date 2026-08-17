@@ -39,6 +39,15 @@ function callbackRequest({ stateContext, query, origin = "https://4stepsbookclub
   });
 }
 
+test("admin CSP permits Decap 3.15.1 configuration evaluation only on admin routes", async () => {
+  const headers = await readFile(new URL("website/public/_headers", rootUrl), "utf8");
+  const adminPolicy = headers.match(/^\/admin\/\*\n  Content-Security-Policy: (.+)$/m)?.[1];
+
+  assert.ok(adminPolicy, "Expected an admin Content-Security-Policy");
+  assert.match(adminPolicy, /script-src 'self' 'unsafe-eval' https:\/\/unpkg\.com/);
+  assert.equal(headers.match(/'unsafe-eval'/g)?.length, 1);
+});
+
 test("authorization handshake is origin-bound and uses minimal public scope", async () => {
   const response = await authorize({
     request: new Request(

@@ -7,7 +7,10 @@ to the GitHub repository through the private `/admin/` editor.
 The admin page pins Decap CMS 3.15.1 and verifies the downloaded entry bundle
 with a SHA-384 Subresource Integrity hash. When updating Decap, update the
 version and integrity hash together and verify the OAuth handshake tests still
-pass.
+pass. Decap CMS 3.15.1 evaluates generated configuration code, so the
+`/admin/*` Content Security Policy permits `unsafe-eval`. That exception is
+limited to admin routes; the CMS bundle remains version-pinned and
+integrity-checked.
 
 ## One-time deployment setup
 
