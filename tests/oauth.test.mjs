@@ -15,7 +15,7 @@ const { onRequest: callback } = await loadModule("functions/callback.js");
 const configuredEnv = {
   GITHUB_OAUTH_ID: "test-client-id",
   GITHUB_OAUTH_SECRET: "test-client-secret",
-  GITHUB_REPO_PRIVATE: "0"
+  GITHUB_REPO_PUBLIC: "1"
 };
 
 function scriptLiteral(html, name) {
@@ -100,7 +100,7 @@ test("authorization validates configuration, sites, canonical host, and private 
 
   const privateResponse = await authorize({
     request: new Request("https://4stepsbookclub.com/auth?provider=github"),
-    env: { ...configuredEnv, GITHUB_REPO_PRIVATE: "1" }
+    env: { ...configuredEnv, GITHUB_REPO_PUBLIC: "0" }
   });
   const privateUrl = new URL(scriptLiteral(await privateResponse.text(), "authorizationUrl"));
   assert.equal(privateUrl.searchParams.get("scope"), "repo");
@@ -114,6 +114,17 @@ test("authorization validates configuration, sites, canonical host, and private 
   });
   const defaultPrivateUrl = new URL(scriptLiteral(await defaultPrivateResponse.text(), "authorizationUrl"));
   assert.equal(defaultPrivateUrl.searchParams.get("scope"), "repo");
+
+  const obsoleteFlagResponse = await authorize({
+    request: new Request("https://4stepsbookclub.com/auth?provider=github"),
+    env: {
+      GITHUB_OAUTH_ID: configuredEnv.GITHUB_OAUTH_ID,
+      GITHUB_OAUTH_SECRET: configuredEnv.GITHUB_OAUTH_SECRET,
+      GITHUB_REPO_PRIVATE: "0"
+    }
+  });
+  const obsoleteFlagUrl = new URL(scriptLiteral(await obsoleteFlagResponse.text(), "authorizationUrl"));
+  assert.equal(obsoleteFlagUrl.searchParams.get("scope"), "repo");
 });
 
 test("successful callback sends only the token to the state-bound exact origin", async () => {

@@ -1,5 +1,5 @@
 # This repository is private. The OAuth Function defaults to the required
-# private-repository scope unless GITHUB_REPO_PRIVATE is explicitly set to 0.
+# private-repository scope unless GITHUB_REPO_PUBLIC is explicitly set to 1.
 backend:
   name: github
   repo: jwyoon25/4stepsbookclub

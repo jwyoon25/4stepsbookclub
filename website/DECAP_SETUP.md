@@ -28,7 +28,7 @@ and Secrets:
 
 - `GITHUB_OAUTH_ID` — the GitHub OAuth App client ID
 - `GITHUB_OAUTH_SECRET` — the GitHub OAuth App client secret, stored as an encrypted secret
-- `GITHUB_REPO_PRIVATE` — `1` for the current private repository; use `0` only if the repository becomes public. If omitted, OAuth defaults to the private-repository `repo` scope.
+- `GITHUB_REPO_PUBLIC` — leave unset for the current private repository; set it to `1` only if the repository becomes public. OAuth defaults to the private-repository `repo` scope. The obsolete `GITHUB_REPO_PRIVATE` setting is ignored and can be removed from Cloudflare.
 
 The OAuth Functions accept Decap login requests only for these admin origins:
 

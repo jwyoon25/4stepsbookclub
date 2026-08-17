@@ -96,7 +96,7 @@ export function onRequest({ request, env }) {
 
   const state = randomHex();
   const callbackUrl = `${oauthOrigin}/callback?provider=github`;
-  const scope = env.GITHUB_REPO_PRIVATE === "0" ? "public_repo" : "repo";
+  const scope = env.GITHUB_REPO_PUBLIC === "1" ? "public_repo" : "repo";
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
 
   authorizationUrl.search = new URLSearchParams({
