@@ -64,8 +64,23 @@ Third-party platform marks use the original Naver Blog, KakaoTalk Channel, and I
 - **Display and editorial headlines:** `Gowun Batang`, 700
 - **Body, navigation, forms, and metadata:** `IBM Plex Sans KR`, 400–700
 - Use the serif for ideas and emotional emphasis, not for dense interface copy.
-- Korean body copy should remain at least 16px on mobile with generous line height.
+- Primary Korean body copy is 16px with generous line height. The 14px compact-body role is reserved for supporting card copy and dense utility content.
 - Keep headings short enough to scan in two to four lines at 360–430px.
+
+### Type roles
+
+The site uses a deliberately small semantic system. New content should choose one of these roles and should not introduce another font size or weight without a deliberate design reason.
+
+| Role | Token | Family / weight | Use |
+| --- | --- | --- | --- |
+| Hero | `--type-hero` | Gowun Batang 700 | The single largest headline on the page |
+| Section | `--type-section` | Gowun Batang 700 | Section headings and feature statements |
+| Heading | `--type-heading` | Gowun Batang 700 | Card, panel, and subsection headings |
+| Body | `--type-body` | IBM Plex Sans KR 400–600 | Primary paragraphs and controls |
+| Small | `--type-small` | IBM Plex Sans KR 400–600 | Supporting card copy and dense content |
+| Label | `--type-label` | IBM Plex Sans KR 400–700 | Buttons, navigation, captions, tags, and utility information |
+
+Only the loaded weights 400, 600, and 700 should be used. Line-height and tracking follow the shared `--leading-*` and `--tracking-*` tokens in `src/pages/index.astro`.
 
 ## Art direction
 

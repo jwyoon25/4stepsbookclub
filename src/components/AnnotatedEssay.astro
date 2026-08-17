@@ -311,10 +311,6 @@ const splitHighlightText = (text: string) => {
     --accent: var(--class-accent, var(--coral-dark));
     --annotation: var(--class-accent, var(--coral-dark));
     --annotation-wash: color-mix(in srgb, var(--annotation) 10%, var(--white));
-    --type-micro: 10px;
-    --type-meta: 12px;
-    --type-body-sm: 14px;
-    --type-subheading: 24px;
     margin-bottom:20px;
     overflow:hidden;
     border:1px solid var(--line-dark);
@@ -335,9 +331,9 @@ const splitHighlightText = (text: string) => {
     flex:0 0 auto;
     padding-top:4px;
     color:var(--accent);
-    font-size:11px;
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:700;
+    font-weight:var(--weight-bold);
     letter-spacing:.13em;
   }
   .feedback-feature-copy {
@@ -349,15 +345,15 @@ const splitHighlightText = (text: string) => {
     margin-bottom:5px;
     color:var(--ink);
     font-family:var(--font-display);
-    font-size:var(--type-subheading);
-    line-height:1.45;
-    font-weight:700;
+    font-size:var(--type-heading);
+    line-height:var(--leading-heading);
+    font-weight:var(--weight-bold);
     word-break:keep-all;
   }
   .feedback-feature-copy p {
     color:var(--muted);
-    font-size:var(--type-body-sm);
-    line-height:1.75;
+    font-size:var(--type-small);
+    line-height:var(--leading-body);
     word-break:keep-all;
   }
   .annotated-layout {
@@ -390,33 +386,33 @@ const splitHighlightText = (text: string) => {
     display:block;
     margin-bottom:4px;
     color:var(--accent);
-    font-size:var(--type-micro);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.14em;
   }
   .essay-document-head h4 {
     color:var(--ink);
     font-family:var(--font-display);
-    font-size:20px;
-    line-height:1.3;
-    font-weight:700;
+    font-size:var(--type-heading);
+    line-height:var(--leading-heading);
+    font-weight:var(--weight-bold);
   }
   .artifact-meta {
     flex:0 0 auto;
     padding-top:17px;
     color:var(--muted);
-    font-size:var(--type-meta);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:700;
+    font-weight:var(--weight-bold);
   }
   .essay-body { padding:19px 23px 22px; }
   .essay-paragraph-group + .essay-paragraph-group { margin-top:11px; }
   .essay-paragraph {
     color:var(--text);
     font-family:var(--font-display);
-    font-size:15.25px;
-    line-height:1.69;
+    font-size:var(--type-body);
+    line-height:var(--leading-body);
   }
   .essay-highlight {
     display:inline;
@@ -497,9 +493,9 @@ const splitHighlightText = (text: string) => {
     background:var(--annotation-wash);
     color:var(--accent);
     font-family:var(--font-sans);
-    font-size:9px;
+    font-size:var(--type-label);
     line-height:1;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.06em;
     vertical-align:.22em;
   }
@@ -524,7 +520,7 @@ const splitHighlightText = (text: string) => {
   }
   .annotation-rail-head p {
     color:var(--muted);
-    font-size:var(--type-micro);
+    font-size:var(--type-label);
     line-height:1.45;
   }
   .annotation-marker-list {
@@ -551,9 +547,9 @@ const splitHighlightText = (text: string) => {
     background:var(--white);
     color:var(--ink);
     box-shadow:var(--shadow-sm);
-    font-size:10px;
+    font-size:var(--type-label);
     line-height:1;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.04em;
     cursor:pointer;
     transition:border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
@@ -587,17 +583,17 @@ const splitHighlightText = (text: string) => {
     margin-bottom:6px;
     color:var(--accent);
     font-family:var(--font-sans);
-    font-size:var(--type-micro);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.12em;
   }
   .desktop-comment-panel p {
     color:var(--text);
     font-family:var(--font-sans);
-    font-size:13px;
+    font-size:var(--type-small);
     line-height:1.58;
-    font-weight:550;
+    font-weight:var(--weight-regular);
   }
   .essay-mobile-comment-panel { display:none; }
   .annotation-fallback {
@@ -613,7 +609,7 @@ const splitHighlightText = (text: string) => {
     grid-template-columns:32px minmax(0,1fr);
     gap:9px;
     color:var(--text);
-    font-size:13px;
+    font-size:var(--type-small);
     line-height:1.55;
   }
   .annotation-fallback strong { color:var(--accent); }
@@ -650,21 +646,21 @@ const splitHighlightText = (text: string) => {
     .essay-mobile-comment-panel p {
       color:var(--text);
       font-family:var(--font-sans);
-      font-size:var(--type-body-sm);
+      font-size:var(--type-small);
       line-height:1.58;
-      font-weight:550;
+      font-weight:var(--weight-regular);
     }
     .annotation-chip {
       min-width:28px;
       height:24px;
-      font-size:10px;
+      font-size:var(--type-label);
       vertical-align:.16em;
     }
   }
 
   @media (max-width:700px) {
     .annotated-essay { border-radius:var(--radius-md); }
-    .feedback-feature-copy h3 { font-size:23px; }
+    .feedback-feature-copy h3 { font-size:var(--type-heading); }
     .essay-paper { border-radius:5px; }
     .essay-document-head {
       flex-direction:column;
@@ -672,10 +668,10 @@ const splitHighlightText = (text: string) => {
       padding:16px 16px 13px;
     }
     .artifact-meta { padding-top:0; }
-    .essay-document-head h4 { font-size:18px; }
+    .essay-document-head h4 { font-size:var(--type-heading); }
     .essay-body { padding:18px 16px 21px; }
     .essay-paragraph-group + .essay-paragraph-group { margin-top:12px; }
-    .essay-paragraph { font-size:15px; line-height:1.72; }
+    .essay-paragraph { font-size:var(--type-body); line-height:var(--leading-body); }
     .essay-highlight { padding:0; }
   }
 
