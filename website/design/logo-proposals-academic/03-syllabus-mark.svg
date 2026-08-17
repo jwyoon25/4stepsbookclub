@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" role="img" aria-labelledby="title desc">
+  <title id="title">The Syllabus compact mark</title>
+  <desc id="desc">A serif numeral four and period above a brick-red course rule.</desc>
+  <path fill="#17342f" d="M29.56 13.38V42.04L33.67 43.21V44H19.02V43.21L23.35 42.04V17.49L25.44 16.52L13.12 32.38L13.1 30.98H32.09L36.44 30.34L35.21 35.4H10.4V33.29L25.29 13.38Z M41.38 37.51Q42.92 37.51 43.92 38.51Q44.93 39.51 44.93 40.96Q44.93 42.42 43.92 43.43Q42.92 44.44 41.38 44.44Q39.84 44.44 38.85 43.43Q37.86 42.42 37.86 40.96Q37.86 39.51 38.86 38.51Q39.87 37.51 41.38 37.51Z" />
+  <path d="M10 52H50" fill="none" stroke="#8a3b32" stroke-width="2.7" />
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140.6 140.6" role="img" aria-labelledby="small-light-title small-light-desc">
+  <title id="small-light-title">4steps Book Club — Small logomark light</title>
+  <desc id="small-light-desc">A compact light 4s logomark with alternating ruled and dashed lines, intersecting coral rules, and the numeral four overlaid at their intersection.</desc>
+  <g aria-hidden="true">
+    <!-- The circle's visible diameter is exactly the finalized pill's 140.6-unit height. -->
+    <circle cx="70.3" cy="70.3" r="69.4" fill="#F7F3EA"></circle>
+    <!-- The horizontal rules terminate on the circular border. -->
+    <g fill="none" stroke="#17342F" stroke-opacity="0.30" stroke-width="1.4">
+      <line x1="26.7069" y1="16.3" x2="113.8931" y2="16.3"></line>
+      <line x1="10.9674" y1="34.3" x2="129.6326" y2="34.3" stroke-dasharray="8 6"></line>
+      <line x1="3.2749" y1="52.3" x2="137.3251" y2="52.3"></line>
+      <line x1="0.9" y1="70.38" x2="139.7" y2="70.38" stroke-dasharray="8 6"></line>
+      <line x1="11.016" y1="106.38" x2="129.584" y2="106.38" stroke-dasharray="8 6"></line>
+      <line x1="26.7069" y1="124.3" x2="113.8931" y2="124.3"></line>
+    </g>
+
+    <!-- The active horizontal and vertical rules also terminate on the border. -->
+    <g fill="none" stroke="#B84431" stroke-width="2">
+      <line x1="3.3181" y1="88.46" x2="137.2819" y2="88.46"></line>
+      <line x1="67.787275" y1="0.9455" x2="67.787275" y2="139.6545"></line>
+    </g>
+
+    <!-- Embedded Gowun Batang Bold 700 “4”, overlaid on the coral intersection. -->
+    <g transform="translate(-22.212725 -35.7)">
+      <g transform="translate(90 124.9) scale(1.04) translate(-90 -124.16)">
+        <path transform="translate(0 1.4)" d="M96.86 152.16Q96.86 153.56 95.74 154.54Q94.62 155.52 92.94 155.94Q90.7 156.5 87.97 156.78Q85.24 157.06 83.14 157.06V128.36L35.68 128.5V119.82L86.64 52.06Q91.82 51.78 93.92 52.76Q96.02 53.74 96.58 55.84L96.72 117.02Q101.06 117.02 104.21 116.81Q107.36 116.6 111.28 115.76L110.02 124.44Q109.46 128.36 105.4 128.36H96.86ZM83.14 117.02V69.56L47.86 117.02Z" fill="#F2C55C"></path>
+      </g>
+    </g>
+
+    <!-- The “s” covers the full strokes of the second solid rule and the coral rule. -->
+    <g transform="translate(-22.212725 -17.6518181818)">
+      <g transform="translate(0 -18)">
+        <g transform="translate(-10.83 0)">
+          <g transform="translate(2.25 6.5)">
+            <g transform="translate(130 102.55) scale(0.975 0.9805749806) translate(-130 -102.55)">
+              <path d="M145.678 118.93Q142.948 118.93 140.218 118.267Q137.488 117.604 135.226 116.122Q133.822 115.108 132.691 113.743Q131.56 112.378 131.56 111.208Q131.56 110.428 132.691 109.375Q133.822 108.322 135.304 107.386Q136.786 106.45 137.8 106.138Q138.346 108.868 139.945 110.623Q141.544 112.378 143.728 113.236Q145.912 114.094 148.096 114.094Q150.202 114.094 151.567 113.08Q152.932 112.066 153.01 109.882Q153.088 106.684 150.631 105.007Q148.174 103.33 145.054 102.394Q139.984 100.834 136.591 98.299Q133.198 95.764 133.198 91.162Q133.198 85.78 137.371 83.05Q141.544 80.32 147.94 80.32Q152.308 80.32 155.818 81.997Q159.328 83.674 160.186 86.95Q160.186 87.964 159.094 88.939Q158.002 89.914 156.442 90.499Q154.882 91.084 153.478 91.006Q153.322 87.652 151.177 86.17Q149.032 84.688 146.38 84.688Q144.43 84.688 142.753 85.741Q141.076 86.794 141.076 88.978Q141.076 90.85 142.285 92.137Q143.494 93.424 145.327 94.282Q147.16 95.14 149.032 95.764Q151.84 96.622 154.57 97.87Q157.3 99.118 159.094 101.38Q160.888 103.642 160.81 107.542Q160.81 111.442 158.587 113.977Q156.364 116.512 152.893 117.721Q149.422 118.93 145.678 118.93Z" fill="#17342F"></path>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <circle cx="70.3" cy="70.3" r="69.4" fill="none" stroke="#17342F" stroke-width="1.8"></circle>
+</svg>

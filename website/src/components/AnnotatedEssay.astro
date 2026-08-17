@@ -308,64 +308,71 @@ const splitHighlightText = (text: string) => {
 
 <style>
   .annotated-essay {
-    margin-bottom:24px;
+    --accent: var(--class-accent, var(--coral-dark));
+    --annotation: var(--class-accent, var(--coral-dark));
+    --annotation-wash: color-mix(in srgb, var(--annotation) 10%, var(--white));
+    margin-bottom:20px;
     overflow:hidden;
-    border:1px solid var(--line);
-    border-radius:18px;
-    background:#fff;
-    box-shadow:0 18px 50px rgba(16,42,67,.08);
+    border:1px solid var(--line-dark);
+    border-radius:var(--radius-md);
+    background:var(--canvas);
+    color:var(--text);
   }
   .feedback-feature-head {
     display:grid;
     grid-template-columns:190px minmax(0,1fr);
     align-items:flex-start;
-    gap:24px;
-    padding:19px 24px;
+    gap:20px;
+    padding:21px 18px 22px;
     border-bottom:1px solid var(--line);
-    background:var(--cream);
+    background:var(--canvas);
   }
   .feedback-feature-index {
     flex:0 0 auto;
     padding-top:4px;
-    color:var(--orange);
-    font-size:var(--type-meta);
+    color:var(--accent);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:900;
-    letter-spacing:.14em;
+    font-weight:var(--weight-bold);
+    letter-spacing:.13em;
   }
   .feedback-feature-copy {
     max-width:760px;
     padding-left:24px;
-    border-left:1px solid rgba(16,42,67,.12);
+    border-left:1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   }
   .feedback-feature-copy h3 {
     margin-bottom:5px;
-    color:var(--navy);
-    font-size:var(--type-subheading);
-    font-weight:900;
+    color:var(--ink);
+    font-family:var(--font-display);
+    font-size:var(--type-heading);
+    line-height:var(--leading-heading);
+    font-weight:var(--weight-bold);
+    word-break:keep-all;
   }
   .feedback-feature-copy p {
     color:var(--muted);
-    font-size:var(--type-body-sm);
-    line-height:1.6;
+    font-size:var(--type-small);
+    line-height:var(--leading-body);
+    word-break:keep-all;
   }
   .annotated-layout {
-    padding:15px;
-    background:var(--soft);
+    padding:12px;
+    background:var(--stage-surface);
   }
   .annotated-essay.is-enhanced .annotated-layout {
     display:grid;
     grid-template-columns:minmax(0, 1fr) 250px;
-    gap:18px;
+    gap:12px;
     align-items:stretch;
   }
   .essay-paper {
     min-width:0;
     overflow:hidden;
-    border:1px solid #e4ded3;
-    border-radius:12px;
-    background:#fffdf9;
-    box-shadow:0 12px 28px rgba(16,42,67,.08);
+    border:1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+    border-radius:5px;
+    background:var(--white);
+    box-shadow:0 14px 35px color-mix(in srgb, var(--ink) 16%, transparent);
   }
   .essay-document-head {
     display:flex;
@@ -373,39 +380,39 @@ const splitHighlightText = (text: string) => {
     justify-content:space-between;
     gap:18px;
     padding:16px 22px 13px;
-    border-bottom:1px solid #ece5d9;
+    border-bottom:1px solid var(--line);
   }
   .artifact-label {
     display:block;
     margin-bottom:4px;
-    color:var(--orange);
-    font-size:var(--type-micro);
+    color:var(--accent);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.14em;
   }
   .essay-document-head h4 {
-    color:var(--navy);
-    font-family:Georgia, "Times New Roman", serif;
-    font-size:20px;
-    line-height:1.3;
-    font-weight:700;
+    color:var(--ink);
+    font-family:var(--font-display);
+    font-size:var(--type-heading);
+    line-height:var(--leading-heading);
+    font-weight:var(--weight-bold);
   }
   .artifact-meta {
     flex:0 0 auto;
     padding-top:17px;
-    color:#7b8794;
-    font-size:var(--type-meta);
+    color:var(--muted);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:700;
+    font-weight:var(--weight-bold);
   }
   .essay-body { padding:19px 23px 22px; }
   .essay-paragraph-group + .essay-paragraph-group { margin-top:11px; }
   .essay-paragraph {
-    color:#2f3a43;
-    font-family:Georgia, "Times New Roman", serif;
-    font-size:15.25px;
-    line-height:1.69;
+    color:var(--text);
+    font-family:var(--font-display);
+    font-size:var(--type-body);
+    line-height:var(--leading-body);
   }
   .essay-highlight {
     display:inline;
@@ -427,8 +434,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 55%,
-      rgba(215,160,78,.3) 55%,
-      rgba(215,160,78,.4) 91%,
+      color-mix(in srgb, var(--butter) 30%, transparent) 55%,
+      color-mix(in srgb, var(--butter) 40%, transparent) 91%,
       transparent 91%
     );
     box-decoration-break:clone;
@@ -438,8 +445,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 52%,
-      rgba(215,160,78,.38) 52%,
-      rgba(215,160,78,.5) 92%,
+      color-mix(in srgb, var(--butter) 38%, transparent) 52%,
+      color-mix(in srgb, var(--butter) 50%, transparent) 92%,
       transparent 92%
     );
   }
@@ -451,7 +458,7 @@ const splitHighlightText = (text: string) => {
   }
   .essay-highlight.is-active {
     text-decoration:underline;
-    text-decoration-color:var(--orange);
+    text-decoration-color:var(--annotation);
     text-decoration-thickness:1.5px;
     text-underline-offset:3px;
   }
@@ -460,8 +467,8 @@ const splitHighlightText = (text: string) => {
     background:linear-gradient(
       to bottom,
       transparent 48%,
-      rgba(215,160,78,.46) 48%,
-      rgba(215,160,78,.6) 93%,
+      color-mix(in srgb, var(--butter) 46%, transparent) 48%,
+      color-mix(in srgb, var(--butter) 60%, transparent) 93%,
       transparent 93%
     );
   }
@@ -469,9 +476,9 @@ const splitHighlightText = (text: string) => {
     outline:none;
   }
   .essay-highlight:focus-visible .annotation-chip {
-    outline:2px solid var(--navy);
+    outline:2px solid var(--ink);
     outline-offset:2px;
-    box-shadow:0 0 0 4px #fffdf9;
+    box-shadow:0 0 0 4px var(--white);
   }
   .annotation-chip {
     display:inline-flex;
@@ -481,21 +488,21 @@ const splitHighlightText = (text: string) => {
     height:20px;
     margin-left:4px;
     padding:0 5px;
-    border:1px solid rgba(207,122,56,.68);
+    border:1px solid color-mix(in srgb, var(--annotation) 68%, transparent);
     border-radius:999px;
-    background:#fff4e7;
-    color:#9a501e;
-    font-family:Inter, "Noto Sans KR", sans-serif;
-    font-size:9px;
+    background:var(--annotation-wash);
+    color:var(--accent);
+    font-family:var(--font-sans);
+    font-size:var(--type-label);
     line-height:1;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.06em;
     vertical-align:.22em;
   }
   .essay-highlight.is-active .annotation-chip {
-    border-color:var(--orange);
-    background:var(--orange);
-    color:#fff;
+    border-color:var(--annotation);
+    background:var(--annotation);
+    color:var(--white);
   }
   .annotation-rail {
     display:none;
@@ -513,7 +520,7 @@ const splitHighlightText = (text: string) => {
   }
   .annotation-rail-head p {
     color:var(--muted);
-    font-size:var(--type-micro);
+    font-size:var(--type-label);
     line-height:1.45;
   }
   .annotation-marker-list {
@@ -535,26 +542,26 @@ const splitHighlightText = (text: string) => {
     width:44px;
     height:44px;
     padding:0;
-    border:1px solid #d8e0e6;
+    border:1px solid var(--line);
     border-radius:50%;
-    background:#fff;
-    color:var(--navy);
-    box-shadow:0 5px 14px rgba(16,42,67,.08);
-    font-size:10px;
+    background:var(--white);
+    color:var(--ink);
+    box-shadow:var(--shadow-sm);
+    font-size:var(--type-label);
     line-height:1;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.04em;
     cursor:pointer;
     transition:border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
   }
-  .annotation-marker:hover { transform:translateX(2px); border-color:var(--orange); }
+  .annotation-marker:hover { transform:translateX(2px); border-color:var(--annotation); }
   .annotation-marker.is-active {
-    border-color:var(--orange);
-    background:var(--orange);
-    color:#fff;
+    border-color:var(--annotation);
+    background:var(--annotation);
+    color:var(--white);
   }
   .annotation-marker:focus-visible {
-    outline:3px solid rgba(16,42,67,.3);
+    outline:3px solid color-mix(in srgb, var(--ink) 30%, transparent);
     outline-offset:3px;
   }
   .desktop-comment-panel {
@@ -564,52 +571,53 @@ const splitHighlightText = (text: string) => {
     left:52px;
     right:0;
     padding:15px 16px;
-    border:1px solid #ead8c6;
-    border-left:3px solid var(--orange);
-    border-radius:11px;
-    background:#fffaf4;
-    box-shadow:0 12px 26px rgba(16,42,67,.09);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    background:var(--canvas);
+    box-shadow:var(--shadow-sm);
     transition:top .18s ease;
   }
   .desktop-comment-panel > article > span,
   .essay-mobile-comment-panel article > span {
     display:block;
     margin-bottom:6px;
-    color:var(--orange);
-    font-size:var(--type-micro);
+    color:var(--accent);
+    font-family:var(--font-sans);
+    font-size:var(--type-label);
     line-height:1.4;
-    font-weight:900;
+    font-weight:var(--weight-bold);
     letter-spacing:.12em;
   }
   .desktop-comment-panel p {
-    color:#40566b;
-    font-size:13px;
+    color:var(--text);
+    font-family:var(--font-sans);
+    font-size:var(--type-small);
     line-height:1.58;
-    font-weight:550;
+    font-weight:var(--weight-regular);
   }
   .essay-mobile-comment-panel { display:none; }
   .annotation-fallback {
     margin-top:18px;
     padding:18px;
     border:1px solid var(--line);
-    border-radius:12px;
-    background:#fff;
+    border-radius:var(--radius-sm);
+    background:var(--canvas);
   }
   .annotation-fallback ol { display:grid; gap:12px; list-style:none; }
   .annotation-fallback li {
     display:grid;
     grid-template-columns:32px minmax(0,1fr);
     gap:9px;
-    color:#40566b;
-    font-size:13px;
+    color:var(--text);
+    font-size:var(--type-small);
     line-height:1.55;
   }
-  .annotation-fallback strong { color:var(--orange); }
+  .annotation-fallback strong { color:var(--accent); }
 
   @media (max-width:900px) {
     .feedback-feature-head {
       display:block;
-      padding:20px 22px;
+      padding:21px 18px 22px;
     }
     .feedback-feature-index {
       display:block;
@@ -623,48 +631,47 @@ const splitHighlightText = (text: string) => {
     }
     .annotated-essay.is-enhanced .annotated-layout {
       display:block;
-      padding:14px;
+      padding:12px;
     }
     .annotated-essay.is-enhanced .annotation-rail { display:none; }
     .essay-mobile-comment-panel:not([hidden]) {
       display:block;
       margin:12px 0 3px;
       padding:14px 15px;
-      border:1px solid #ead8c6;
-      border-left:3px solid var(--orange);
-      border-radius:10px;
-      background:#fff8f1;
-      box-shadow:0 7px 18px rgba(16,42,67,.05);
+      border:1px solid var(--line);
+      border-radius:var(--radius-sm);
+      background:var(--canvas);
+      box-shadow:var(--shadow-sm);
     }
     .essay-mobile-comment-panel p {
-      color:#40566b;
-      font-size:var(--type-body-sm);
+      color:var(--text);
+      font-family:var(--font-sans);
+      font-size:var(--type-small);
       line-height:1.58;
+      font-weight:var(--weight-regular);
     }
     .annotation-chip {
       min-width:28px;
       height:24px;
-      font-size:10px;
+      font-size:var(--type-label);
       vertical-align:.16em;
     }
   }
 
   @media (max-width:700px) {
-    .annotated-essay { border-radius:14px; }
-    .feedback-feature-head { padding:18px 17px; }
-    .feedback-feature-copy h3 { font-size:21px; }
-    .annotated-essay.is-enhanced .annotated-layout { padding:9px; }
-    .essay-paper { border-radius:9px; }
+    .annotated-essay { border-radius:var(--radius-md); }
+    .feedback-feature-copy h3 { font-size:var(--type-heading); }
+    .essay-paper { border-radius:5px; }
     .essay-document-head {
       flex-direction:column;
       gap:4px;
       padding:16px 16px 13px;
     }
     .artifact-meta { padding-top:0; }
-    .essay-document-head h4 { font-size:18px; }
+    .essay-document-head h4 { font-size:var(--type-heading); }
     .essay-body { padding:18px 16px 21px; }
     .essay-paragraph-group + .essay-paragraph-group { margin-top:12px; }
-    .essay-paragraph { font-size:15px; line-height:1.72; }
+    .essay-paragraph { font-size:var(--type-body); line-height:var(--leading-body); }
     .essay-highlight { padding:0; }
   }
 
