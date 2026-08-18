@@ -68,10 +68,11 @@ For a package with the ID `the-book-id`, the renderer creates:
 - `the-book-id-lesson-01-teacher.pdf` and one equivalent file per lesson
 
 Complete-workbook PDFs contain the workbook cover, exactly one required
-`How to use this workbook` page, and every lesson in manifest order. Standalone
-lesson PDFs begin with the lesson cover and omit the instruction page. Student
-editions contain response lines; teacher editions replace those surfaces with
-the stored teacher guidance and optional writing rubric.
+`How to use this workbook` page, and every lesson in manifest order; the page is
+not repeated inside those lessons. Standalone lesson PDFs contain their own copy
+directly after the lesson cover. Student editions contain response lines;
+teacher editions replace those surfaces with the stored teacher guidance and
+optional writing rubric.
 
 `workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
 grammar with placeholder content. It is the file to look at when changing

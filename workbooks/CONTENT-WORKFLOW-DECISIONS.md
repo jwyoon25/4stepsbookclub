@@ -35,8 +35,9 @@ Optional:
 - Cover subtitle or description
 
 Every full-workbook PDF contains exactly one required **How to use this
-workbook** page. It appears after the workbook cover. Standalone lesson PDFs do
-not contain this page.
+workbook** page. It appears after the workbook cover and is not repeated before
+the lessons. Every standalone lesson PDF also contains the page, directly after
+its lesson cover.
 
 ## Lesson information
 

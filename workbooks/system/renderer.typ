@@ -159,7 +159,7 @@
   if edition != "Teacher" { own-words() }
 }
 
-#let render-lesson(lesson, edition) = {
+#let render-lesson(lesson, edition, include-how-to: false) = {
   let number = lesson.at("lessonNumber")
   let label = "Lesson " + str(number)
   let sections = lesson.at("sections")
@@ -178,6 +178,7 @@
       [*Writing your answers in Google Docs?* Label each answer with its code — #("L" + str(number) + "-C2"), #("L" + str(number) + "-A1"), and so on — so your tutor can match your responses to the workbook.]
     },
   )
+  if include-how-to { how-to-page() }
 
   render-question-section(
     sections.at("readingComprehension"),
@@ -205,6 +206,7 @@
   let build = data.at("build")
   let lessons = data.at("lessons")
   let edition = if build.at("edition") == "teacher" { "Teacher" } else { "Student" }
+  let standalone-lesson = build.at("scope") == "lesson"
 
   workbook(
     book: manifest.at("bookTitle"),
@@ -223,7 +225,7 @@
     }
 
     #for lesson in lessons {
-      render-lesson(lesson, edition)
+      render-lesson(lesson, edition, include-how-to: standalone-lesson)
     }
   ]
 }

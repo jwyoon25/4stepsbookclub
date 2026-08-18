@@ -129,7 +129,8 @@ The following do not appear as tutor-editable schema fields:
 - Student-versus-teacher presentation
 
 The full-workbook instruction page is generated exactly once after the workbook
-cover. It is not included in standalone lesson PDFs.
+cover and is not repeated before its lessons. A standalone lesson PDF generates
+its own copy directly after the lesson cover.
 
 ## Package-level validation
 

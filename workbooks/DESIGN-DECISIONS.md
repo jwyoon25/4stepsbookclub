@@ -72,9 +72,9 @@ Because there is no reliable back-of-cover page, the standing reference material
 is handled in two places:
 
 - **Full-book builds:** a single "How to use this workbook" page following the
-  workbook cover.
-- **Standalone lesson builds:** compressed to the one-line labelling note on the
-  lesson cover. A single lesson does not get a full instruction page.
+  workbook cover, with no repeated copies inside individual lessons.
+- **Standalone lesson builds:** one full instruction page following the lesson
+  cover, so the handout remains self-contained when distributed separately.
 
 ### Vocabulary is reference-only
 
