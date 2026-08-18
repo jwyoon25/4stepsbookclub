@@ -155,11 +155,8 @@
 #let lines-medium = 4
 #let lines-extended = 6
 
-// Writing surfaces fill the page they start on. This minimum is what makes that
-// happen: prompt, scaffold, and this many lines form one unbreakable block, too
-// tall to land low on a page, so it moves to a fresh one and is then topped up
-// to the footer. No explicit page break is needed — so nothing above it can be
-// orphaned.
+// The first page of a full-page response includes the prompt, any guidance, and
+// this fixed writing surface. Fixed geometry keeps pagination reproducible.
 #let lines-writing-min = 14
 
 // Tutor-facing response-space presets. The extended-answer mapping is
@@ -174,14 +171,6 @@
 // its repeated prompt label.
 #let response-first-page-lines = 14
 #let response-continuation-lines = 26
-
-// Automatically filled final Writing pages keep this many line gaps in reserve
-// before the Vocabulary transition. This lets the next sticky section move as
-// one unit without overflowing beyond Typst's resolved final page counter.
-#let response-transition-safety-lines = 2
-
-// Keeps a filled surface clear of the footer.
-#let surface-bottom-guard = 4mm
 
 // --- Cover geometry ---------------------------------------------------------
 

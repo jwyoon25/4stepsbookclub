@@ -42,6 +42,7 @@
 
 // --- Step 1: Comprehension --------------------------------------------------
 
+#interior-pages(1, "Comprehension")[
 #section-band(
   1,
   "Comprehension",
@@ -82,9 +83,11 @@
     Chapter 13.],
   lines: lines-extended,
 )
+]
 
 // --- Step 2: Analysis -------------------------------------------------------
 
+#interior-pages(2, "Analysis")[
 #section-band(
   2,
   "Analysis",
@@ -96,6 +99,7 @@
   [The narrator describes their decision as inevitable. Do you find that
     convincing? Use at least one detail from Chapter 10 to support your view.],
   lines: lines-extended,
+  step: 2,
 )
 
 #question(
@@ -103,6 +107,7 @@
   [Compare how two different characters respond to the same piece of news. What
     does the difference between their reactions suggest about each of them?],
   lines: lines-extended,
+  step: 2,
 )
 
 #question(
@@ -110,14 +115,17 @@
   [The same image appears in Chapter 9 and again in Chapter 13. What has changed
     about its meaning by the second time we see it?],
   lines: lines-extended,
+  step: 2,
 )
 
-// The Analysis section ends here, and the writing surface that follows cannot
-// fit on this page. The remainder becomes the student's, rather than a hole.
+// The specimen demonstrates the optional fixed-height reflection tail. The
+// data-driven renderer leaves section-end space blank for stable pagination.
 #ruled-tail("Anything you noticed that the questions didn't ask about")
+]
 
 // --- Step 3: Writing --------------------------------------------------------
 
+#interior-pages(3, "Writing")[
 #section-band(
   3,
   "Writing",
@@ -136,14 +144,15 @@
     [End by acknowledging what a reader who disagreed with you might point to.],
   ),
 )
+]
 
 // --- Step 4: Vocabulary -----------------------------------------------------
 
+#interior-pages(4, "Vocabulary")[
 #section-band(
   4,
   "Vocabulary",
   "Reference for this lesson. Read these before you begin Chapter 9.",
-  continued-label: true,
 )
 
 #vocab-entry(
@@ -256,6 +265,6 @@
     late to repair the consequences of the earlier accusation.],
 )
 
-// The list ends short of the page foot, as a tutor-authored list almost always
-// will. The remainder becomes the student's own.
+// The specimen also demonstrates the optional fixed-height own-words surface.
 #own-words()
+]

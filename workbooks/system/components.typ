@@ -17,64 +17,6 @@
 #let doc-lesson = state("lesson", "")
 #let doc-edition = state("edition", "Student")
 
-// Which section a page belongs to cannot use `state`: a header is laid out at
-// the top of its page, before any state update made by content on that same
-// page. A section beginning on page 3 would therefore never reach page 3's
-// header. Instead each section drops a positioned marker, and the furniture
-// works out which one applies by comparing page numbers.
-#let section-marker(name, step: 0, force: false, continued: false) = [#metadata((
-  name: name, step: step, force: force, continued: continued,
-))#label("wb-section")]
-
-// A section takes over the page it begins on, provided it begins in the top half
-// of the text block. The tabs are a finder: someone flipping for Analysis should
-// land on the page where the Analysis band is and see the Analysis tab lit, not
-// the previous section's. An earlier draft gave the page to whichever section
-// was already running, which left pages carrying one section band under another
-// section's active tab
-// and a head naming the wrong section.
-//
-// The half-page test is the guard on that: a band that starts near the foot of a
-// page has not really taken it, so the running section keeps it.
-#let takes-page = margin-top + body-height / 2
-
-// Precedence: a forced marker (continuation heading) > the last section to begin
-// in the top half of this page > the section still running when the page opened
-// > any section beginning on this page at all.
-//
-// Returns `none` on covers, or `(name, step, continued)` on interior pages.
-#let active-section() = {
-  let p = here().position().page
-  let markers = query(<wb-section>)
-  let on-page = markers.filter(m => m.location().position().page == p)
-  let forced = on-page.filter(m => m.value.force)
-  let opening = on-page.filter(m => m.location().position().y <= takes-page)
-  let earlier = markers.filter(m => m.location().position().page < p)
-  let carried = if earlier.len() > 0 { earlier.last().value } else { none }
-
-  let chosen = if forced.len() > 0 {
-    forced.first().value
-  } else if opening.len() > 0 {
-    opening.last().value
-  } else if carried != none and carried.name != none {
-    carried
-  } else if on-page.len() > 0 {
-    on-page.first().value
-  } else { none }
-
-  if chosen == none or chosen.name == none { return none }
-
-  // A section that opted in gets "(continued)" on every page after the one it
-  // started on. This is how a vocabulary list announces itself across a break
-  // without anyone having to know in advance where the break lands.
-  let carried-on = carried != none and chosen == carried and chosen.continued
-  (
-    name: if carried-on { chosen.name + " (continued)" } else { chosen.name },
-    step: chosen.step,
-    continued: carried-on,
-  )
-}
-
 // --- Layout helpers ---------------------------------------------------------
 
 #let caps(body, size: size-label, weight: "semibold", fill: faint, tracking: tracking-caps) = text(
@@ -123,12 +65,9 @@
   }
 }
 
-#let page-spine() = context {
-  let section = active-section()
-  if section != none {
-    margin-rule()
-    if section.step >= 1 and section.step <= 4 { section-tabs(section.step) }
-  }
+#let page-spine(step) = {
+  margin-rule()
+  if step >= 1 and step <= 4 { section-tabs(step) }
 }
 
 // The wordmark, typeset rather than placed as an image. The logotype lockup is
@@ -141,9 +80,8 @@
   text(font: sans, size: size * 0.74, weight: "semibold", fill: muted, tracking: 0.09em, "BOOK CLUB")
 })
 
-#let running-head() = context {
-  let section = active-section()
-  if section != none {
+#let running-head(section-name) = context {
+  if section-name != none and section-name != "" {
     // The head sits over the text block, so it starts clear of the margin rule
     // and ends level with the block — the tabs live outside it.
     grid(
@@ -151,14 +89,12 @@
       column-gutter: 4mm,
       align: horizon,
       text(font: serif, size: size-furniture, fill: muted, doc-book.get()),
-      caps(section.name, size: size-furniture, fill: ink-soft),
+      caps(section-name, size: size-furniture, fill: ink-soft),
     )
   }
 }
 
 #let running-foot() = context {
-  let section = active-section()
-  if section == none { return }
   let total = counter(page).final().first()
   let current = counter(page).at(here()).first()
   let lesson-label = doc-lesson.get()
@@ -186,11 +122,8 @@
       top: margin-top, bottom: margin-bottom,
       left: margin-left, right: margin-right,
     ),
-    header: running-head(),
     header-ascent: head-ascent,
-    footer: running-foot(),
     footer-descent: foot-descent,
-    background: page-spine(),
   )
   set text(font: serif, size: size-body, fill: ink-body, lang: "en")
   // Ragged right: at this measure justification opens rivers, and prompts read
@@ -204,6 +137,20 @@
 }
 
 #let lesson-start(lesson) = doc-lesson.update(lesson)
+
+// Interior page furniture is selected structurally instead of inferred from
+// positioned metadata. Every section starts on a fresh page and owns all pages
+// in its scoped body, so running heads, tabs, and pagination cannot disagree.
+#let interior-pages(step, section-name, body) = {
+  pagebreak(weak: true)
+  set page(
+    header: running-head(section-name),
+    footer: running-foot(),
+    background: page-spine(step),
+  )
+  body
+  pagebreak(weak: true)
+}
 
 // --- Covers -----------------------------------------------------------------
 //
@@ -271,7 +218,6 @@
   subtitle: none,
   edition: "Student",
 ) = {
-  section-marker(none)
   cover-paper(show-labels: true)
   cover-rule()
   place(
@@ -357,48 +303,46 @@
 )
 
 #let how-to-page() = {
-  // An empty section name keeps the running rule, book title, footer, and page
-  // number while leaving the right side of the running head deliberately blank.
-  section-marker("", step: 0, force: true)
-  place(top + left, dy: 0mm,
-    text(font: serif, size: 24pt, weight: "bold", fill: ink, "How to use this workbook"),
-  )
-  place(top + left, dy: 14.5mm,
-    block(width: 122mm, text(font: serif, size: 11pt, fill: ink-body)[Each lesson covers a set of chapters and moves through four steps. Read the chapters once for the story, then work through the questions with the book open beside you.]),
-  )
-  place(top + left, dy: 44mm, caps("Choosing how to answer"))
-  place(top + left, dy: 50.6mm, stack(
-    spacing: 3.5mm,
-    instruction-row("Print and handwrite", [Write on the ruled lines and follow any *Guidance & requirements* box attached to the question. The space provided is chosen by your tutor.]),
-    instruction-row("Annotate the PDF", [Use GoodNotes or another app that lets you write directly on the ruled lines.]),
-    instruction-row("Type in Google Docs", [Label each answer with its lesson, section, and question code so your tutor can match it to the workbook.]),
-  ))
-  place(top + left, dy: 91.7mm, block(
-    width: 100%,
-    inset: (x: 6mm, y: 5mm),
-    radius: 2pt,
-    fill: canvas,
-    stroke: stroke-hairline,
-    grid(
-      columns: (auto, 1fr),
-      column-gutter: 7mm,
-      stack(
-        spacing: 2mm,
-        text(font: serif, size: 17pt, weight: "bold", fill: coral-deep, "L3-C2"),
-        text(font: sans, size: 7pt, fill: faint, tracking: 0.06em, "Lesson 3 · Comprehension · 2"),
+  interior-pages(0, "", {
+    place(top + left, dy: 0mm,
+      text(font: serif, size: 24pt, weight: "bold", fill: ink, "How to use this workbook"),
+    )
+    place(top + left, dy: 14.5mm,
+      block(width: 122mm, text(font: serif, size: 11pt, fill: ink-body)[Each lesson covers a set of chapters and moves through four steps. Read the chapters once for the story, then work through the questions with the book open beside you.]),
+    )
+    place(top + left, dy: 44mm, caps("Choosing how to answer"))
+    place(top + left, dy: 50.6mm, stack(
+      spacing: 3.5mm,
+      instruction-row("Print and handwrite", [Write on the ruled lines and follow any *Guidance & requirements* box attached to the question. The space provided is chosen by your tutor.]),
+      instruction-row("Annotate the PDF", [Use GoodNotes or another app that lets you write directly on the ruled lines.]),
+      instruction-row("Type in Google Docs", [Label each answer with its lesson, section, and question code so your tutor can match it to the workbook.]),
+    ))
+    place(top + left, dy: 91.7mm, block(
+      width: 100%,
+      inset: (x: 6mm, y: 5mm),
+      radius: 2pt,
+      fill: canvas,
+      stroke: stroke-hairline,
+      grid(
+        columns: (auto, 1fr),
+        column-gutter: 7mm,
+        stack(
+          spacing: 2mm,
+          text(font: serif, size: 17pt, weight: "bold", fill: coral-deep, "L3-C2"),
+          text(font: sans, size: 7pt, fill: faint, tracking: 0.06em, "Lesson 3 · Comprehension · 2"),
+        ),
+        text(font: sans, size: 9pt, fill: ink-soft)[Use *C* for Comprehension, *A* for Analysis, and *W* for Writing. Questions restart at 1 in every section. When you quote or point to a detail, cite the page inside your response—for example, *(p. 47)*.],
       ),
-      text(font: sans, size: 9pt, fill: ink-soft)[Use *C* for Comprehension, *A* for Analysis, and *W* for Writing. Questions restart at 1 in every section. When you quote or point to a detail, cite the page inside your response—for example, *(p. 47)*.],
-    ),
-  ))
-  place(top + left, dy: 132mm, caps("The four steps"))
-  place(top + left, dy: 139.2mm, stack(
-    spacing: 3.2mm,
-    how-to-step(1, "Comprehension", [Answer from the text. Keep factual responses concise and cite supporting pages in parentheses.]),
-    how-to-step(2, "Analysis", [Interpret the reading, explain your reasoning, and point to specific evidence.]),
-    how-to-step(3, "Writing", [Develop a claim, support it with evidence, and explain the connection.]),
-    how-to-step(4, "Vocabulary", [Return to important words and the moments in which they appear in the reading.]),
-  ))
-  pagebreak()
+    ))
+    place(top + left, dy: 132mm, caps("The four steps"))
+    place(top + left, dy: 139.2mm, stack(
+      spacing: 3.2mm,
+      how-to-step(1, "Comprehension", [Answer from the text. Keep factual responses concise and cite supporting pages in parentheses.]),
+      how-to-step(2, "Analysis", [Interpret the reading, explain your reasoning, and point to specific evidence.]),
+      how-to-step(3, "Writing", [Develop a claim, support it with evidence, and explain the connection.]),
+      how-to-step(4, "Vocabulary", [Return to important words and the moments in which they appear in the reading.]),
+    ))
+  })
 }
 
 // The lesson cover absorbs what would otherwise be a separate lesson opener: a
@@ -415,7 +359,6 @@
   edition: "Student",
 ) = {
   pagebreak(weak: true)
-  section-marker(none)
   cover-paper()
   cover-rule()
   let cover-kind = if edition == "Teacher" { "Teacher guide · Reading workbook" } else { "Reading workbook" }
@@ -518,8 +461,7 @@
 // ties the section to the page's spine — a bar that floats free of the rule
 // reads as a stray swatch, which is exactly how the previous draft's did.
 
-#let section-band(step, name, description, continued-label: false, repair-running-head: false) = {
-  section-marker(name, step: step, continued: continued-label)
+#let section-band(step, name, description) = {
   let c = step-fill.at(step - 1)
   let overhang = margin-left - rule-x
   block(
@@ -528,17 +470,6 @@
     above: space-band-above,
     below: space-band-below,
     box(width: 100%, height: 23.5mm, {
-      if repair-running-head {
-        // Full writing surfaces can leave Typst's final header pass carrying
-        // the previous section even though this band is on the new page. Mask
-        // only the right header slot and redraw this section's correct label.
-        place(top + right, dy: -6mm, box(
-          width: 80mm,
-          height: 5.5mm,
-          fill: white,
-          align(top + right, caps(name, size: size-furniture, fill: ink-soft)),
-        ))
-      }
       place(top + left, dx: -overhang, rect(
         width: block-width + overhang, height: band-bar-height,
         fill: c, radius: (right: tab-radius), stroke: none,
@@ -592,8 +523,7 @@
   },
 )
 
-#let teacher-panel(label, body) = context {
-  let step = active-section().step
+#let teacher-panel(step, label, body) = {
   block(
     width: 100%,
     above: 3.5mm,
@@ -623,8 +553,8 @@
   teacher: false,
   teacher-guidance: none,
   rubric: none,
-) = context {
-  let step = active-section().step
+  step: 1,
+) = {
   block(
     breakable: false,
     width: 100%,
@@ -639,10 +569,10 @@
       if quote != none { quoted(step, quote) }
       if response-guidance != none { response-guidance-panel(step, response-guidance) }
       if teacher {
-        if teacher-guidance != none { teacher-panel("Teacher guidance", teacher-guidance) }
-        if rubric != none { teacher-panel("Example structure / rubric", rubric) }
+        if teacher-guidance != none { teacher-panel(step, "Teacher guidance", teacher-guidance) }
+        if rubric != none { teacher-panel(step, "Example structure / rubric", rubric) }
         if teacher-guidance == none and rubric == none {
-          teacher-panel("Teacher guidance", [No additional guidance was provided for this prompt.])
+          teacher-panel(step, "Teacher guidance", [No additional guidance was provided for this prompt.])
         }
       } else {
         v(space-prompt-to-response)
@@ -654,28 +584,16 @@
 
 // --- Writing prompt ---------------------------------------------------------
 
-// Fills whatever vertical space remains on the page with ruled lines. This
-// exists because a writing surface must never break unlabelled, and an author
-// cannot know where a page will break — the layout engine decides that.
-#let fill-with-lines(minimum: 0, safety-lines: 0) = context {
-  let free = page-height - margin-bottom - surface-bottom-guard - here().position().y
-  let n = calc.max(minimum, int(free / line-gap) - safety-lines)
-  block(above: 0pt, below: 0pt, response-lines(n))
-}
-
-// A writing prompt gets a page of its own, without ever forcing a page break.
-// See DESIGN-DECISIONS.md — an explicit break here would strand the section band
-// on the page it left behind, which is the orphan this design exists to prevent.
+// A writing prompt includes a deterministic first response surface. Additional
+// pages are emitted explicitly and carry their own compact continuation label.
 #let writing-prompt(
   number,
   prompt,
   response-guidance: none,
   quote: none,
-  bottom-safety-lines: 0,
+  step: 3,
 ) = {
-  context {
-    let step = active-section().step
-    block(
+  block(
       breakable: false,
       width: 100%,
       above: space-between-questions,
@@ -691,10 +609,7 @@
         v(space-prompt-to-response)
         block(above: 0pt, below: 0pt, response-lines(lines-writing-min))
       },
-    )
-  }
-  // Top up the remainder of the page, seamlessly continuing the same surface.
-  fill-with-lines(safety-lines: bottom-safety-lines)
+  )
 }
 
 // An additional, deliberate response page. The running head identifies the
@@ -703,13 +618,10 @@
   number,
   _echo,
   step: 3,
-  section: "Paragraph Writing (continued)",
   lines: none,
   break-before: true,
-  bottom-safety-lines: 0,
 ) = {
   if break-before { pagebreak(weak: true) }
-  section-marker(section, step: step, force: true)
   block(sticky: true, width: 100%, above: 0mm, below: 5mm, {
     text(
       font: sans,
@@ -720,17 +632,16 @@
     )
   })
   if lines == none {
-    fill-with-lines(safety-lines: bottom-safety-lines)
+    response-lines(response-continuation-lines)
   } else {
     response-lines(lines)
   }
 }
 
-#let writing-continuation(number, echo, step: 3, section: "Paragraph Writing (continued)") = response-continuation(
+#let writing-continuation(number, echo, step: 3) = response-continuation(
   number,
   echo,
   step: step,
-  section: section,
   break-before: false,
 )
 
@@ -748,19 +659,11 @@
 //
 // It renders only when enough of the page is left to be worth using, so authors
 // can call it at the end of any section without ever producing a stub.
-#let ruled-tail(title, minimum: 5) = context {
-  let free = page-height - margin-bottom - surface-bottom-guard - here().position().y
-  // Keep two lines of safety below the calculated surface. Filling the exact
-  // remainder makes Typst's final page counter observe a phantom trailing page
-  // even though the PDF renderer elides that empty page; one line is not enough
-  // once the label and block spacing are rounded during layout.
-  let n = int((free - 15mm) / line-gap) - 2
-  if n >= minimum {
-    v(11mm)
-    caps(title, size: 7pt, fill: faint)
-    v(3.5mm)
-    response-lines(n)
-  }
+#let ruled-tail(title, minimum: 5) = {
+  v(11mm)
+  caps(title, size: 7pt, fill: faint)
+  v(3.5mm)
+  response-lines(minimum)
 }
 
 #let own-words(minimum: 5) = ruled-tail("Words you met in these chapters", minimum: minimum)

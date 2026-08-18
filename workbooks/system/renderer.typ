@@ -30,7 +30,7 @@
   }
 }
 
-#let render-teacher-item(number, item) = question(
+#let render-teacher-item(number, item, step) = question(
   str(number),
   item.at("prompt"),
   quote: optional(item, "quotation"),
@@ -38,14 +38,13 @@
   teacher: true,
   teacher-guidance: optional(item, "teacherGuidance"),
   rubric: optional(item, "exampleStructureOrRubric"),
+  step: step,
 )
 
 #let render-student-item(
   number,
   item,
   step,
-  section-name,
-  finish-section: false,
 ) = {
   let space = item.at("responseSpace")
   let mode = space.at("mode")
@@ -61,6 +60,7 @@
       lines: first-page-count,
       quote: quote,
       response-guidance: optional(item, "responseGuidance"),
+      step: step,
     )
 
     let remaining = line-count - first-page-count
@@ -70,7 +70,6 @@
         str(number),
         prompt,
         step: step,
-        section: section-name + " (continued)",
         lines: page-lines,
       )
       remaining -= page-lines
@@ -83,9 +82,7 @@
       prompt,
       response-guidance: optional(item, "responseGuidance"),
       quote: quote,
-      bottom-safety-lines: if finish-section and continuation-count == 0 {
-        response-transition-safety-lines
-      } else { 0 },
+      step: step,
     )
 
     for index in range(continuation-count) {
@@ -93,11 +90,7 @@
         str(number),
         prompt,
         step: step,
-        section: section-name + " (continued)",
-        break-before: false,
-        bottom-safety-lines: if finish-section and index == continuation-count - 1 {
-          response-transition-safety-lines
-        } else { 0 },
+        break-before: true,
       )
     }
   }
@@ -110,60 +103,62 @@
   description,
   edition,
 ) = {
-  section-band(step, name, description)
-  for ((index, item)) in items.enumerate() {
-    if edition == "Teacher" {
-      render-teacher-item(index + 1, item)
-    } else {
-      render-student-item(index + 1, item, step, name)
+  interior-pages(step, name, {
+    section-band(step, name, description)
+    for ((index, item)) in items.enumerate() {
+      if edition == "Teacher" {
+        render-teacher-item(index + 1, item, step)
+      } else {
+        render-student-item(index + 1, item, step)
+      }
     }
-  }
+  })
 }
 
 #let render-writing-section(items, edition) = {
   let name = section-names.at(2)
-  section-band(
-    3,
-    name,
-    "Develop a clear response. Make a claim, support it with evidence, and explain the connection.",
-  )
-  for ((index, item)) in items.enumerate() {
-    if edition == "Teacher" {
-      render-teacher-item(index + 1, item)
-    } else {
-      render-student-item(
-        index + 1,
-        item,
-        3,
-        name,
-        finish-section: index == items.len() - 1,
-      )
+  interior-pages(3, name, {
+    section-band(
+      3,
+      name,
+      "Develop a clear response. Make a claim, support it with evidence, and explain the connection.",
+    )
+    for ((index, item)) in items.enumerate() {
+      if edition == "Teacher" {
+        render-teacher-item(index + 1, item, 3)
+      } else {
+        render-student-item(
+          index + 1,
+          item,
+          3,
+        )
+      }
     }
-  }
+  })
 }
 
 #let render-vocabulary-section(items, edition) = {
-  section-band(
-    4,
-    section-names.at(3),
-    "Return to these words and the moments in which they appear in the assigned reading.",
-    continued-label: true,
-    repair-running-head: true,
-  )
-  for ((index, item)) in items.enumerate() {
-    let number = index + 1
-    vocab-entry(
-      if number < 10 { "0" + str(number) } else { str(number) },
-      item.at("term"),
-      item.at("koreanMeaning"),
-      definition: item.at("definition"),
-      from-book: item.at("bookExcerpt"),
-      excerpt-context: item.at("excerptContext"),
-      chapter-reference: optional(item, "chapterReference"),
-      index: index,
+  let name = section-names.at(3)
+  interior-pages(4, name, {
+    section-band(
+      4,
+      name,
+      "Return to these words and the moments in which they appear in the assigned reading.",
     )
-  }
-  if edition != "Teacher" { own-words() }
+    for ((index, item)) in items.enumerate() {
+      let number = index + 1
+      vocab-entry(
+        if number < 10 { "0" + str(number) } else { str(number) },
+        item.at("term"),
+        item.at("koreanMeaning"),
+        definition: item.at("definition"),
+        from-book: item.at("bookExcerpt"),
+        excerpt-context: item.at("excerptContext"),
+        chapter-reference: optional(item, "chapterReference"),
+        index: index,
+      )
+    }
+  })
 }
 
 #let render-lesson(lesson, edition, include-how-to: false) = {
@@ -207,9 +202,6 @@
     "Interpret the reading. Give your reasoning and point to specific evidence from the text.",
     edition,
   )
-  if edition != "Teacher" {
-    ruled-tail("Anything you noticed that the questions didn't ask about")
-  }
   render-writing-section(sections.at("paragraphWriting"), edition)
   render-vocabulary-section(sections.at("vocabulary"), edition)
 }

@@ -138,25 +138,18 @@ The lesson cover absorbs what would otherwise be a separate lesson opener block:
 lesson number, title, chapter range, framing note, and section list. Content
 pages then begin directly with the first section band.
 
-### Writing surface defaults to one page
+### Writing surface uses deterministic page geometry
 
-A writing prompt gets one page of response space by default. Tutors may override
-the line count and request deliberate continuation pages. The layout engine,
-rather than the tutor, remains responsible for placing the prompt and its
-response surface safely on the page.
+A writing prompt gets one response page by default. That page contains the
+prompt, its optional guidance, and a fixed 14-line first response surface. The
+fixed geometry is deliberate: calculating lines from the remaining page height
+made the document's pagination depend on its own unresolved position, which
+could change page totals between Typst layout passes.
 
-This is a revision of the original plan, which allowed the surface to flow
-across a page break with a label on each side. Building it showed why that does
-not work: the author cannot know where the break will land, so the label ends up
-in the wrong place and the surface splits silently — reproducing the reference
-PDF's worst habit, writing space separated from the prompt explaining it.
-
-It is implemented without any author-supplied page break. The prompt, its
-scaffold, and its response surface form one unbreakable block; when it does not
-fit, the engine moves the whole thing forward and carries the sticky section
-band with it. For the default one-page response, the surface is topped up to the
-footer. An explicit break would have stranded the section band on the page it
-left behind — the exact orphan this design exists to prevent.
+Tutors may override the line count or request deliberate continuation pages.
+Custom line counts use up to 14 lines with the prompt and then split into
+explicitly labelled continuation pages of up to 26 lines. Tutors never place
+page breaks themselves.
 
 Longer responses get an additional, deliberate continuation page. The running
 head identifies the section, and the page itself uses the compact label
@@ -227,36 +220,18 @@ and they cost nothing to print. They do not bleed off the edge: a home printer
 cannot print to the edge, and a tab clipped by an unprintable margin looks broken
 rather than deliberate.
 
-### A section takes the page it begins on
+### Every section begins on a fresh page
 
-If a section band appears in the top half of a page, that page's running head and
-tab belong to the new section, even when the page opens with the tail of the
-previous one.
+Reading Comprehension, Critical Thinking & Analysis, Paragraph Writing, and
+Vocabulary each begin on a fresh page and own the running head and active tab on
+every page in their section. Page furniture is passed structurally with the
+section instead of inferred from positioned metadata after layout.
 
-This reverses the earlier rule, which gave the page to whichever section was
-already running. That produced pages carrying an Analysis band under a lit
-Comprehension tab, with a head naming the wrong section — indefensible
-once the tabs existed, because the tabs are a finder and someone flipping for
-Analysis has to land on the page the Analysis band is on.
-
-The half-page test is the guard: a band starting near the foot of a page has not
-really taken it, so the running section keeps it.
-
-### A section that ends short hands the page back
-
-A section almost never ends level with the foot of a page, and a section whose
-last question is followed by a writing prompt leaves most of a sheet behind —
-a writing surface is an unbreakable block, so it moves whole to a page it fits
-on. Those were the emptiest pages in the book.
-
-`ruled-tail` fills the remainder with a labelled ruled area. Every use is a real
-invitation rather than filler: "Anything you noticed that the questions didn't
-ask about" after Analysis, "Words you met in these chapters" after Vocabulary.
-Close reading is the point of the book, and a student noticing something
-unprompted is the behaviour worth making room for.
-
-It renders only when enough of the page is left to be worth using, so an author
-can call it at the end of any section without ever producing a stub.
+This is a consistency rule, not merely a visual preference. The previous
+position-query system could oscillate between two page arrangements and leave a
+page with a stale header, active tab, or total-page count. A section boundary may
+now leave unused space at the end of the preceding page; that space is preferable
+to ambiguous page ownership or non-reproducible pagination.
 
 ### Typefaces
 
