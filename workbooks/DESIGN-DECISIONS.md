@@ -135,8 +135,8 @@ reorder, or simplify it.
 - **Lesson cover** — one per lesson, a full page.
 
 The lesson cover absorbs what would otherwise be a separate lesson opener block:
-lesson number, title, chapter range, framing note, section list, and the
-name/date field. Content pages then begin directly with the first section band.
+lesson number, title, chapter range, framing note, and section list. Content
+pages then begin directly with the first section band.
 
 ### Writing surface defaults to one page
 
@@ -192,13 +192,12 @@ green–coral–teal–purple sequence for Read, Think, Speak, and Write.
   the remaining hierarchy.
 - **Lesson covers** use the same four colour bands without vertical labels. They
   show the lesson identity, chapter range, framing copy, optional instructions,
-  derived section item counts, Google Docs/teacher note, and name/date fields.
+  derived section item counts, and Google Docs/teacher note.
 - **Interior pages** keep a rust rule at 24 mm and begin content at 29 mm. Plain
   question numbers hang outside the rule. Four tabs at the outer edge repeat the
   method colours, with the current step wider and more saturated.
-- **Solid rules mean "write here"; dashed rules mean "fill this in."** Response
-  lines are solid; name and date fields are dashed. Page references are not a
-  field and remain parenthetical citations within the student's response.
+- **Solid rules mean "write here."** Page references are not a separate field
+  and remain parenthetical citations within the student's response.
 
 All pages stay white. This preserves the approved visual composition, reduces
 home-printer ink coverage, and keeps pencil and annotation contrast high.
@@ -297,8 +296,8 @@ number most likely to need changing after the first real print with real
 students.
 
 The running head sits at 14 mm from the top edge and the footer at 14 mm from
-the bottom edge, matching the approved HTML composition. Handwriting and dashed
-field rules are 0.2 mm; the rust spine and quiet panel borders are 0.25 mm. The
+the bottom edge, matching the approved HTML composition. Handwriting rules are
+0.2 mm; the rust spine and quiet panel borders are 0.25 mm. The
 section opener follows the reference's fixed vertical stack so its step label,
 title, description, and first question do not drift as copy elsewhere changes.
 

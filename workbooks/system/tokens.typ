@@ -58,7 +58,6 @@
 #let ruled = rgb("#c6d0c8") // handwriting guides; dark enough for a home laser
 #let stroke-ruled = 0.2mm + ruled
 #let stroke-hairline = 0.25mm + line-soft
-#let stroke-field = (paint: rgb("#a8b3ae"), thickness: 0.2mm, dash: "densely-dashed")
 #let stroke-margin = 0.25mm + coral-deep
 
 // --- Typefaces --------------------------------------------------------------

@@ -92,18 +92,6 @@
   )),
 )
 
-// A short dashed field to be filled in — currently name and date.
-#let dashed-field(label, width: 100%, label-width: 17mm) = box(width: width, height: 8mm, {
-  place(bottom + left, dy: -1.9mm, caps(label, fill: muted))
-  place(bottom + left, dx: label-width, line(length: 100% - label-width, stroke: stroke-field))
-})
-
-#let name-date-fields(width: 86mm) = block(width: width, stack(
-  spacing: 4mm,
-  dashed-field("Name"),
-  dashed-field("Date"),
-))
-
 // --- Page furniture ---------------------------------------------------------
 //
 // The spine: the rust margin rule and the section tabs. Together they are what
@@ -369,7 +357,9 @@
 )
 
 #let how-to-page() = {
-  section-marker("Front matter", step: 0, force: true)
+  // An empty section name keeps the running rule, book title, footer, and page
+  // number while leaving the right side of the running head deliberately blank.
+  section-marker("", step: 0, force: true)
   place(top + left, dy: 0mm,
     text(font: serif, size: 24pt, weight: "bold", fill: ink, "How to use this workbook"),
   )
@@ -408,24 +398,12 @@
     how-to-step(3, "Writing", [Develop a claim, support it with evidence, and explain the connection.]),
     how-to-step(4, "Vocabulary", [Return to important words and the moments in which they appear in the reading.]),
   ))
-  place(top + left, dy: 202.4mm, caps("Lines and fields"))
-  place(top + left, dy: 209mm, stack(
-    spacing: 3mm,
-    grid(columns: (32mm, 1fr), column-gutter: 5mm, align: horizon,
-      line(length: 32mm, stroke: stroke-ruled),
-      text(font: sans, size: 9.5pt, fill: muted, "A solid line is for writing on."),
-    ),
-    grid(columns: (32mm, 1fr), column-gutter: 5mm, align: horizon,
-      line(length: 32mm, stroke: stroke-field),
-      text(font: sans, size: 9.5pt, fill: muted, "A dashed line is a field to fill in, such as your name or date."),
-    ),
-  ))
   pagebreak()
 }
 
 // The lesson cover absorbs what would otherwise be a separate lesson opener: a
 // single lesson is often handed out on its own, so it needs its own identity,
-// name field, and orientation.
+// identity and orientation.
 #let lesson-cover(
   lesson: "",
   title: "",
@@ -515,22 +493,18 @@
     }),
   )
 
-  place(bottom + left, dx: cover-content-left - margin-left, dy: -6mm,
-    block(width: page-width - cover-content-left - cover-content-right, stack(
-      spacing: 8mm,
-      ..if note != none { (
-        block(
-          width: 100%,
-          inset: (x: 4mm, y: 3.4mm),
-          radius: 2pt,
-          fill: canvas,
-          stroke: stroke-hairline,
-          text(font: sans, size: 8.5pt, fill: ink-soft, note),
-        ),
-        name-date-fields(width: 100%),
-      ) } else { (name-date-fields(width: 100%),) },
-    )),
-  )
+  if note != none {
+    place(bottom + left, dx: cover-content-left - margin-left, dy: -6mm,
+      block(
+        width: page-width - cover-content-left - cover-content-right,
+        inset: (x: 4mm, y: 3.4mm),
+        radius: 2pt,
+        fill: canvas,
+        stroke: stroke-hairline,
+        text(font: sans, size: 8.5pt, fill: ink-soft, note),
+      ),
+    )
+  }
   pagebreak()
 }
 
