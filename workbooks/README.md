@@ -85,6 +85,32 @@ site cannot drift apart.
 Every build passes `--font-path workbooks/assets/fonts`; the npm scripts already
 do. Compiling without it silently substitutes whatever the machine has.
 
+## Logos
+
+`assets/logo/` holds the full brand set, copied from
+`website/public/images/logo/png/`: `logomark-large`, `logomark-small`, and
+`logotype`, each in a `-light` and a `-dark` form. They are addressed by the
+names in `tokens.typ`, never by path.
+
+They are PNG rather than SVG because the source SVGs set letter-spacing with CSS
+custom properties, which Typst's renderer does not support — imported as SVG the
+glyphs collapse on top of each other.
+
+Typst cannot read outside `workbooks/`, so these are copies. Re-run this from the
+repository root when the brand assets change:
+
+```bash
+python3 - <<'PY'
+from PIL import Image
+src, dst = 'website/public/images/logo/png/', 'workbooks/assets/logo/'
+for name in ('logomark-large-light', 'logomark-large-dark',
+             'logomark-small-light', 'logomark-small-dark',
+             'logotype-light', 'logotype-dark'):
+    im = Image.open(src + name + '.png').convert('RGBA')
+    im.crop(im.getbbox()).save(dst + name + '.png')
+PY
+```
+
 ## Typst.app compatibility
 
 The core Typst source should remain portable between the local CLI and a future

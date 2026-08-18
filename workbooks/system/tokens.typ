@@ -179,9 +179,31 @@
 
 // --- Assets -----------------------------------------------------------------
 
-// Only the logomark is placed as an image, and only on covers. The footer
-// wordmark is typeset from the brand faces — see `wordmark` in components.typ.
-#let logomark = "/assets/logo/logomark.png"
+// The full brand set, copied from website/public/images/logo/png so the workbook
+// and the site cannot drift apart. Re-sync with the script in README.md.
+//
+// PNG rather than SVG on purpose: the source SVGs set letter-spacing with CSS
+// custom properties, which Typst's renderer does not support, so the glyphs
+// collapse on top of each other. This was tested, not assumed.
+//
+// Three shapes, each light and dark:
+//   logomark-large  circle, full "4steps BOOK CLUB" lockup
+//   logomark-small  circle, compact "4s" — holds up at small sizes
+//   logotype        capsule, full lockup, for wide spaces
+//
+// `-dark` is the reversed form: dark green ground, cream type. It needs a dark
+// or coloured ground behind it, so nothing on white should reach for it.
+
+#let logomark-large = "/assets/logo/logomark-large-light.png"
+#let logomark-large-dark = "/assets/logo/logomark-large-dark.png"
+#let logomark-small = "/assets/logo/logomark-small-light.png"
+#let logomark-small-dark = "/assets/logo/logomark-small-dark.png"
+#let logotype = "/assets/logo/logotype-light.png"
+#let logotype-dark = "/assets/logo/logotype-dark.png"
+
+// The default mark, used on covers. The footer wordmark is typeset from the
+// brand faces instead — see `wordmark` in components.typ.
+#let logomark = logomark-large
 
 // Height of the coloured bar that opens a section.
 #let band-bar-height = 2.5mm
