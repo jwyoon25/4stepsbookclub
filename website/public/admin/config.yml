@@ -1,5 +1,6 @@
 # This repository is private. The OAuth Function defaults to the required
 # private-repository scope unless GITHUB_REPO_PUBLIC is explicitly set to 1.
+# Its Decap handshake includes a timed fallback for Safari and other WebKit browsers.
 backend:
   name: github
   repo: jwyoon25/4stepsbookclub

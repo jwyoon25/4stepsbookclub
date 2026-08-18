@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { runInNewContext } from "node:vm";
 
 const rootUrl = new URL("../", import.meta.url);
 
@@ -22,6 +23,12 @@ function scriptLiteral(html, name) {
   const match = html.match(new RegExp(`const ${name} = ("(?:[^"\\\\]|\\\\.)*");`));
   assert.ok(match, `Expected ${name} in response HTML`);
   return JSON.parse(match[1]);
+}
+
+function inlineScript(html) {
+  const match = html.match(/<script nonce="[^"]+">([\s\S]*?)<\/script>/);
+  assert.ok(match, "Expected an inline authorization script");
+  return match[1];
 }
 
 function stateFromResponse(response) {
@@ -63,7 +70,7 @@ test("authorization handshake is origin-bound and uses minimal public scope", as
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.match(response.headers.get("content-security-policy"), /script-src 'nonce-[0-9a-f]{32}'/);
   assert.equal(scriptLiteral(html, "adminOrigin"), "https://www.4stepsbookclub.com");
-  assert.ok(html.includes("event.source === window.opener"));
+  assert.ok(!html.includes("event.source === window.opener"));
   assert.ok(html.includes("event.origin === adminOrigin"));
   assert.equal(stateContext.adminOrigin, "https://www.4stepsbookclub.com");
   assert.match(stateContext.state, /^[0-9a-f]{32}$/);
@@ -73,6 +80,69 @@ test("authorization handshake is origin-bound and uses minimal public scope", as
     authorizationUrl.searchParams.get("redirect_uri"),
     "https://4stepsbookclub.com/callback?provider=github"
   );
+});
+
+test("authorization popup tolerates a WebKit message source mismatch and has a timed fallback", async () => {
+  const response = await authorize({
+    request: new Request("https://4stepsbookclub.com/auth?provider=github"),
+    env: configuredEnv
+  });
+  const html = await response.text();
+  const posts = [];
+  const redirects = [];
+  let messageHandler;
+  let fallback;
+  const opener = {
+    postMessage(data, targetOrigin) {
+      posts.push({ data, targetOrigin });
+    }
+  };
+
+  runInNewContext(inlineScript(html), {
+    document: {
+      querySelector() {
+        throw new Error("The connected-popup error should not render");
+      }
+    },
+    window: {
+      opener,
+      addEventListener(type, handler) {
+        assert.equal(type, "message");
+        messageHandler = handler;
+      },
+      location: {
+        replace(url) {
+          redirects.push(url);
+        }
+      },
+      setTimeout(handler, delay) {
+        fallback = { handler, delay };
+      }
+    }
+  });
+
+  assert.deepEqual(posts, [
+    { data: "authorizing:github", targetOrigin: "https://4stepsbookclub.com" }
+  ]);
+  assert.equal(fallback.delay, 500);
+
+  messageHandler({
+    data: "authorizing:github",
+    origin: "https://attacker.example",
+    source: opener
+  });
+  assert.equal(redirects.length, 0);
+
+  messageHandler({
+    data: "authorizing:github",
+    origin: "https://4stepsbookclub.com",
+    source: { safariWindowProxy: true }
+  });
+  assert.equal(redirects.length, 1);
+  assert.equal(new URL(redirects[0]).origin, "https://github.com");
+
+  fallback.handler();
+  assert.equal(redirects.length, 1);
 });
 
 test("authorization validates configuration, sites, canonical host, and private scope", async () => {

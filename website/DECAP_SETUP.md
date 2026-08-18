@@ -75,10 +75,12 @@ npm test
 npm run build
 ```
 
-The tests cover the Decap handshake, apex and `www` origins, state cookies,
-public/private scopes, callback target origins, cancellation, malformed GitHub
-responses, and token-exchange network failures. After deployment, verify a
-real GitHub login from both supported `/admin/` origins.
+The tests cover the Decap handshake (including WebKit's non-identical popup
+message source behavior and the timed redirect fallback), apex and `www`
+origins, state cookies, public/private scopes, callback target origins,
+cancellation, malformed GitHub responses, and token-exchange network failures.
+After deployment, verify a real GitHub login from both supported `/admin/`
+origins and in Safari on macOS or iOS.
 
 ## Local development
 

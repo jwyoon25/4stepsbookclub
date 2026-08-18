@@ -42,19 +42,30 @@ function handshakeResponse({ authorizationUrl, adminOrigin, stateCookie }) {
 <html lang="en">
   <head><meta charset="utf-8"><title>Authorizing GitHub</title></head>
   <body>
-    <p>Connecting to GitHub...</p>
+    <p id="status">Connecting to GitHub...</p>
     <script nonce="${nonce}">
       const authorizationUrl = ${safeAuthorizationUrl};
       const adminOrigin = ${safeAdminOrigin};
+      let redirectStarted = false;
 
-      window.addEventListener("message", (event) => {
-        if (event.source === window.opener && event.origin === adminOrigin && event.data === "authorizing:github") {
-          window.location.replace(authorizationUrl);
-        }
-      });
+      const redirectToGitHub = () => {
+        if (redirectStarted) return;
+        redirectStarted = true;
+        window.location.replace(authorizationUrl);
+      };
 
       if (window.opener) {
+        window.addEventListener("message", (event) => {
+          if (event.origin === adminOrigin && event.data === "authorizing:github") {
+            redirectToGitHub();
+          }
+        });
+
         window.opener.postMessage("authorizing:github", adminOrigin);
+        window.setTimeout(redirectToGitHub, 500);
+      } else {
+        document.querySelector("#status").textContent =
+          "The sign-in window was disconnected. Close it and try again with pop-ups allowed.";
       }
     </script>
   </body>
