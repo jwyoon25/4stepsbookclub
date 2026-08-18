@@ -100,11 +100,12 @@
         "quotation": {
           "$ref": "#/$defs/nonEmptyText"
         },
-        "responseLines": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 3,
-          "description": "Omit to use the 3-line Reading Comprehension default."
+        "responseSpace": {
+          "$ref": "#/$defs/responseSpace",
+          "default": {
+            "mode": "short-answer"
+          },
+          "description": "Omit to use the Short answer (3-line) default."
         },
         "teacherGuidance": {
           "$ref": "#/$defs/nonEmptyText"
@@ -125,11 +126,12 @@
         "quotation": {
           "$ref": "#/$defs/nonEmptyText"
         },
-        "responseLines": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 6,
-          "description": "Omit to use the 6-line Critical Thinking & Analysis default."
+        "responseSpace": {
+          "$ref": "#/$defs/responseSpace",
+          "default": {
+            "mode": "short-paragraph"
+          },
+          "description": "Omit to use the Short paragraph (6-line) default."
         },
         "teacherGuidance": {
           "$ref": "#/$defs/nonEmptyText"
@@ -153,11 +155,10 @@
             "$ref": "#/$defs/nonEmptyText"
           }
         },
-        "response": {
-          "$ref": "#/$defs/writingResponse",
+        "responseSpace": {
+          "$ref": "#/$defs/responseSpace",
           "default": {
-            "mode": "full-page",
-            "continuationPages": 0
+            "mode": "full-page"
           }
         },
         "exampleStructureOrRubric": {
@@ -168,7 +169,8 @@
         }
       }
     },
-    "writingResponse": {
+    "responseSpace": {
+      "description": "Tutor-selected response space. Preset-to-line mappings are renderer-owned.",
       "oneOf": [
         {
           "type": "object",
@@ -178,12 +180,30 @@
           ],
           "properties": {
             "mode": {
-              "const": "full-page"
+              "enum": [
+                "short-answer",
+                "short-paragraph",
+                "extended-answer",
+                "full-page"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "pages"
+          ],
+          "properties": {
+            "mode": {
+              "const": "multiple-pages"
             },
-            "continuationPages": {
+            "pages": {
               "type": "integer",
-              "minimum": 0,
-              "default": 0
+              "minimum": 2,
+              "description": "Total number of full response pages."
             }
           }
         },
@@ -201,11 +221,6 @@
             "lines": {
               "type": "integer",
               "minimum": 1
-            },
-            "continuationPages": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0
             }
           }
         }
@@ -218,8 +233,8 @@
         "term",
         "koreanMeaning",
         "definition",
-        "contextNote",
-        "bookExcerpt"
+        "bookExcerpt",
+        "excerptContext"
       ],
       "properties": {
         "term": {
@@ -231,11 +246,12 @@
         "definition": {
           "$ref": "#/$defs/nonEmptyText"
         },
-        "contextNote": {
-          "$ref": "#/$defs/nonEmptyText"
-        },
         "bookExcerpt": {
           "$ref": "#/$defs/nonEmptyText"
+        },
+        "excerptContext": {
+          "$ref": "#/$defs/nonEmptyText",
+          "description": "What is happening in the story around the excerpt; not a word-usage note."
         },
         "chapterReference": {
           "$ref": "#/$defs/nonEmptyText"

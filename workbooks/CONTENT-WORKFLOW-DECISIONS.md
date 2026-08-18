@@ -64,11 +64,11 @@ Each question contains:
 
 - Question text — required
 - Passage or quotation from the book — optional
-- Student response space — 3 lines by default
+- Student response space — Short answer (3 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
-The tutor may replace the 3-line default with a custom number of lines for an
-individual question.
+The tutor may replace the default with any response-space preset or any positive
+number of lines.
 
 ## Critical Thinking & Analysis
 
@@ -76,11 +76,11 @@ Each question contains:
 
 - Question text — required
 - Passage or quotation from the book — optional
-- Student response space — 6 lines by default
+- Student response space — Short paragraph (6 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
-The tutor may replace the 6-line default with a custom number of lines for an
-individual question.
+The tutor may replace the default with any response-space preset or any positive
+number of lines.
 
 ## Paragraph Writing
 
@@ -89,11 +89,27 @@ Each writing item contains:
 - Writing prompt — required
 - `Before you write` hints or steps — optional
 - Response space — one page by default
-- Number of continuation pages — tutor-selectable when needed
 - Example structure or rubric — optional
 
-The tutor may override the default response-space line count. A lesson may
-contain more than one writing prompt.
+The tutor may replace the default with any response-space preset or any positive
+number of lines. A lesson may contain more than one writing prompt.
+
+## Response-space choices
+
+Every Comprehension question, Analysis question, and Writing prompt uses the
+same tutor-facing chooser:
+
+- **Short answer** — 3 lines, intended for 1–2 sentences
+- **Short paragraph** — 6 lines
+- **Extended answer** — provisionally 12 lines and approximately half a page
+- **Full page** — all available writing lines on one response page
+- **Multiple pages** — the tutor chooses the number of full response pages
+- **Custom lines** — the tutor enters any positive number of lines
+
+The `Extended answer` mapping is not locked. Its current 12-line / half-page
+description must be reviewed after the final page geometry and line spacing are
+locked. Content records store the semantic choice `Extended answer`, not the
+number 12, so changing that mapping will not require curriculum data edits.
 
 ## Vocabulary
 
@@ -102,12 +118,15 @@ Each entry contains:
 - Vocabulary word — required
 - Korean meaning — required
 - English definition — required
-- Usage or context explanation — required
 - Excerpt from the book — required
+- Excerpt context — required
 - Chapter reference — optional
 
 Part of speech is not part of the agreed entry format. Tutor-authored vocabulary
 must never be rewritten, shortened, simplified, or reordered by the system.
+`Excerpt context` explains what is happening in the story around the excerpt so
+students can remember that moment in the chapter. It is not a definition, usage
+note, or explanation of the vocabulary word itself.
 
 ## Builder workflow
 

@@ -15,7 +15,10 @@
       {
         "prompt": "What has the narrator chosen not to reveal, and when does the omission become clear?",
         "quotation": "It was easier, in the end, to say nothing at all.",
-        "responseLines": 5,
+        "responseSpace": {
+          "mode": "custom-lines",
+          "lines": 5
+        },
         "teacherGuidance": "Accept answers that identify the concealed decision and point to the later conversation as the moment of disclosure."
       }
     ],
@@ -26,7 +29,9 @@
       },
       {
         "prompt": "How does the repeated image change in meaning between Chapters 9 and 13?",
-        "responseLines": 8,
+        "responseSpace": {
+          "mode": "extended-answer"
+        },
         "teacherGuidance": "Look for a comparison of the image's earlier association with safety and its later association with concealment."
       }
     ],
@@ -42,11 +47,10 @@
         "teacherGuidance": "A strong response maintains a clear interpretation, uses two relevant details, and explains rather than merely summarizes them."
       },
       {
-        "prompt": "Write a short alternative account of the conversation from another character's point of view.",
-        "response": {
-          "mode": "custom-lines",
-          "lines": 10,
-          "continuationPages": 0
+        "prompt": "Develop an alternative account of the conversation from another character's point of view.",
+        "responseSpace": {
+          "mode": "multiple-pages",
+          "pages": 2
         },
         "teacherGuidance": "The response should remain consistent with the events while revealing a perspective or motive unavailable in the original narration."
       }
@@ -56,16 +60,16 @@
         "term": "resolute",
         "koreanMeaning": "단호한",
         "definition": "Determined and unwavering; refusing to be moved from a decision.",
-        "contextNote": "Usually describes a person and often carries a positive judgment.",
         "bookExcerpt": "She remained resolute even as the others began to reconsider.",
+        "excerptContext": "The rest of the group has begun to doubt the plan, but she continues to defend the decision they made earlier.",
         "chapterReference": "Chapter 10"
       },
       {
         "term": "pretext",
         "koreanMeaning": "구실, 핑계",
         "definition": "A stated reason that conceals the real one.",
-        "contextNote": "A pretext implies deliberate concealment rather than a simple mistake.",
-        "bookExcerpt": "The letter was a pretext; he had wanted only to see the house again."
+        "bookExcerpt": "The letter was a pretext; he had wanted only to see the house again.",
+        "excerptContext": "He has just returned after a long absence and presents the letter as his official reason for visiting the house."
       }
     ]
   }

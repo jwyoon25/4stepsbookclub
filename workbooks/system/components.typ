@@ -520,8 +520,8 @@
   term,
   gloss,
   definition: none,
-  in-context: none,
   from-book: none,
+  excerpt-context: none,
   index: 0,
 ) = block(
   breakable: false,
@@ -544,7 +544,7 @@
     v(1.8mm)
     line(length: 100%, stroke: 0.5pt + step-fill.at(3))
     if definition != none { vocab-field("Definition", definition) }
-    if in-context != none { vocab-field("In context", in-context) }
     if from-book != none { vocab-field("From book", from-book) }
+    if excerpt-context != none { vocab-field("Excerpt context", excerpt-context) }
   },
 )

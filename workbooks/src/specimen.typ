@@ -148,10 +148,10 @@
   index: 0,
   definition: [Determined and unwavering; refusing to be moved from a decision once
     it has been made.],
-  in-context: [Used of people, not objects. Carries approval — a resolute person is
-    admirable, whereas a stubborn one is not.],
   from-book: ["She remained resolute even as the others began, one by one, to
     reconsider."],
+  excerpt-context: [The rest of the group has begun to doubt the plan, but she
+    continues to defend the decision they made earlier.],
 )
 
 #vocab-entry(
@@ -160,11 +160,10 @@
   "피할 수 없는",
   index: 1,
   definition: [Certain to happen; impossible to prevent or avoid.],
-  in-context: [Often used by characters to justify a choice they did in fact make
-    freely. Watch for who is calling something inevitable, and what they gain by
-    it.],
   from-book: ["He spoke of the outcome as inevitable, though he had arranged every
     step of it himself."],
+  excerpt-context: [The others have challenged him about the outcome, and he is
+    defending a result that his own choices helped bring about.],
 )
 
 #vocab-entry(
@@ -174,10 +173,10 @@
   index: 2,
   definition: [Close, critical examination; careful attention paid to something in
     order to find fault or detail.],
-  in-context: [Almost always negative in tone. To be "under scrutiny" is
-    uncomfortable, even when you have nothing to hide.],
   from-book: ["Under such scrutiny the smallest hesitation began to look like an
     admission."],
+  excerpt-context: [The character is being questioned, and the group begins to
+    treat even a brief pause as evidence of guilt.],
 )
 
 #vocab-entry(
@@ -186,9 +185,9 @@
   "솔직한",
   index: 3,
   definition: [Honest and direct, especially about something awkward or unflattering.],
-  in-context: [Stronger than "honest". A candid remark is one most people would have
-    kept to themselves.],
   from-book: ["It was the first candid thing anyone had said all evening."],
+  excerpt-context: [The group has spent the evening avoiding the truth until one
+    person finally speaks directly about what happened.],
 )
 
 #vocab-entry(
@@ -198,10 +197,10 @@
   index: 4,
   definition: [Unwillingness to do something, shown through hesitation rather than
     outright refusal.],
-  in-context: [Describes the feeling, not the action — a character can act with
-    reluctance and still act.],
   from-book: ["Her reluctance was plain to everyone except, apparently, the man
     asking."],
+  excerpt-context: [She has been asked to take part and hesitates in front of the
+    group even though she eventually agrees.],
 )
 
 #vocab-entry(
@@ -210,9 +209,9 @@
   "구실, 핑계",
   index: 5,
   definition: [A stated reason that conceals the real one.],
-  in-context: [Implies deliberate concealment. A pretext is offered, an excuse is
-    made — the difference matters.],
   from-book: ["The letter was a pretext; he had wanted only to see the house again."],
+  excerpt-context: [He has returned after a long absence and presents the letter
+    as his official reason for visiting the house.],
 )
 
 #vocab-entry(
@@ -222,10 +221,10 @@
   index: 6,
   definition: [Involved in wrongdoing with others, often by staying silent rather
     than by acting.],
-  in-context: [A key word for this section. Notice how often characters are
-    complicit through what they choose not to say.],
   from-book: ["They were all complicit, and all of them knew it, and none of them
     said so."],
+  excerpt-context: [The group realizes that their shared silence has made everyone
+    partly responsible for what followed.],
 )
 
 #vocab-entry(
@@ -235,9 +234,9 @@
   index: 7,
   definition: [Self-control; holding back a reaction that would have been
     understandable.],
-  in-context: [Can be praise or criticism depending on who is exercising it and
-    what it costs them.],
   from-book: ["What looked like restraint was, she later understood, simply fear."],
+  excerpt-context: [She first interprets his silence as self-control, then learns
+    that he stayed quiet because he was afraid.],
 )
 
 #vocab-entry(
@@ -246,10 +245,10 @@
   "정당성이 입증된",
   index: 8,
   definition: [Proved to have been right after being doubted or blamed.],
-  in-context: [Requires an earlier accusation or doubt. You cannot be vindicated
-    unless someone first thought you were wrong.],
   from-book: ["He was vindicated eventually, though by then it made very little
     difference."],
+  excerpt-context: [Later evidence proves that he was right, but it arrives too
+    late to repair the consequences of the earlier accusation.],
 )
 
 // The list ends short of the page foot, as a tutor-authored list almost always

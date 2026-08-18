@@ -59,33 +59,63 @@ field is absent:
 | Content | Default |
 | --- | --- |
 | Series title | `4steps Book Club Workbook` |
-| Reading Comprehension response | 3 lines |
-| Critical Thinking & Analysis response | 6 lines |
+| Reading Comprehension response | Short answer (3 lines) |
+| Critical Thinking & Analysis response | Short paragraph (6 lines) |
 | Paragraph Writing response | Full page |
-| Writing continuation pages | 0 |
 
-## Writing response modes
+## Response-space choices
 
-A writing prompt may omit `response` to use the full-page default. An explicit
-response has one of two shapes:
+Every question and writing prompt accepts the same optional `responseSpace`
+object. Omitting it applies that section's default from the table above.
+
+The simple presets need only a mode:
 
 ```json
 {
-  "mode": "full-page",
-  "continuationPages": 1
+  "mode": "short-answer"
 }
 ```
+
+The simple preset modes are `short-answer`, `short-paragraph`,
+`extended-answer`, and `full-page`. Their renderer-owned meanings are:
+
+| Mode | Current meaning | Status |
+| --- | --- | --- |
+| `short-answer` | 3 lines; approximately 1–2 sentences | Locked |
+| `short-paragraph` | 6 lines | Locked |
+| `extended-answer` | Provisionally 12 lines; approximately half a page | Revisit after final page design |
+| `full-page` | Fill one response page with lines | Locked |
+
+The semantic `extended-answer` value is stored instead of the derived line
+count. Its page-space mapping can therefore change after final line spacing is
+known without editing lesson content.
+
+For an exact positive number of lines:
 
 ```json
 {
   "mode": "custom-lines",
-  "lines": 10,
-  "continuationPages": 0
+  "lines": 10
 }
 ```
 
-This keeps the usual one-page choice effortless while allowing the tutor control
-confirmed in the workflow decisions.
+For two or more full response pages, `pages` is the total number of pages:
+
+```json
+{
+  "mode": "multiple-pages",
+  "pages": 2
+}
+```
+
+This provides fast common choices without taking away the tutor's ability to
+request any positive line count.
+
+## Vocabulary excerpt context
+
+`excerptContext` describes what is happening in the story around `bookExcerpt`
+so the student can recall that moment in the chapter. It does not explain the
+word's usual context, connotation, or usage. Those are not fields in version 1.
 
 ## System-owned content
 
