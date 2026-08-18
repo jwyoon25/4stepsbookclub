@@ -75,18 +75,26 @@ the site automatically. Changes usually appear within a few minutes. The
 
 ## Workbook system
 
-The workbook project is currently infrastructure scaffolding. Its Typst smoke
-test can be built or watched from the repository root:
+The workbook design system is implemented in Typst and proven by a nine-page
+specimen; what does not exist yet is a content format, so lessons are still
+written directly in Typst.
 
 ```bash
-npm run workbook:build
+npm run workbook:specimen        # build the design specimen
+npm run workbook:specimen:watch
+npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
 ```
 
-The build writes
-`workbooks/output/workbook-smoke-test.pdf`. Generated PDFs in that directory
-are ignored by Git. See [workbooks/README.md](workbooks/README.md) for the
-project structure and Typst guidance.
+`workbook:specimen` writes `workbooks/output/specimen.pdf`, the file to look at
+when changing anything in `workbooks/system/`. Generated PDFs in that directory
+are ignored by Git.
+
+The two brand typefaces are vendored in `workbooks/assets/fonts`, so every build
+must pass `--font-path`; the npm scripts already do. See
+[workbooks/README.md](workbooks/README.md) for the project structure and
+[workbooks/DESIGN-DECISIONS.md](workbooks/DESIGN-DECISIONS.md) for the design
+reasoning.
 
 ## Deployment checklist
 

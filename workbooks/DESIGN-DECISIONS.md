@@ -135,52 +135,150 @@ The workbook must be fully usable printed black-and-white. All hierarchy works
 through type size, weight, and spacing. Color, if used at all, carries only
 secondary meaning and never the primary signal.
 
-### Branding never competes with handwriting
+### The page is the mark
 
-Full brand expression on covers; a quiet mark in page furniture on interior
-pages; a watermark behind interior pages at 6% alpha.
+The 2026-08 brand identity is a sheet of ruled notebook paper: cream ground, soft
+rules alternating solid and dashed, a rust vertical margin rule, the numeral four
+in butter. A reading workbook is the thing that logo is a picture of.
 
-The watermark does sit behind writing surfaces — this is a revision of an earlier
-"no watermark behind writing" rule, which produced pages with no visible
-ownership at all. The rule that actually matters is about *strength*, not
-position: at 6% the mark is far lighter than any pencil or pen, and lighter than
-the ruled guide lines themselves. What the reference workbook got wrong was
-repeated dark diagonal text, not the existence of a watermark.
+So the workbook does not decorate itself with the logo. It reproduces the paper,
+and lets the parts that are already functional carry the brand:
+
+- **A rust margin rule** runs the full height of every interior page at 30 mm.
+  Question numbers hang in the gutter outside it; the text block begins clear of
+  it. It is the reason an unfilled page bottom now reads as paper with room left
+  on it rather than as a layout that ran out — the earlier draft had no vertical
+  structure, so every short page looked like a mistake.
+- **Solid rules mean "write here"; dashed rules mean "fill this in."** The mark
+  alternates the two, and the workbook reuses that alternation as a signal rather
+  than as texture. Response lines are solid; name, date, and "found on page(s)"
+  fields are dashed.
+- **Covers reproduce the paper in full** — cream ground, rules edge to edge, the
+  rust rule, the logomark at full strength. Nobody writes an answer on a cover,
+  so it is the one place the brand is allowed to be loud.
+
+Interior pages stay on white. A full-bleed cream ground is expensive on a home
+printer and greys down pencil, and students print these themselves.
+
+### The centred watermark is withdrawn
+
+Interior pages carry no watermark. This reverses the previous decision, which
+put the logomark behind every page at 6% alpha.
+
+That decision was a correction to an earlier draft that had no visible ownership
+at all, and it fixed the right problem the wrong way. With a rust spine, section
+tabs, a running head, and a wordmark in every footer, the page is now branded
+several times over, and a pale disc floating behind the ruled lines read as a
+smudge on the writing surface — the exact defect logged against the reference
+workbook. Ownership is carried by furniture that also does a job.
+
+### Section tabs are the finder and the progress indicator
+
+Four index tabs run down the outer edge of every interior page, the current
+section saturated and extended, the others tinted. They are lifted from the
+site's own `.step-tabs`, where the same four colours already stand for the same
+four steps.
+
+They are a section finder when flipping and a progress indicator when reading,
+and they cost nothing to print. They do not bleed off the edge: a home printer
+cannot print to the edge, and a tab clipped by an unprintable margin looks broken
+rather than deliberate.
+
+### A section takes the page it begins on
+
+If a section band appears in the top half of a page, that page's running head and
+tab belong to the new section, even when the page opens with the tail of the
+previous one.
+
+This reverses the earlier rule, which gave the page to whichever section was
+already running. That produced pages carrying a green Analysis band under a lit
+butter Comprehension tab, with a head naming the wrong section — indefensible
+once the tabs existed, because the tabs are a finder and someone flipping for
+Analysis has to land on the page the Analysis band is on.
+
+The half-page test is the guard: a band starting near the foot of a page has not
+really taken it, so the running section keeps it.
+
+### A section that ends short hands the page back
+
+A section almost never ends level with the foot of a page, and a section whose
+last question is followed by a writing prompt leaves most of a sheet behind —
+a writing surface is an unbreakable block, so it moves whole to a page it fits
+on. Those were the emptiest pages in the book.
+
+`ruled-tail` fills the remainder with a labelled ruled area. Every use is a real
+invitation rather than filler: "Anything you noticed that the questions didn't
+ask about" after Analysis, "Words you met in these chapters" after Vocabulary.
+Close reading is the point of the book, and a student noticing something
+unprompted is the behaviour worth making room for.
+
+It renders only when enough of the page is left to be worth using, so an author
+can call it at the end of any section without ever producing a stub.
 
 ### Typefaces
 
-All three are SIL Open Font License, vendored in `assets/fonts`, and embedded in
-the PDF by Typst. Vendoring rather than relying on system fonts is what makes a
-build reproducible on any machine and legally distributable.
+Both faces are SIL Open Font License, both are Korean-capable, and both are
+vendored in `assets/fonts` and embedded in the PDF by Typst. Vendoring rather
+than relying on system fonts is what makes a build reproducible on any machine
+and legally distributable.
 
 | Role | Face | Why |
 | --- | --- | --- |
-| Reading matter — prompts, quotes, definitions | Source Serif 4 | Academic without being fusty; sturdy at small sizes, so it survives a home laser printer where a finer face like Garamond would break up |
-| Page furniture — labels, running heads, section names | Source Sans 3 | Same designer and skeleton as the serif, so structure and content never compete |
-| Large cover titles | Source Serif 4 Display | A genuine optical size, not the text face scaled up |
-| Korean glosses | Pretendard Std | Very legible at gloss size; a sans gloss also reads as annotation rather than as prose. Myeongjo-style serifs have hairlines that home printers drop |
+| Reading matter, cover and section titles, Korean glosses | Gowun Batang | The logotype's own face, so the workbook and the mark are set in the same voice. Covers Latin and Hangul in one family, which is what retires the separate Korean gloss face |
+| Page furniture — labels, running heads, instructions, scaffolds | IBM Plex Sans KR | The website's sans, also Korean-capable; a clear sans against the serif keeps structure and content from competing |
 
-This mirrors the website's existing serif + sans pairing rather than inventing a
-separate identity.
+Both are the website's own `--font-display` and `--font-sans`, so the workbook
+and the site cannot drift apart.
+
+Gowun Batang ships exactly two weights, regular and bold. Nothing may ask for
+another: Typst would synthesise it, and a synthesised semibold does not match the
+logo.
+
+This replaces Source Serif 4 / Source Sans 3 / Pretendard Std, which belonged to
+the previous brand. It also closes a real defect: the old stack named a Korean
+face that was never actually vendored, so every Korean gloss silently fell back
+to whatever the build machine happened to have.
 
 ### Page metrics
 
-A4. Symmetric 25 mm side margins, 22 mm top, 20 mm bottom. Text block 160 mm,
-split into a 13 mm rail and a 142 mm content column with a 5 mm gutter.
+A4. Margins are 36 mm left, 26 mm right, 20 mm top, 18 mm bottom, giving a
+148 mm text block. The margins are asymmetric because the page has a spine, not
+because of binding: the left margin is wide enough to hold the rust rule at
+30 mm and a 10 mm number gutter outside it. Nothing depends on whether a sheet is
+left- or right-hand, because students print single-sided.
 
 Body text is 11 pt — larger than a typical adult book, because younger students
-handwrite in these. Ruled lines are 9 mm apart, which suits a teenage hand;
-younger cohorts may want that raised.
+handwrite in these. Ruled lines are 8.5 mm apart, which suits a teenage hand;
+younger cohorts may want that raised. `line-gap` in `tokens.typ` is the single
+number most likely to need changing after the first real print with real
+students.
 
-The rail holds question labels and section letters and is otherwise deliberately
-empty: it gives handwriting students somewhere to make margin notes and
-GoodNotes users somewhere to drop annotations without covering the prompt.
+Question numbers hang in the gutter outside the rule rather than indenting the
+text. They align down the page without taking measure from either the prompt or
+the answer lines.
 
 ### Colour
 
-Slate blue, warm cream, and a terracotta accent, taken from the website palette.
+| Token | Value | Role |
+| --- | --- | --- |
+| `ink` | `#17342f` | The brand's black; a deep forest green |
+| `muted` | `#5f7069` | Secondary type and furniture |
+| `paper` | `#f7f3ea` | The cream of the mark; covers and panels |
+| `coral-deep` | `#b84431` | The margin rule |
+| `ruled` | `#c6d0c8` | Handwriting guides; dark enough for a home laser |
+
+Section colours are the brand's method palette in method order — butter, sage,
+aqua, lilac, for Comprehension, Analysis, Writing, Vocabulary. The sections keep
+their working names because that is what is actually on the page; the palette is
+what ties them to READ · THINK · SPEAK · WRITE.
+
+**These four are fills, never type.** Every one of them fails contrast as text on
+white. Each has a `-deep` partner in `tokens.typ` for the rare place a section
+has to be named in its own colour.
+
 Colour is never the only carrier of meaning — verified by rendering pages to
-grayscale and confirming the hierarchy still reads.
+grayscale and confirming the hierarchy still reads. Every section is also named
+in words and numbered.
 
 ## Deferred — revisit before implementation locks
 

@@ -10,110 +10,141 @@
 
 // --- Brand ------------------------------------------------------------------
 //
-// Taken from the actual logo (website/public/images/logo.png), not from the
-// site's CSS. The mark is four ascending bars — navy, green, orange, teal —
-// which is the "4 steps" of the business name.
+// Taken from the website's design tokens (website/src/components/SiteChrome.astro)
+// and the logo SVGs, so the workbook and the site cannot drift apart.
 //
-// The workbook uses that literally: each lesson section IS one of the four
-// steps and carries that step's colour. The bar device on every section header
-// doubles as a progress indicator, so a student can see how far through the
-// lesson they are without counting pages.
+// The mark is a sheet of ruled notebook paper: cream ground, soft rules, a rust
+// vertical margin rule, the numeral four in butter. The workbook is the thing
+// the logo is a picture of, so it does not decorate itself with the logo — it
+// reproduces the paper.
 
-#let brand-navy = rgb("#1e3b56")
-#let brand-green = rgb("#5a9b4b")
-#let brand-orange = rgb("#e08a2e")
-#let brand-teal = rgb("#4a8b9a")
+#let ink = rgb("#17342f") // forest green; the brand's black
+#let ink-soft = rgb("#24483f")
+#let ink-body = rgb("#263a34")
+#let muted = rgb("#5f7069")
+#let faint = rgb("#8a978f") // small labels and quiet furniture
 
-#let step-colors = (brand-navy, brand-green, brand-orange, brand-teal)
-#let step-muted = rgb("#d5dbe1") // inactive bars
+#let paper = rgb("#f7f3ea") // the cream of the mark; covers and tinted panels
+#let paper-deep = rgb("#eee7da")
+#let canvas = rgb("#fffdf8")
 
-// --- Ink --------------------------------------------------------------------
+#let coral = rgb("#ef6b4a")
+#let coral-deep = rgb("#b84431") // the margin rule
+#let line-soft = rgb("#dfe4dc")
+
+// --- Section colours --------------------------------------------------------
 //
-// Grayscale legibility is load-bearing: colour never carries meaning on its
-// own. Every section is also named in words and numbered, so the four step
-// colours are reinforcement, not the signal.
-
-#let ink = rgb("#1c2b3a") // body text
-#let ink-soft = rgb("#4a5b6b") // descriptions, secondary
-#let ink-faint = rgb("#8496a6") // field labels, quiet furniture
-#let hairline = rgb("#ccd6de")
-#let ruled = rgb("#9fb0bf") // handwriting guide lines
-#let tint-quote = rgb("#f4f7f9") // quoted book passages
-#let tint-row = rgb("#f7f9fa") // alternating vocabulary rows
-
-// --- Watermark --------------------------------------------------------------
+// The four section colours are the brand's method palette, in method order.
+// The sections keep their working names — Comprehension, Analysis, Writing,
+// Vocabulary — because that is what is actually on the page; the palette is
+// what ties them to READ · THINK · SPEAK · WRITE.
 //
-// Present on every page, but never behind a writing surface at a strength that
-// competes with pencil. The reference workbook's repeated diagonal text is
-// exactly what not to do.
+// These are pastels. They are fills, never text: every one of them fails
+// contrast as type on white. Each has a `-deep` partner for the rare place a
+// section has to be named in its own colour.
 
-// Typst cannot fade an image inline, so the transparency is baked into a
-// dedicated asset. To change it, re-run the alpha step in DESIGN-DECISIONS.md
-// rather than editing a number here.
-#let watermark-size = 72mm
+#let step-fill = (rgb("#f2c55c"), rgb("#9dc5a5"), rgb("#8bc7c3"), rgb("#b9abd8"))
+#let step-deep = (rgb("#a4741d"), rgb("#4f7d5b"), rgb("#3a7570"), rgb("#6d5c99"))
+#let step-wash = (rgb("#fdf5e2"), rgb("#eef5ef"), rgb("#ebf5f4"), rgb("#f2eef8"))
+
+// --- Rules ------------------------------------------------------------------
+//
+// Two rule weights carry the notebook motif, and they mean different things:
+// solid rules are for writing on, dashed rules are for fields to be filled in.
+// The distinction is the mark's own — it alternates solid and dashed — reused
+// here as a signal rather than as texture.
+
+#let ruled = rgb("#c6d0c8") // handwriting guides; dark enough for a home laser
+#let stroke-ruled = 0.5pt + ruled
+#let stroke-hairline = 0.4pt + line-soft
+#let stroke-field = (paint: muted.lighten(45%), thickness: 0.5pt, dash: "densely-dashed")
+#let stroke-margin = 0.7pt + coral-deep
 
 // --- Typefaces --------------------------------------------------------------
 //
-// All OFL, embeddable, and vendored in workbooks/assets/fonts so builds are
-// reproducible on any machine.
+// The two brand faces, both OFL, both Korean-capable, both vendored in
+// workbooks/assets/fonts so builds are reproducible on any machine.
+//
+// Gowun Batang has exactly two weights, regular and bold. Nothing may ask for
+// another: Typst would synthesise it and the result does not match the logo.
 
-#let serif = "Source Serif 4"
-#let serif-display = "Source Serif 4 Display"
-#let sans = "Source Sans 3"
-#let korean = "Pretendard Std"
-#let gloss-stack = (serif, korean)
+#let serif = "Gowun Batang" // display and reading text, English and Korean
+#let sans = "IBM Plex Sans KR" // labels, furniture, instructions
 
 // --- Type scale -------------------------------------------------------------
 
-#let size-cover-title = 27pt
-#let size-lesson-title = 23pt
-#let size-band = 10.5pt
-#let size-body = 10.5pt // prompts — the reading size of the workbook
-#let size-quote = 9.5pt
-#let size-vocab-term = 12pt
+#let size-cover-title = 30pt
+#let size-cover-series = 9.5pt
+#let size-lesson-title = 24pt
+#let size-section-title = 15pt
+#let size-body = 11pt // prompts — the reading size of the workbook
+#let size-quote = 10pt
+#let size-vocab-term = 12.5pt
 #let size-vocab-body = 9.5pt
 #let size-label = 7.5pt
 #let size-furniture = 8pt
 
-#let tracking-caps = 0.07em
+#let tracking-caps = 0.1em
 
 // --- Page geometry ----------------------------------------------------------
 //
-// A4. Margins are symmetric across every page: the layout never depends on
-// whether a sheet is printed left- or right-hand, because students print these
-// themselves, often single-sided.
+// A4, and symmetric across every page: the layout never depends on whether a
+// sheet is printed left- or right-hand, because students print these themselves,
+// often single-sided.
 //
-// There is no margin rail. An earlier draft reserved one for question numbers
-// and annotation; it cost 18mm off every answer line and pushed the whole text
-// block right, for space students had not asked for. Question numbers hang in a
-// narrow indent instead, and response lines run the full width of the block.
+// The left margin is wide because the page has a spine. A rust margin rule runs
+// the full height at `rule-x`, question numbers hang outside it in the gutter,
+// and the text block begins clear of it. This is what makes an unfilled page
+// bottom read as paper rather than as a hole — the earlier draft had no vertical
+// structure, so every short page looked like a mistake.
 
-#let paper = "a4"
+#let paper-size = "a4"
 #let page-width = 210mm
 #let page-height = 297mm
-#let margin-top = 19mm
-#let margin-bottom = 17mm
-#let margin-x = 20mm
+
+#let margin-top = 20mm
+#let margin-bottom = 18mm
+#let margin-left = 36mm
+#let margin-right = 26mm
 
 #let head-ascent = 9mm
-#let foot-descent = 8mm
+#let foot-descent = 9mm
 
-#let block-width = page-width - 2 * margin-x
+#let block-width = page-width - margin-left - margin-right
 #let body-height = page-height - margin-top - margin-bottom
 
-// Hanging indent for question numbers.
-#let hang = 8mm
+// The margin rule, and the gutter left of it where question numbers sit.
+#let rule-x = 30mm
+#let gutter-width = 10mm
+#let gutter-dx = -16mm // from the text block's left edge
+
+// --- Section tabs -----------------------------------------------------------
+//
+// Four index tabs down the outer edge, the current one saturated and extended.
+// Lifted from the site's own `.step-tabs`, where the same four colours are the
+// same four steps. They are a section finder when flipping and a progress
+// indicator when reading, and they cost nothing to print.
+//
+// They do not bleed. A home printer cannot print to the edge, and a tab clipped
+// by an unprintable margin looks broken rather than deliberate.
+
+#let tab-x = 191mm
+#let tab-width = 11mm
+#let tab-width-active = 15mm
+#let tab-height = 8.5mm
+#let tab-gap = 2mm
+#let tab-top = 22mm
+#let tab-radius = 2.5pt
 
 // --- Vertical rhythm --------------------------------------------------------
 
-#let leading-body = 0.68em
-#let space-prompt-to-response = 0mm
-#let space-between-questions = 5.5mm
-#let space-band-above = 8mm
-#let space-band-below = 5mm
-
+#let leading-body = 0.75em
+#let space-between-questions = 6mm
+#let space-prompt-to-response = 1mm
+#let space-band-above = 9mm
+#let space-band-below = 6mm
 #let space-vocab-field = 2.4mm
-#let space-vocab-entry = 4mm
+#let space-vocab-entry = 4.5mm
 
 // --- Handwriting response areas ---------------------------------------------
 //
@@ -121,8 +152,6 @@
 // changing after the first real print with real students.
 
 #let line-gap = 8.5mm
-#let stroke-ruled = 0.5pt + ruled
-#let stroke-hairline = 0.4pt + hairline
 
 // Named response sizes, in ruled lines.
 #let lines-short = 3
@@ -137,10 +166,22 @@
 #let lines-writing-min = 14
 
 // Keeps a filled surface clear of the footer.
-#let surface-bottom-guard = 3mm
+#let surface-bottom-guard = 4mm
+
+// --- Cover paper ------------------------------------------------------------
+//
+// Covers reproduce the mark: cream ground, ruled lines edge to edge, rust
+// margin rule. Interior pages do not — a full-bleed cream ground is expensive
+// on a home printer and greys down pencil. See DESIGN-DECISIONS.md.
+
+#let cover-rule-gap = 9mm
+#let cover-rule-top = 24mm
 
 // --- Assets -----------------------------------------------------------------
 
-#let logo-full = "/assets/logo/logo-full.png"
-#let logo-wordmark = "/assets/logo/logo-wordmark.png"
-#let logo-watermark = "/assets/logo/logo-watermark.png"
+// Only the logomark is placed as an image, and only on covers. The footer
+// wordmark is typeset from the brand faces — see `wordmark` in components.typ.
+#let logomark = "/assets/logo/logomark.png"
+
+// Height of the coloured bar that opens a section.
+#let band-bar-height = 2.5mm

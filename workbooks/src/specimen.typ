@@ -105,6 +105,10 @@
   lines: lines-extended,
 )
 
+// The Analysis section ends here, and the writing surface that follows cannot
+// fit on this page. The remainder becomes the student's, rather than a hole.
+#ruled-tail("Anything you noticed that the questions didn't ask about")
+
 // --- Step 3: Writing --------------------------------------------------------
 
 #section-band(
@@ -247,3 +251,7 @@
   from-book: ["He was vindicated eventually, though by then it made very little
     difference."],
 )
+
+// The list ends short of the page foot, as a tutor-authored list almost always
+// will. The remainder becomes the student's own.
+#own-words()

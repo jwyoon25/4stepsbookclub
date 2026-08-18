@@ -1,16 +1,16 @@
 # 4steps Workbook System
 
-This directory is the initial home for the internal publishing/build tool that
-will eventually generate 4steps Bookclub workbooks with Typst.
+The internal publishing system that generates 4steps Bookclub workbooks with
+Typst.
 
-The current project is intentionally only infrastructure scaffolding. The
-smoke test in `src/main.typ` verifies that the Typst source-to-PDF workflow can
-be wired up; it is not a workbook design or a production template.
+The design system is implemented and proven by a specimen; what does not exist
+yet is a content format. Lessons are still written directly in Typst, and
+`content/` is empty on purpose — see "Project shape" below.
 
 ## Prerequisites
 
-The local Typst CLI is the only additional dependency required for this
-scaffold. Check whether it is available with:
+The local Typst CLI is the only additional dependency. Check whether it is
+available with:
 
 ```bash
 typst --version
@@ -29,36 +29,66 @@ No Typst account or Typst.app subscription is required for local development.
 From the repository root:
 
 ```bash
-npm run workbook:build
+npm run workbook:specimen        # build the design specimen
+npm run workbook:specimen:watch  # rebuild it on every save
+npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
 ```
 
-The build command writes the smoke-test PDF to
-`workbooks/output/workbook-smoke-test.pdf`. Generated PDFs in that directory
-are ignored by Git.
+`workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
+grammar with placeholder content. It is the file to look at when changing
+anything in `system/`. Generated PDFs are ignored by Git.
+
+## The design in one paragraph
+
+The brand mark is a sheet of ruled notebook paper, and a reading workbook is the
+thing that mark is a picture of — so the workbook reproduces the paper rather
+than decorating itself with the logo. A rust margin rule runs down every interior
+page with question numbers hanging outside it; solid rules mean "write here" and
+dashed rules mean "fill this in"; four index tabs on the outer edge show which of
+the four sections you are in. Covers reproduce the cream ruled ground in full.
+Reasoning for all of it is in [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md).
 
 ## Project shape
 
 ```text
 workbooks/
 ├── README.md
-├── assets/       # Future project-owned publishing assets.
-├── content/      # Future book- and lesson-specific curriculum data.
-├── output/       # Generated files; PDFs are ignored by Git.
+├── DESIGN-DECISIONS.md   # settled decisions and deferred questions, with reasoning
+├── assets/
+│   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
+│   └── logo/             # logomark and logotype, derived from the website assets
+├── content/              # Future book- and lesson-specific curriculum data.
+├── output/               # Generated files; PDFs are ignored by Git.
 ├── src/
-│   └── main.typ  # Minimal Typst compilation smoke test.
-└── system/       # Future deterministic workbook presentation logic.
+│   ├── main.typ          # Minimal Typst compilation smoke test.
+│   └── specimen.typ      # The design specimen.
+└── system/
+    ├── tokens.typ        # Every measurement, colour, and type size.
+    └── components.typ    # The page grammar.
 ```
 
-The content representation is intentionally undecided. The `content/`,
-`system/`, and `assets/` boundaries leave room to introduce that separation
-later without committing to a schema or visual design prematurely.
+Components must not hard-code values. Change a workbook's feel by editing
+`tokens.typ`, not `components.typ`.
+
+The content representation is still undecided, which is why `content/` is empty.
+The `content/`, `system/`, and `assets/` boundaries leave room to introduce that
+separation without committing to a schema prematurely.
+
+## Fonts
+
+Both faces are SIL Open Font License and are vendored rather than assumed to be
+installed, so builds are reproducible on any machine and the PDFs are legally
+distributable. They are the same two the website uses, so the workbook and the
+site cannot drift apart.
+
+Every build passes `--font-path workbooks/assets/fonts`; the npm scripts already
+do. Compiling without it silently substitutes whatever the machine has.
 
 ## Typst.app compatibility
 
 The core Typst source should remain portable between the local CLI and a future
 Typst.app project. Keep project resources relative to this project, avoid
-developer-machine-specific absolute paths, and keep future fonts/assets with
-the project where licensing permits. A later staff-facing Typst.app workflow
-can copy or deploy the stable project without making Typst.app part of local
-development.
+developer-machine-specific absolute paths, and keep fonts and assets with the
+project. A later staff-facing Typst.app workflow can copy or deploy the stable
+project without making Typst.app part of local development.
