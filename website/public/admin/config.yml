@@ -14,7 +14,9 @@ locale: ko
 publish_mode: simple
 
 media_folder: website/public/images/notices
-public_folder: /images/notices
+# Keep this relative so Decap resolves newly selected files through its draft
+# asset store. Astro normalizes it to a root-relative URL when loading content.
+public_folder: images/notices
 
 collections:
   - name: notices
