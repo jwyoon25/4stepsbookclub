@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { join, relative } from "node:path";
 import test from "node:test";
 
-import { createBuildTargets } from "../workbooks/lib/build.mjs";
+import {
+  containsTypstWarning,
+  createBuildTargets,
+} from "../workbooks/lib/build.mjs";
 
 const outputDirectory = "/tmp/4steps-workbook-build-test";
 
@@ -62,4 +65,15 @@ test("resolves every output below the requested directory", () => {
     );
     assert.doesNotMatch(relative(outputDirectory, target.outputPath), /^\.\./);
   }
+});
+
+test("recognizes successful Typst output that still contains warnings", () => {
+  assert.equal(containsTypstWarning(""), false);
+  assert.equal(containsTypstWarning("compiled successfully"), false);
+  assert.equal(
+    containsTypstWarning(
+      "warning: document did not converge within five attempts\n = hint: inspect layout",
+    ),
+    true,
+  );
 });

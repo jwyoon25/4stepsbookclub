@@ -216,4 +216,8 @@ npm run workbook:render -- workbooks/content/the-book-id/workbook.json
 The build planner creates complete-workbook and standalone-lesson PDFs for both
 student and teacher editions. It writes a temporary normalized JSON bundle for
 each build, passes it to the generic Typst entry point, and removes the bundle
-after compilation. Tutors never author Typst or pagination data.
+after compilation. A staged PDF is promoted to its final filename only when
+Typst reports no warnings and the PDF audit confirms A4 geometry, correct
+footers, in-bounds text, instruction-page count, section order, running-header
+agreement, and edition separation. Tutors never author Typst or pagination
+data.

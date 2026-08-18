@@ -76,6 +76,14 @@ optional writing rubric. Optional tutor-authored `Guidance & requirements`
 lists stay attached to their questions in both editions because they are
 directions for the student, not answer-key content.
 
+Every render is staged under a temporary filename and replaces the previous PDF
+only after passing the consistency audit. A successful export requires zero
+Typst warnings, A4 page geometry, in-bounds text, correct physical and printed
+page totals, exactly one instruction page, the four sections in locked order,
+matching section bands and running heads, and no teacher-only guidance in a
+student PDF. `npm test` renders both the canonical package and a pagination
+stress package so these checks run against actual PDFs rather than JSON alone.
+
 `workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
 grammar with placeholder content. It is the file to look at when changing
 anything in `system/`. Generated PDFs are ignored by Git.
@@ -104,7 +112,8 @@ workbooks/
 ├── content/              # Production book- and lesson-specific curriculum data
 ├── lib/
 │   ├── build.mjs         # output planning and Typst build orchestration
-│   └── content.mjs       # package loading, validation, and default application
+│   ├── content.mjs       # package loading, validation, and default application
+│   └── pdf-audit.mjs     # post-render PDF consistency checks
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
 │   ├── render-content.mjs   # command-line PDF renderer

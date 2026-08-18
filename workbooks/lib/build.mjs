@@ -1,10 +1,11 @@
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { mkdir, mkdtemp, rename, rm, writeFile } from "node:fs/promises";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
 import { loadWorkbookPackage, WorkbookContentError } from "./content.mjs";
+import { auditWorkbookPdf, WorkbookPdfAuditError } from "./pdf-audit.mjs";
 
 const execFileAsync = promisify(execFile);
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,10 @@ export class WorkbookBuildError extends Error {
     super(message, options);
     this.name = "WorkbookBuildError";
   }
+}
+
+export function containsTypstWarning(diagnostics) {
+  return /^warning:/im.test(diagnostics ?? "");
 }
 
 function twoDigitLessonNumber(number) {
@@ -90,6 +95,11 @@ async function compileTarget(workbook, target, temporaryDirectory) {
   };
   await writeFile(bundlePath, `${JSON.stringify(bundle, null, 2)}\n`);
 
+  const stagedOutputPath = join(
+    dirname(target.outputPath),
+    `.${basename(target.outputPath, ".pdf")}.building-${process.pid}.pdf`,
+  );
+
   const argumentsForTypst = [
     "compile",
     "--root",
@@ -99,15 +109,17 @@ async function compileTarget(workbook, target, temporaryDirectory) {
     "--input",
     `data=${typstRootPath(bundlePath)}`,
     renderSource,
-    target.outputPath,
+    stagedOutputPath,
   ];
 
+  let compileResult;
   try {
-    await execFileAsync("typst", argumentsForTypst, {
+    compileResult = await execFileAsync("typst", argumentsForTypst, {
       cwd: repositoryRoot,
       maxBuffer: 10 * 1024 * 1024,
     });
   } catch (cause) {
+    await rm(stagedOutputPath, { force: true });
     if (cause?.code === "ENOENT") {
       throw new WorkbookBuildError(
         "Typst CLI is not installed or is not available on PATH.",
@@ -122,6 +134,31 @@ async function compileTarget(workbook, target, temporaryDirectory) {
       }`,
       { cause },
     );
+  }
+
+  const successfulDiagnostics = [compileResult.stdout, compileResult.stderr]
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  if (containsTypstWarning(successfulDiagnostics)) {
+    await rm(stagedOutputPath, { force: true });
+    throw new WorkbookBuildError(
+      `Typst reported warnings while building ${target.outputPath}:\n${successfulDiagnostics}`,
+    );
+  }
+
+  try {
+    await auditWorkbookPdf(stagedOutputPath, target);
+    await rename(stagedOutputPath, target.outputPath);
+  } catch (cause) {
+    await rm(stagedOutputPath, { force: true });
+    if (cause instanceof WorkbookPdfAuditError) {
+      throw new WorkbookBuildError(
+        `Generated PDF failed the workbook consistency audit:\n${cause.message}`,
+        { cause },
+      );
+    }
+    throw cause;
   }
 }
 
