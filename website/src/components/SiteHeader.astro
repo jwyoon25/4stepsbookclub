@@ -1,0 +1,150 @@
+---
+interface Props {
+  homeHref?: string;
+  sectionPrefix?: string;
+  enableMenuScript?: boolean;
+}
+
+const {
+  homeHref = "/",
+  sectionPrefix = "/",
+  enableMenuScript = true
+} = Astro.props;
+
+const hrefFor = (id: string) => `${sectionPrefix}#${id}`;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand-home" href={homeHref} aria-label="4steps Book Club 홈">
+      <img class="brand-logo" src="/images/logo/logotype-light.svg" alt="" width="351" height="150" />
+    </a>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="메뉴 열기" aria-controls="site-nav" aria-expanded="false">
+      <i class="menu-icon-open" data-lucide="menu" aria-hidden="true"></i>
+      <i class="menu-icon-close" data-lucide="x" aria-hidden="true"></i>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
+      <p class="nav-label">4STEPS 주요 메뉴</p>
+      <div class="nav-links">
+        <a href={hrefFor("about")}>4steps의 차이</a>
+        <a href={hrefFor("method")}>4steps 방식</a>
+        <a href={hrefFor("class-content")}>수업 자료</a>
+        <a href={hrefFor("faculty")}>강사진</a>
+        <a href={hrefFor("level")}>레벨 안내</a>
+        <a href={hrefFor("management")}>학습 관리</a>
+        <a href={hrefFor("faq")}>FAQ</a>
+        <a href={hrefFor("notices")}>공지사항</a>
+        <a href={hrefFor("consulting")} class="button button-primary nav-cta">무료 레벨테스트</a>
+      </div>
+      <div class="nav-socials" aria-label="소셜 채널">
+        <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="네이버 블로그 열기 (새 창)" title="네이버 블로그">
+          <img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" />
+          <span class="social-label">네이버</span>
+        </a>
+        <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" aria-label="카카오톡 채널 열기 (새 창)" title="카카오톡 채널">
+          <img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" />
+          <span class="social-label">카카오</span>
+        </a>
+        <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 열기 (새 창)" title="인스타그램">
+          <img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" />
+          <span class="social-label">인스타</span>
+        </a>
+        <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="Threads 열기 (새 창)" title="Threads">
+          <img class="brand-icon" src="/images/social/threads.png" width="20" height="20" alt="" />
+          <span class="social-label">Threads</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+<div id="nav-backdrop" class="nav-backdrop" aria-hidden="true"></div>
+
+<script is:inline data-site-nav-enabled={enableMenuScript ? "true" : "false"}>
+  (() => {
+    const scriptElement = document.currentScript;
+    const initialize = () => {
+      if (scriptElement?.dataset.siteNavEnabled !== "true") return;
+
+      window.lucide?.createIcons();
+
+      const body = document.body;
+      const menuToggle = document.getElementById("menu-toggle");
+      const navigation = document.getElementById("site-nav");
+      const navBackdrop = document.getElementById("nav-backdrop");
+      const mobileCta = document.getElementById("mobile-cta");
+      const footer = document.querySelector(".site-footer");
+      const brandHome = document.querySelector(".brand-home");
+      const skipLink = document.querySelector(".skip-link");
+      const pageMain = document.getElementById("main-content");
+      const desktopNavigation = window.matchMedia("(min-width: 1180px)");
+      const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+      const toggleInert = (elements, inert) => {
+        elements.filter(Boolean).forEach((element) => element.toggleAttribute("inert", inert));
+      };
+
+      const visibleFocusables = (container) => Array.from(container?.querySelectorAll(focusableSelector) || [])
+        .filter((element) => !element.closest("[inert]") && element.getClientRects().length > 0);
+
+      const trapTab = (elements, event) => {
+        if (event.key !== "Tab" || !elements.length) return;
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (!elements.includes(document.activeElement)) {
+          event.preventDefault();
+          first.focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      };
+
+      const menuPageRegions = [pageMain, footer, mobileCta, brandHome, skipLink];
+      const setMenu = (requestedOpen, options = {}) => {
+        const open = Boolean(requestedOpen && !desktopNavigation.matches);
+        navigation?.classList.toggle("open", open);
+        navBackdrop?.classList.toggle("open", open);
+        body.classList.toggle("menu-open", open);
+        menuToggle?.setAttribute("aria-expanded", String(open));
+        menuToggle?.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+        navBackdrop?.setAttribute("aria-hidden", String(!open));
+        navigation?.toggleAttribute("inert", !desktopNavigation.matches && !open);
+        toggleInert(menuPageRegions, open);
+
+        if (open && options.focus !== false) {
+          window.setTimeout(() => navigation?.querySelector("a")?.focus({ preventScroll: true }), 260);
+        } else if (!open && options.restoreFocus !== false && navigation?.contains(document.activeElement)) {
+          menuToggle?.focus({ preventScroll: true });
+        }
+      };
+
+      menuToggle?.addEventListener("click", () => setMenu(!navigation?.classList.contains("open")));
+      navBackdrop?.addEventListener("click", () => setMenu(false));
+      navigation?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenu(false, { restoreFocus: false })));
+      const syncNavigation = () => setMenu(false, { restoreFocus: false });
+      if (desktopNavigation.addEventListener) desktopNavigation.addEventListener("change", syncNavigation);
+      else desktopNavigation.addListener(syncNavigation);
+      syncNavigation();
+
+      document.addEventListener("keydown", (event) => {
+        if (!navigation?.classList.contains("open")) return;
+        if (event.key === "Escape") setMenu(false);
+        if (event.key === "Tab") trapTab([menuToggle, ...visibleFocusables(navigation)].filter(Boolean), event);
+      });
+
+      if (mobileCta && footer && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => entries.forEach((entry) => mobileCta.classList.toggle("hidden", entry.isIntersecting)),
+          { threshold: 0.08 }
+        );
+        observer.observe(footer);
+      }
+    };
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
+    else initialize();
+  })();
+</script>

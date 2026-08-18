@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import AnnotatedEssay from "../components/AnnotatedEssay.astro";
+import SiteChrome from "../components/SiteChrome.astro";
 import { sortNotices } from "../data/notices";
 
 // Shared page metadata. Title and description feed both the document head and
@@ -495,159 +496,13 @@ const faqItems = [
       ::selection { background: var(--butter); color: var(--ink); }
       :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 6px var(--butter); }
 
-      .skip-link {
-        position: fixed;
-        top: 8px;
-        left: 8px;
-        z-index: 5000;
-        transform: translateY(-160%);
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: var(--ink);
-        color: var(--white);
-        font-weight: var(--weight-bold);
-      }
-      .skip-link:focus { transform: translateY(0); }
-      .container { width: min(var(--container), calc(100% - 32px)); margin-inline: auto; }
       /* Keep the sticky header offset in one place: html scroll-padding-top.
          Applying the same offset here as scroll-margin-top makes every anchor
          stop one header-height too early, leaving the previous section visible. */
-      .section { position: relative; padding: 72px 0; }
       .anchor-target { position: absolute; top: 0; display: block; width: 1px; height: 1px; }
-      .section-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        margin-bottom: 16px;
-        color: var(--coral-dark);
-        font-size: var(--type-label);
-        font-weight: var(--weight-bold);
-        letter-spacing: var(--tracking-label);
-        text-transform: uppercase;
-      }
-      .section-kicker::before { content: ""; width: 22px; height: 2px; border-radius: 99px; background: currentColor; }
-      .section-heading { max-width: 730px; margin-bottom: 32px; }
-      .section-heading.center { margin-inline: auto; text-align: center; }
-      .section-heading.center .section-kicker::before { display: none; }
-      .section-title {
-        color: var(--ink);
-        font-family: var(--font-display);
-        font-size: var(--type-section);
-        font-weight: var(--weight-bold);
-        line-height: var(--leading-display);
-        letter-spacing: var(--tracking-display);
-        word-break: keep-all;
-      }
-      .section-copy { margin-top: 15px; color: var(--muted); line-height: 1.75; word-break: keep-all; }
-      .button {
-        display: inline-flex;
-        min-height: 52px;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        padding: 13px 20px;
-        border: 1px solid transparent;
-        border-radius: 999px;
-        font-size: var(--type-body);
-        font-weight: var(--weight-bold);
-        line-height: 1.35;
-        cursor: pointer;
-        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-      }
-      .button-primary { background: var(--coral-dark); color: var(--white); box-shadow: 0 12px 30px rgba(184, 68, 49, 0.24); }
       .button-ink { background: var(--ink); color: var(--white); }
       .button-outline { border-color: rgba(23, 52, 47, 0.24); background: rgba(255, 255, 255, 0.5); color: var(--ink); }
       .button-light { border-color: rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.08); color: var(--white); }
-
-      .site-header {
-        position: sticky;
-        top: 0;
-        z-index: 1200;
-        padding-top: env(safe-area-inset-top);
-        border-bottom: 1px solid rgba(23, 52, 47, 0.09);
-        background: rgba(247, 243, 234, 0.98);
-        box-shadow: 0 8px 28px rgba(23, 52, 47, 0.035);
-      }
-      .site-header .header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-      .brand-home { min-height: 44px; display: inline-flex; flex: 0 0 auto; align-items: center; border-radius: 4px; }
-      .brand-logo { display: block; width: 132px; height: auto; transform: translateX(-10.83%); filter: drop-shadow(0 3px 7px rgba(23, 52, 47, 0.06)); }
-      .menu-toggle {
-        width: 46px;
-        height: 46px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid rgba(23, 52, 47, 0.15);
-        border-radius: 50%;
-        background: var(--canvas);
-        cursor: pointer;
-      }
-      .menu-toggle svg { width: 21px; height: 21px; }
-      .menu-icon-close { display: none; }
-      .menu-toggle[aria-expanded="true"] .menu-icon-open { display: none; }
-      .menu-toggle[aria-expanded="true"] .menu-icon-close { display: block; }
-      .nav-backdrop {
-        position: fixed;
-        inset: calc(72px + env(safe-area-inset-top)) 0 0;
-        z-index: 1090;
-        opacity: 0;
-        visibility: hidden;
-        background: rgba(14, 36, 31, 0.44);
-        transition: opacity 200ms ease, visibility 200ms ease;
-      }
-      .nav-backdrop.open { opacity: 1; visibility: visible; }
-      .site-nav {
-        position: fixed;
-        top: calc(72px + env(safe-area-inset-top));
-        right: 0;
-        bottom: 0;
-        z-index: 1100;
-        width: min(88vw, 390px);
-        padding: 22px max(20px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
-        background: var(--paper);
-        transform: translateX(105%);
-        visibility: hidden;
-        pointer-events: none;
-        transition: transform 240ms cubic-bezier(.22,.8,.24,1), visibility 240ms ease;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-      }
-      .site-nav.open { transform: translateX(0); visibility: visible; pointer-events: auto; }
-      .nav-label { margin-bottom: 18px; color: var(--muted); font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: 0.15em; }
-      .nav-links { display: grid; }
-      .nav-links > a:not(.nav-cta) {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 55px;
-        border-bottom: 1px solid var(--line);
-        color: var(--ink);
-        font-family: var(--font-display);
-        font-size: var(--type-heading);
-        font-weight: var(--weight-bold);
-      }
-      .nav-links > a:not(.nav-cta)::after { content: "↘"; color: var(--coral); font-family: var(--font-sans); font-size: var(--type-body); }
-      .nav-cta { width: 100%; margin-top: 22px; }
-      .nav-socials { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 22px; }
-      .nav-socials .social-chip { width: 100%; min-width: 0; justify-content: center; padding: 0; font-size: var(--type-label); }
-      .nav-socials .social-label { display: none; }
-      .nav-socials .threads-chip, .footer-socials .threads-chip { background: #111; border-color: #111; color: var(--white); }
-      .social-chip {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 8px 12px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: var(--canvas);
-        color: var(--ink);
-        font-size: var(--type-label);
-        font-weight: var(--weight-bold);
-        white-space: nowrap;
-      }
-      .brand-icon { width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
-      .social-chip > svg { width: 20px; height: 20px; flex: 0 0 auto; }
 
       .hero {
         position: relative;
@@ -1133,83 +988,6 @@ const faqItems = [
       .consult-form { height: clamp(360px, 50dvh, 440px); overflow: hidden; padding: 22px 16px; border-radius: 20px; background: var(--canvas); color: var(--text); box-shadow: var(--shadow-lg); }
       .tally-embed { display: block; width: 100%; height: 100%; border: 0; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
 
-      .site-footer {
-        position: relative;
-        overflow: hidden;
-        padding: 52px 0 calc(106px + env(safe-area-inset-bottom));
-        background: #102722;
-        color: white;
-      }
-      .site-footer::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: var(--coral);
-      }
-      .footer-grid,
-      .business-info { position: relative; z-index: 1; }
-      .footer-section-label {
-        display: block;
-        color: var(--butter);
-        font-size: var(--type-label);
-        font-weight: var(--weight-bold);
-        letter-spacing: var(--tracking-label);
-        text-transform: uppercase;
-      }
-      .footer-grid { display: grid; gap: 36px; }
-      .footer-brand { display: inline-flex; flex-direction: column; align-items: flex-start; border-radius: 4px; }
-      .footer-logo { display: block; width: 305px; max-width: none; height: auto; transform: translateX(-10.83%); filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.16)); }
-      .footer-method { margin-top: 13px; color: #a9b5ac; font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: 0.18em; }
-      .footer-audience { max-width: 390px; margin-top: 13px; color: rgba(255, 255, 255, 0.62); font-size: var(--type-small); font-weight: var(--weight-semibold); line-height: 1.65; word-break: keep-all; }
-      .footer-tagline { margin-top: 13px; color: rgba(255, 255, 255, 0.8); font-family: var(--font-display); font-size: var(--type-heading); line-height: var(--leading-heading); }
-      .footer-nav-column { min-width: 0; }
-      .footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; margin-top: 12px; }
-      .footer-links a { position: relative; min-height: 44px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.72); font-size: var(--type-small); transition: color 180ms ease, border-color 180ms ease; }
-      .footer-links a::after { content: "↗"; color: rgba(239, 107, 74, 0.8); font-size: var(--type-label); opacity: 0; transform: translate(-3px, 3px); transition: opacity 180ms ease, transform 180ms ease; }
-      .footer-links a:hover { border-color: rgba(239, 107, 74, 0.55); color: white; }
-      .footer-links a:hover::after { opacity: 1; transform: translate(0, 0); }
-      .footer-social-block { margin-top: 27px; }
-      .footer-socials { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
-      .footer-socials .social-chip { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.07); color: white; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease; }
-      .footer-socials .social-chip:hover { border-color: rgba(255, 255, 255, 0.34); background: rgba(255, 255, 255, 0.14); transform: translateY(-2px); }
-      .business-info { margin-top: 42px; padding-top: 23px; border-top: 1px solid rgba(255, 255, 255, 0.13); color: rgba(255, 255, 255, 0.64); font-size: var(--type-label); line-height: 1.75; word-break: keep-all; }
-      .business-details { display: grid; gap: 8px; margin-top: 12px; }
-      .business-details p { display: flex; flex-wrap: wrap; gap: 4px 18px; }
-      .business-item { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-      .business-info strong { color: rgba(255, 255, 255, 0.8); }
-      .business-info a { min-height: 32px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 2px; }
-      .copyright { margin-top: 20px; color: rgba(255, 255, 255, 0.48); font-size: var(--type-label); letter-spacing: 0.04em; }
-
-      .mobile-cta {
-        position: fixed;
-        left: max(10px, env(safe-area-inset-left));
-        right: max(10px, env(safe-area-inset-right));
-        bottom: calc(10px + env(safe-area-inset-bottom));
-        z-index: 1000;
-        display: flex;
-        width: auto;
-        max-width: 440px;
-        margin-inline: auto;
-        min-height: 54px;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 7px 8px 7px 16px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
-        background: rgba(23, 52, 47, 0.96);
-        color: white;
-        box-shadow: 0 14px 34px rgba(23, 52, 47, 0.28);
-        backdrop-filter: blur(12px);
-        transition: opacity 180ms ease, transform 180ms ease;
-      }
-      .mobile-cta.hidden { opacity: 0; transform: translateY(120%); pointer-events: none; }
-      .mobile-cta span { font-size: var(--type-label); font-weight: var(--weight-bold); }
-      .mobile-cta b { display: inline-flex; min-height: 38px; align-items: center; padding: 7px 14px; border-radius: 999px; background: var(--coral-dark); font-size: var(--type-label); }
-
       .image-modal { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); background: rgba(8, 27, 23, 0.88); backdrop-filter: blur(9px); }
       .image-modal.open { display: flex; }
       .modal-dialog { position: relative; width: min(1080px, 100%); max-height: calc(100dvh - 20px); overflow: auto; padding: 16px; border-radius: 19px; background: var(--canvas); box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35); }
@@ -1281,9 +1059,6 @@ const faqItems = [
       }
 
       @media (min-width: 760px) {
-        .container { width: min(var(--container), calc(100% - 64px)); }
-        .section { padding: 112px 0; }
-        .section-heading { margin-bottom: 52px; }
         .hero { padding: 78px 0 50px; }
         .trust-strip { margin-top: 0; }
         .trust-item { padding: 6px 24px; }
@@ -1317,9 +1092,6 @@ const faqItems = [
         .roadmap { margin-top: 94px; }
         .consult-grid { grid-template-columns: minmax(0, .8fr) minmax(480px, 1.2fr); align-items: start; }
         .consult-form { padding: 32px; }
-        .footer-grid { grid-template-columns: minmax(280px, .82fr) minmax(0, 1.18fr); align-items: start; gap: 72px; }
-        .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .business-info { grid-column: 1 / -1; }
       }
 
       @media (min-width: 600px) and (max-width: 859px) {
@@ -1339,18 +1111,6 @@ const faqItems = [
         body { padding-bottom: 0; }
         .site-header .header-inner { min-height: 80px; }
         .brand-logo { width: 142px; }
-        .menu-toggle, .nav-backdrop, .nav-label { display: none; }
-        .site-nav { position: static; width: auto; display: flex; align-items: center; gap: 10px; padding: 0; overflow: visible; background: transparent; transform: none; visibility: visible; pointer-events: auto; }
-        .nav-links { display: flex; align-items: center; gap: 17px; }
-        .nav-links > a:not(.nav-cta) { min-height: auto; border: 0; font-family: var(--font-sans); font-size: var(--type-small); }
-        .nav-links > a:not(.nav-cta)::after { display: none; }
-        .nav-links > a:not(.nav-cta):hover { color: var(--coral-dark); }
-        .nav-cta { width: auto; min-height: 44px; margin: 0 0 0 4px; padding: 10px 16px; font-size: var(--type-small); }
-        .nav-socials { display: flex; gap: 5px; margin: 0; }
-        .nav-socials .social-chip { width: 38px; height: 38px; min-height: 38px; justify-content: center; padding: 0; overflow: hidden; border: 0; border-radius: 50%; background: transparent; }
-        .nav-socials .social-label { display: none; }
-        .nav-socials .brand-icon { display: block; width: 100%; height: 100%; object-fit: cover; }
-        .nav-socials .threads-chip { background: #111; color: var(--white); }
         .hero { min-height: 720px; display: flex; align-items: center; }
         .hero-grid { grid-template-columns: 1.13fr .87fr; gap: 64px; }
         .comparison-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
@@ -1372,57 +1132,6 @@ const faqItems = [
         .grade-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .grade-description { min-height: 96px; }
         .management-card { min-height: 330px; padding: 30px; }
-        .site-footer { padding-bottom: 42px; }
-        .mobile-cta { display: none; }
-      }
-
-      /* Keep iPad-width headers on the drawer pattern so nav labels do not wrap into narrow columns. */
-      @media (min-width: 980px) and (max-width: 1179px) {
-        html { scroll-padding-top: calc(72px + env(safe-area-inset-top)); }
-        .site-header .header-inner { min-height: 72px; }
-        .menu-toggle { display: inline-flex; }
-        .nav-backdrop { display: block; }
-        .nav-label { display: block; }
-        .site-nav {
-          position: fixed;
-          top: calc(72px + env(safe-area-inset-top));
-          right: 0;
-          bottom: 0;
-          width: min(88vw, 390px);
-          display: block;
-          padding: 22px max(20px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
-          overflow-y: auto;
-          background: var(--paper);
-          transform: translateX(105%);
-          visibility: hidden;
-          pointer-events: none;
-        }
-        .site-nav.open { transform: translateX(0); visibility: visible; pointer-events: auto; }
-        .nav-links { display: grid; gap: 0; }
-        .nav-links > a:not(.nav-cta) {
-          min-height: 55px;
-          border-bottom: 1px solid var(--line);
-          font-family: var(--font-display);
-          font-size: var(--type-heading);
-        }
-        .nav-links > a:not(.nav-cta)::after { display: inline; }
-        .nav-cta { width: 100%; min-height: 52px; margin: 22px 0 0; padding: 13px 20px; font-size: var(--type-body); }
-        .nav-socials { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin: 22px 0 0; }
-        .nav-socials .social-chip {
-          width: 100%;
-          height: auto;
-          min-height: 44px;
-          padding: 0;
-          border: 1px solid var(--line);
-          border-radius: 999px;
-          background: var(--canvas);
-        }
-        .nav-socials .brand-icon { width: 20px; height: 20px; }
-      }
-
-      @media (max-width: 1179px) {
-        .site-header { position: fixed; left: 0; right: 0; }
-        #main-content { padding-top: calc(72px + env(safe-area-inset-top)); }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -1432,54 +1141,7 @@ const faqItems = [
     </style>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">본문으로 바로가기</a>
-
-    <header class="site-header">
-      <div class="container header-inner">
-        <a class="brand-home" href="#top" aria-label="4steps Book Club 홈">
-          <img class="brand-logo" src="/images/logo/logotype-light.svg" alt="" width="351" height="150" />
-        </a>
-        <button id="menu-toggle" class="menu-toggle" type="button" aria-label="메뉴 열기" aria-controls="site-nav" aria-expanded="false">
-          <i class="menu-icon-open" data-lucide="menu" aria-hidden="true"></i>
-          <i class="menu-icon-close" data-lucide="x" aria-hidden="true"></i>
-        </button>
-        <nav id="site-nav" class="site-nav" aria-label="주요 메뉴">
-          <p class="nav-label">4STEPS 주요 메뉴</p>
-          <div class="nav-links">
-            <a href="#about">4steps의 차이</a>
-            <a href="#method">4steps 방식</a>
-            <a href="#class-content">수업 자료</a>
-            <a href="#faculty">강사진</a>
-            <a href="#level">레벨 안내</a>
-            <a href="#management">학습 관리</a>
-            <a href="#faq">FAQ</a>
-            <a href="#notices">공지사항</a>
-            <a href="#consulting" class="button button-primary nav-cta">무료 레벨테스트</a>
-          </div>
-          <div class="nav-socials" aria-label="소셜 채널">
-            <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="네이버 블로그 열기 (새 창)" title="네이버 블로그">
-              <img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" />
-              <span class="social-label">네이버</span>
-            </a>
-            <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer" aria-label="카카오톡 채널 열기 (새 창)" title="카카오톡 채널">
-              <img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" />
-              <span class="social-label">카카오</span>
-            </a>
-            <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 열기 (새 창)" title="인스타그램">
-              <img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" />
-              <span class="social-label">인스타</span>
-            </a>
-            <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer" aria-label="Threads 열기 (새 창)" title="Threads">
-              <img class="brand-icon" src="/images/social/threads.png" width="20" height="20" alt="" />
-              <span class="social-label">Threads</span>
-            </a>
-          </div>
-        </nav>
-      </div>
-    </header>
-    <div id="nav-backdrop" class="nav-backdrop" aria-hidden="true"></div>
-
-    <main id="main-content" tabindex="-1">
+    <SiteChrome homeHref="#top" sectionPrefix="" enableMenuScript={false}>
       <section id="top" class="hero">
         <div class="container">
           <div class="hero-grid">
@@ -1842,49 +1504,8 @@ const faqItems = [
           </div>
         </div>
       </section>
-    </main>
 
-    <footer class="site-footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-brand-column">
-            <a class="footer-brand" href="#top" aria-label="4steps Book Club 홈">
-              <img class="footer-logo" src="/images/logo/logotype-dark.svg" alt="" width="351" height="150" />
-              <span class="footer-method">READ · THINK · SPEAK · WRITE</span>
-            </a>
-            <p class="footer-audience">국제학교·해외 유학생을 위한 프리미엄 주니어 Reading &amp; Writing Club</p>
-            <p class="footer-tagline">읽은 책이, 아이의 문장이 되도록.</p>
-          </div>
-
-          <div class="footer-nav-column">
-            <span class="footer-section-label">4STEPS 둘러보기</span>
-            <nav class="footer-links" aria-label="푸터 메뉴"><a href="#about">4steps의 차이</a><a href="#method">4steps 방식</a><a href="#class-content">수업 자료</a><a href="#faculty">강사진</a><a href="#level">레벨 안내</a><a href="#management">학습 관리</a><a href="#faq">FAQ</a><a href="#notices">공지사항</a><a href="#consulting">무료 레벨테스트</a></nav>
-            <div class="footer-social-block">
-              <span class="footer-section-label">소셜 채널</span>
-              <div class="footer-socials">
-                <a class="social-chip" href="https://m.blog.naver.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/naver-blog.png" width="20" height="20" alt="" /> 네이버 블로그</a>
-                <a class="social-chip" href="https://pf.kakao.com/_UxlvxnX" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/kakao-channel.png" width="20" height="20" alt="" /> 카카오톡</a>
-                <a class="social-chip" href="https://www.instagram.com/4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/instagram.webp" width="20" height="20" alt="" /> Instagram</a>
-                <a class="social-chip threads-chip" href="https://www.threads.com/@4stepsbookclub" target="_blank" rel="noopener noreferrer"><img class="brand-icon" src="/images/social/threads.png" width="20" height="20" alt="" /> Threads</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="business-info">
-          <span class="footer-section-label">연락처 및 사업자 정보</span>
-          <div class="business-details">
-            <p><span class="business-item"><strong>상호</strong> 4스텝스북클럽온라인원격학원</span><span class="business-item"><strong>사업자등록번호</strong> 610-93-10022</span><span class="business-item"><strong>대표자</strong> 박소연</span></p>
-            <p><span class="business-item"><strong>E-mail</strong> <a href="mailto:4stepsbookclub@gmail.com">4stepsbookclub@gmail.com</a></span><span class="business-item"><strong>Phone</strong> <a href="tel:01088354913">010-8835-4913</a></span></p>
-            <p><span class="business-item">서울특별시 강남구 영동대로 602, 6층 Z175호 (삼성동)</span></p>
-            <p><span class="business-item"><strong>학원설립·운영등록번호</strong> 제15451호</span><span class="business-item">4스텝스북클럽원격학원(4stepsbookclub)</span><span class="business-item"><strong>신고기관명</strong> 서울특별시 강남서초교육지원청</span></p>
-          </div>
-          <p class="copyright">© 2026 4STEPS BOOK CLUB. ALL RIGHTS RESERVED.</p>
-        </div>
-      </div>
-    </footer>
-
-    <a id="mobile-cta" class="mobile-cta" href="#consulting"><span>우리 아이의 첫 step 찾기</span><b>무료 레벨테스트</b></a>
+    </SiteChrome>
 
     <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption" aria-hidden="true" inert>
       <div class="modal-dialog">
