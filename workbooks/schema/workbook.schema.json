@@ -30,21 +30,31 @@
       "description": "Stable system-generated workbook identifier."
     },
     "bookTitle": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 90
     },
     "author": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 80
     },
     "seriesTitle": {
+      "type": "string",
       "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 80,
       "default": "4steps Book Club Workbook"
     },
     "lessonRange": {
+      "type": "string",
       "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 60,
       "description": "Human-readable cover label, for example: Lessons 1–12."
     },
     "coverSubtitle": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 180
     },
     "lessonFiles": {
       "type": "array",

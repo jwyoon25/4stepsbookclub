@@ -185,6 +185,113 @@ test("migrates legacy Writing hints into shared response guidance", async () => 
   });
 });
 
+test("rejects cover text beyond its standardized field limit", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.title = "T".repeat(101);
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /\/title/);
+        assert.match(error.message, /more than 100 characters/);
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects individually valid lesson-cover fields that overflow together", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.title = "A focused lesson title";
+    lesson.readingRange = "Chapters 1–10";
+    lesson.framingNote = "framing ".repeat(40).trim();
+    lesson.studentInstructions = "instruction ".repeat(33).trim();
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /\/lesson-cover/);
+        assert.match(error.message, /standardized workbook layout/);
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects a prompt and guidance combination that cannot fit its response space", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.sections.paragraphWriting[0].prompt = "prompt ".repeat(92).trim();
+    lesson.sections.paragraphWriting[0].responseGuidance = [
+      "guide ".repeat(26).trim(),
+      "evidence ".repeat(20).trim(),
+    ];
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /\/sections\/paragraphWriting\/0/);
+        assert.match(error.message, /choose fewer first-page response lines/);
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects unbroken text that cannot wrap inside the page measure", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.sections.readingComprehension[0].prompt = "P".repeat(81);
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(
+          error.message,
+          /\/sections\/readingComprehension\/0\/prompt/,
+        );
+        assert.match(error.message, /unbroken text segment of 81 characters/);
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects a vocabulary entry whose fields cannot fit together", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.sections.vocabulary[0] = {
+      term: "term ".repeat(10).trim(),
+      koreanMeaning: "뜻 ".repeat(45).trim(),
+      definition: "detail ".repeat(82).trim(),
+      bookExcerpt: "evidence ".repeat(65).trim(),
+      excerptContext: "context ".repeat(85).trim(),
+      chapterReference: "reference ".repeat(8).trim(),
+    };
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /\/sections\/vocabulary\/0/);
+        assert.match(error.message, /estimated layout size/);
+        return true;
+      },
+    );
+  });
+});
+
 test("rejects duplicate lesson numbers", async () => {
   await withTemporaryPackage(
     async ({ packageDirectory, manifestPath, lessonPath }) => {

@@ -27,17 +27,25 @@
       "minimum": 1
     },
     "title": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 100
     },
     "readingRange": {
+      "type": "string",
       "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 80,
       "description": "Human-readable chapter or page range."
     },
     "framingNote": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 400
     },
     "studentInstructions": {
-      "$ref": "#/$defs/nonEmptyText"
+      "type": "string",
+      "$ref": "#/$defs/nonEmptyText",
+      "maxLength": 400
     },
     "sections": {
       "type": "object",
@@ -95,10 +103,14 @@
       ],
       "properties": {
         "prompt": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700
         },
         "quotation": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700
         },
         "responseSpace": {
           "$ref": "#/$defs/responseSpace",
@@ -111,7 +123,9 @@
           "$ref": "#/$defs/responseGuidance"
         },
         "teacherGuidance": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 1200
         }
       }
     },
@@ -124,10 +138,14 @@
       ],
       "properties": {
         "prompt": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700
         },
         "quotation": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700
         },
         "responseSpace": {
           "$ref": "#/$defs/responseSpace",
@@ -140,7 +158,9 @@
           "$ref": "#/$defs/responseGuidance"
         },
         "teacherGuidance": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 1200
         }
       }
     },
@@ -152,7 +172,9 @@
       ],
       "properties": {
         "prompt": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700
         },
         "hints": {
           "type": "array",
@@ -172,10 +194,14 @@
           "$ref": "#/$defs/responseGuidance"
         },
         "exampleStructureOrRubric": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 1200
         },
         "teacherGuidance": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 1200
         }
       }
     },
@@ -183,8 +209,11 @@
       "type": "array",
       "description": "Optional tutor-authored response guidance or requirements shown unchanged in both student and teacher editions.",
       "minItems": 1,
+      "maxItems": 6,
       "items": {
-        "$ref": "#/$defs/nonEmptyText"
+        "type": "string",
+        "$ref": "#/$defs/nonEmptyText",
+        "maxLength": 180
       }
     },
     "responseSpace": {
@@ -256,23 +285,35 @@
       ],
       "properties": {
         "term": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 60
         },
         "koreanMeaning": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 100
         },
         "definition": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 600
         },
         "bookExcerpt": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 600
         },
         "excerptContext": {
+          "type": "string",
           "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 700,
           "description": "What is happening in the story around the excerpt; not a word-usage note."
         },
         "chapterReference": {
-          "$ref": "#/$defs/nonEmptyText"
+          "type": "string",
+          "$ref": "#/$defs/nonEmptyText",
+          "maxLength": 80
         }
       }
     }

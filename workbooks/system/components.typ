@@ -34,6 +34,33 @@
   )),
 )
 
+// Select the largest approved size whose measured content fits a fixed cover
+// region. Measurement is local and deterministic; unlike page-position queries,
+// it cannot change pagination between layout passes.
+#let fit-cover-text(
+  body,
+  width,
+  height,
+  sizes,
+  font: serif,
+  weight: "regular",
+  fill: ink,
+) = context {
+  let chosen = sizes.last()
+  for size in sizes {
+    let candidate = text(font: font, size: size, weight: weight, fill: fill, body)
+    if measure(candidate, width: width).height <= height {
+      chosen = size
+      break
+    }
+  }
+  box(
+    width: width,
+    height: height,
+    text(font: font, size: chosen, weight: weight, fill: fill, body),
+  )
+}
+
 // --- Page furniture ---------------------------------------------------------
 //
 // The spine: the rust margin rule and the section tabs. Together they are what
@@ -260,9 +287,13 @@
     top + left,
     dx: cover-content-left - margin-left,
     dy: 74mm - margin-top,
-    box(width: page-width - cover-content-left - 34mm, text(
-      font: serif, size: size-cover-title, weight: "bold", fill: ink, book,
-    )),
+    fit-cover-text(
+      book,
+      page-width - cover-content-left - 34mm,
+      54mm,
+      (size-cover-title, 40pt, 36pt, 32pt, 28pt, 24pt),
+      weight: "bold",
+    ),
   )
   place(
     top + left,
@@ -386,7 +417,13 @@
   place(top + left, dx: cover-content-left - margin-left, dy: 80mm - margin-top,
     box(width: page-width - cover-content-left - cover-content-right, height: 118mm, {
       place(top + left,
-        box(width: 124mm, text(font: serif, size: size-lesson-title, weight: "bold", fill: ink, title)),
+        fit-cover-text(
+          title,
+          124mm,
+          11mm,
+          (size-lesson-title, 22pt, 20pt, 18pt, 16pt, 14pt, 12pt),
+          weight: "bold",
+        ),
       )
       place(top + left, dy: 12.8mm,
         text(font: serif, size: 12pt, fill: muted, chapters),
@@ -556,7 +593,7 @@
   step: 1,
 ) = {
   block(
-    breakable: false,
+    breakable: true,
     width: 100%,
     above: space-between-questions,
     below: 0pt,
@@ -696,7 +733,7 @@
   chapter-reference: none,
   index: 0,
 ) = block(
-  breakable: false,
+  breakable: true,
   width: 100%,
   above: 0mm,
   below: 0mm,

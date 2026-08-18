@@ -55,6 +55,21 @@ type or manage them.
   Analysis question, or Writing prompt. It is a list of student-facing
   directions or requirements and is rendered unchanged in both editions.
 
+### Layout-safety limits
+
+The schema places generous maximum lengths on cover copy, prompts, quotations,
+guidance items, teacher notes, rubrics, and vocabulary fields. A guidance list
+contains at most six concise requirements. These limits are part of the editor
+contract: they let the staff UI warn a tutor before content reaches PDF export.
+
+The package loader also checks combinations that can overflow even when every
+individual field is valid—for example, a long prompt plus six long guidance
+items beside a 14-line response area. Korean and Han characters count as wider
+layout units in this check. An individual unbroken segment is limited to 80
+characters so pasted URLs or malformed text cannot run beyond the page edge. The
+system never truncates or rewrites tutor content; it rejects unsafe content with
+the exact lesson and item path so the tutor can revise it deliberately.
+
 JSON Schema's `default` keyword documents a value; validation does not insert it
 into the source file. The builder and renderer must apply these defaults when a
 field is absent:
@@ -183,6 +198,8 @@ With no path, the command validates the example package. The loader in
 - Every lesson file validates against `lesson.schema.json`.
 - Lesson numbers are unique.
 - Manifest order is preserved as the complete-PDF order.
+- Cover, question, guidance, and vocabulary combinations fit the standardized
+  page geometry.
 
 It returns normalized lesson data with omitted section defaults filled in.
 Response presets remain semantic; mapping them to physical lines and pages stays

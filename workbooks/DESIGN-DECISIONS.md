@@ -183,10 +183,12 @@ green–coral–teal–purple sequence for Read, Think, Speak, and Write.
 - **Workbook covers** carry a 24 mm full-height rail split into four equal colour
   bands. Each band names its step and section vertically. The wide brand logotype,
   a thin rust rule, large book title, author, lesson range, and website mark form
-  the remaining hierarchy.
+  the remaining hierarchy. Long titles step down through an approved size scale
+  to remain inside the fixed title region.
 - **Lesson covers** use the same four colour bands without vertical labels. They
   show the lesson identity, chapter range, framing copy, optional instructions,
-  derived section item counts, and Google Docs/teacher note.
+  derived section item counts, and Google Docs/teacher note. The lesson title
+  uses the same measured fit behavior within its own fixed region.
 - **Interior pages** keep a rust rule at 24 mm and begin content at 29 mm. Plain
   question numbers hang outside the rule. Four tabs at the outer edge repeat the
   method colours, with the current step wider and more saturated.
