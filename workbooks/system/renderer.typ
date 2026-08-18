@@ -148,6 +148,7 @@
     section-names.at(3),
     "Return to these words and the moments in which they appear in the assigned reading.",
     continued-label: true,
+    repair-running-head: true,
   )
   for ((index, item)) in items.enumerate() {
     let number = index + 1

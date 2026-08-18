@@ -518,7 +518,7 @@
 // ties the section to the page's spine — a bar that floats free of the rule
 // reads as a stray swatch, which is exactly how the previous draft's did.
 
-#let section-band(step, name, description, continued-label: false) = {
+#let section-band(step, name, description, continued-label: false, repair-running-head: false) = {
   section-marker(name, step: step, continued: continued-label)
   let c = step-fill.at(step - 1)
   let overhang = margin-left - rule-x
@@ -528,6 +528,17 @@
     above: space-band-above,
     below: space-band-below,
     box(width: 100%, height: 23.5mm, {
+      if repair-running-head {
+        // Full writing surfaces can leave Typst's final header pass carrying
+        // the previous section even though this band is on the new page. Mask
+        // only the right header slot and redraw this section's correct label.
+        place(top + right, dy: -6mm, box(
+          width: 80mm,
+          height: 5.5mm,
+          fill: white,
+          align(top + right, caps(name, size: size-furniture, fill: ink-soft)),
+        ))
+      }
       place(top + left, dx: -overhang, rect(
         width: block-width + overhang, height: band-bar-height,
         fill: c, radius: (right: tab-radius), stroke: none,
