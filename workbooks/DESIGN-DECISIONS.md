@@ -65,6 +65,13 @@ This keeps the page quiet while staying unambiguous across a whole book. Printin
 `L3-C2` beside every question would be more foolproof but noisier, and was
 rejected on those grounds.
 
+### Page references belong inside the response
+
+When students quote or refer to evidence, they put the relevant page number in
+parentheses within their answer, for example `(p. 47)`. Questions do not carry a
+separate "Found on page(s)" field. Keeping the citation beside the sentence or
+quotation makes the connection clearer and removes redundant form furniture.
+
 ### Where "how to use this workbook" lives
 
 Because there is no reliable back-of-cover page, the standing reference material
@@ -175,8 +182,7 @@ and lets the parts that are already functional carry the brand:
   structure, so every short page looked like a mistake.
 - **Solid rules mean "write here"; dashed rules mean "fill this in."** The mark
   alternates the two, and the workbook reuses that alternation as a signal rather
-  than as texture. Response lines are solid; name, date, and "found on page(s)"
-  fields are dashed.
+  than as texture. Response lines are solid; name and date fields are dashed.
 - **Covers reproduce the paper in full** — cream ground, rules edge to edge, the
   rust rule, the logomark at full strength. Nobody writes an answer on a cover,
   so it is the one place the brand is allowed to be loud.

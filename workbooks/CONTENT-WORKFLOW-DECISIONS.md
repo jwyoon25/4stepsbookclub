@@ -21,6 +21,9 @@ between student and teacher versions.
 
 Tutors never edit Typst or manually place page breaks.
 
+Students put page references in parentheses inside their written response, for
+example `(p. 47)`. Questions do not include a separate `Found on page(s)` field.
+
 ## Full-workbook information
 
 Required:

@@ -320,7 +320,7 @@
   stack(
     spacing: 7mm,
     instruction-row("1", "Choose how you will respond", [Print and handwrite, annotate the PDF in an app such as GoodNotes, or type longer responses in Google Docs.]),
-    instruction-row("2", "Point back to the book", [Use the “Found on page(s)” field whenever it appears. A strong answer identifies the detail that supports it.]),
+    instruction-row("2", "Cite the page in your response", [When you quote or refer to a specific detail, put the page number in parentheses in your answer, for example (p. 47).]),
     instruction-row("3", "Label typed answers", [In Google Docs, label each answer with its lesson, section, and question code: L3-C2, L3-A1, or L3-W1.]),
     instruction-row("4", "Use the four sections differently", [Comprehension checks what happened; Analysis asks what it means; Writing develops an argument or interpretation; Vocabulary helps you return to important moments in the chapter.]),
   )
@@ -463,16 +463,6 @@
 
 // --- Question unit ----------------------------------------------------------
 //
-// Where in the book the answer came from. Carried over from the existing 4steps
-// workbook, where every question has a "page(s):" field — it makes students
-// evidence their answers instead of recalling them, which is the whole point of
-// a close-reading workbook.
-#let cite-field(label: "Found on page(s)") = block(above: 3mm, below: 0pt, width: 100%, align(right, {
-  caps(label, size: 6.5pt, fill: faint)
-  h(2.5mm)
-  box(width: 22mm, place(bottom + left, dy: -0.6mm, line(length: 100%, stroke: stroke-field)))
-}))
-
 // A passage quoted from the book, so a student never confuses the book's voice
 // with the tutor's question.
 #let quoted(step, body) = block(
@@ -531,7 +521,6 @@
   prompt,
   lines: lines-medium,
   quote: none,
-  cite: true,
   hints: none,
   teacher: false,
   teacher-guidance: none,
@@ -560,7 +549,6 @@
       } else {
         v(space-prompt-to-response)
         response-lines(lines)
-        if cite { cite-field() }
       }
     },
   )
@@ -580,7 +568,7 @@
 // A writing prompt gets a page of its own, without ever forcing a page break.
 // See DESIGN-DECISIONS.md — an explicit break here would strand the section band
 // on the page it left behind, which is the orphan this design exists to prevent.
-#let writing-prompt(number, prompt, hints: none, quote: none, cite: false) = {
+#let writing-prompt(number, prompt, hints: none, quote: none) = {
   context {
     let step = active-section().step
     block(
@@ -596,7 +584,6 @@
         block(below: 0pt, prompt)
         if quote != none { quoted(step, quote) }
         if hints != none { scaffold(step, hints) }
-        if cite { cite-field() }
         v(space-prompt-to-response)
         block(above: 0pt, below: 0pt, response-lines(lines-writing-min))
       },

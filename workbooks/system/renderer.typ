@@ -29,7 +29,6 @@
   str(number),
   item.at("prompt"),
   quote: optional(item, "quotation"),
-  cite: false,
   hints: hints,
   teacher: true,
   teacher-guidance: optional(item, "teacherGuidance"),
@@ -42,7 +41,6 @@
   step,
   section-name,
   hints: none,
-  cite: true,
 ) = {
   let space = item.at("responseSpace")
   let mode = space.at("mode")
@@ -57,7 +55,6 @@
       prompt,
       lines: first-page-count,
       quote: quote,
-      cite: cite,
       hints: hints,
     )
 
@@ -79,7 +76,6 @@
       prompt,
       hints: hints,
       quote: quote,
-      cite: cite,
     )
 
     let page-count = if mode == "multiple-pages" { space.at("pages") } else { 1 }
@@ -130,7 +126,6 @@
         3,
         name,
         hints: hints,
-        cite: false,
       )
     }
   }
@@ -184,7 +179,7 @@
     sections.at("readingComprehension"),
     1,
     section-names.at(0),
-    "Answer from the text. Keep factual responses concise and note the page where you found the evidence.",
+    "Answer from the text. Keep factual responses concise and cite supporting pages in parentheses.",
     edition,
   )
   render-question-section(
@@ -198,6 +193,10 @@
     ruled-tail("Anything you noticed that the questions didn't ask about")
   }
   render-writing-section(sections.at("paragraphWriting"), edition)
+  // Student writing surfaces deliberately fill their final page. Make the
+  // following section transition explicit so Vocabulary receives its own
+  // stable running furniture instead of being pushed there implicitly.
+  if edition != "Teacher" { pagebreak(weak: true) }
   render-vocabulary-section(sections.at("vocabulary"), edition)
 }
 
