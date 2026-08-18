@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import AnnotatedEssay from "../components/AnnotatedEssay.astro";
-import { formatNoticeDate, noticeImageAlt, sortNotices } from "../data/notices";
+import { sortNotices } from "../data/notices";
 
 // Shared page metadata. Title and description feed both the document head and
 // the Open Graph / Twitter link preview so they can never drift apart.
@@ -12,12 +12,19 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL("/images/og/og-default.png", Astro.site);
 
 const noticeEntries = sortNotices(await getCollection("notices"));
+const noticesPerPage = 8;
 const notices = await Promise.all(
-  noticeEntries.slice(0, 3).map(async (entry) => ({
+  noticeEntries.map(async (entry) => ({
     entry,
     Content: (await render(entry)).Content
   }))
 );
+const noticeDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Seoul",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+});
 
 const classContentGalleries = [
   {
@@ -1095,22 +1102,26 @@ const faqItems = [
       .faq-toggle-icon::after { transform: translate(-50%, -50%) rotate(90deg); }
       .faq-item[open] .faq-toggle-icon { transform: rotate(45deg); }
       .faq-answer { padding: 0 40px 22px 0; color: var(--muted); font-size: var(--type-small); line-height: 1.8; word-break: keep-all; }
-      .notices-section { background: var(--butter); }
-      .notice-list { display: grid; gap: 16px; }
-      .notice-preview { display: grid; gap: 13px; padding: 16px; border: 1px solid rgba(23, 52, 47, 0.12); border-radius: var(--radius-md); background: var(--white); box-shadow: 0 10px 28px rgba(23, 52, 47, 0.07); }
-      .notice-preview-media { aspect-ratio: 16 / 8; overflow: hidden; border-radius: 13px; background: rgba(255, 255, 255, 0.46); }
-      .notice-preview-media img { width: 100%; height: 100%; object-fit: cover; }
-      .notice-preview-meta { display: block; color: rgba(23, 52, 47, 0.58); font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: 0.04em; }
-      .notice-preview h4 { margin-top: 5px; color: var(--ink); font-family: var(--font-display); font-size: 20px; line-height: 1.45; }
-      .notice-preview h4 a:hover { color: var(--coral-dark); }
-      .notice-preview-body { max-height: 5.2em; margin-top: 7px; overflow: hidden; color: rgba(23, 52, 47, 0.69); font-size: var(--type-small); line-height: 1.72; }
-      :global(.notice-preview-body p) { margin: 0; }
-      :global(.notice-preview-body p + p) { margin-top: 8px; }
-      :global(.notice-preview-body ul), :global(.notice-preview-body ol) { margin: 5px 0 0 18px; }
-      .notice-preview-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 9px; color: var(--ink); font-size: var(--type-label); font-weight: var(--weight-bold); }
-      .notice-preview-link:hover { color: var(--coral-dark); }
-      .notice-more { margin-top: 24px; background: var(--ink); color: white; }
-      .notice-empty { padding: 24px; border: 1px solid rgba(23, 52, 47, 0.12); border-radius: var(--radius-md); background: var(--white); color: rgba(23, 52, 47, 0.69); font-size: var(--type-small); line-height: var(--leading-body); }
+      .notices-section { background: var(--canvas); }
+      .notice-board { border-top: 1px solid var(--line); }
+      .notice-row { border-bottom: 1px solid var(--line); }
+      .notice-row-link { display: block; padding: 11px 0 13px; }
+      .notice-row-link:hover .notice-row-title { color: var(--coral-dark); }
+      .notice-row-meta { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--muted); font-size: var(--type-label); font-weight: var(--weight-semibold); line-height: 1.35; }
+      .notice-row-number { color: var(--muted); }
+      .notice-row-date { flex: 0 0 auto; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; white-space: nowrap; }
+      .notice-row-title { margin-top: 5px; color: var(--ink); font-size: clamp(15px, 1.6vw, 18px); font-weight: var(--weight-semibold); line-height: 1.35; word-break: keep-all; transition: color 180ms ease; }
+      .notice-row-description { display: -webkit-box; max-width: 760px; max-height: 1.5em; margin-top: 2px; overflow: hidden; color: var(--muted); font-size: var(--type-label); line-height: 1.5; word-break: keep-all; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+      :global(.notice-row-description p) { margin: 0; }
+      :global(.notice-row-description p + p) { margin-top: 6px; }
+      :global(.notice-row-description ul), :global(.notice-row-description ol) { margin: 4px 0 0 17px; }
+      .notice-pagination { display: flex; align-items: center; justify-content: center; gap: 19px; margin-top: 16px; }
+      .notice-page-button { min-width: 22px; min-height: 32px; padding: 4px 3px; border: 0; background: transparent; color: var(--muted); font-size: var(--type-small); font-weight: var(--weight-semibold); cursor: pointer; }
+      .notice-page-button[aria-current="page"] { color: var(--coral-dark); font-weight: var(--weight-bold); }
+      .notice-page-button:hover { color: var(--ink); }
+      .notice-more { display: flex; width: fit-content; align-items: center; gap: 6px; margin: 16px auto 0; color: var(--ink); font-size: var(--type-small); font-weight: var(--weight-bold); }
+      .notice-more:hover { color: var(--coral-dark); }
+      .notice-empty { padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: var(--type-small); line-height: var(--leading-body); }
 
       .consulting { background: var(--ink); color: white; }
       .consulting::before { content: ""; position: absolute; right: -110px; top: 40px; width: 250px; height: 250px; border: 45px solid rgba(242, 197, 92, 0.14); border-radius: 50%; }
@@ -1239,6 +1250,11 @@ const faqItems = [
         .about-positioning, .problem-panel { padding: 24px 20px; }
         .consult-quick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .consult-quick .button { min-width: 0; padding-inline: 11px; font-size: var(--type-body); }
+        .notice-row-link { padding: 10px 0 12px; }
+        .notice-row-meta { align-items: flex-start; gap: 12px; font-size: var(--type-label); }
+        .notice-row-title { margin-top: 5px; font-size: 15px; }
+        .notice-row-description { margin-top: 2px; }
+        .notice-pagination { gap: 13px; margin-top: 13px; }
       }
 
       @media (max-width: 759px) {
@@ -1299,7 +1315,6 @@ const faqItems = [
         .path-step { grid-template-columns: 37px 1fr; }
         .path-step:not(:last-child)::after { left: auto; right: -6px; top: 50%; bottom: auto; width: 20px; height: 1px; }
         .roadmap { margin-top: 94px; }
-        .notice-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .consult-grid { grid-template-columns: minmax(0, .8fr) minmax(480px, 1.2fr); align-items: start; }
         .consult-form { padding: 32px; }
         .footer-grid { grid-template-columns: minmax(280px, .82fr) minmax(0, 1.18fr); align-items: start; gap: 72px; }
@@ -1778,29 +1793,31 @@ const faqItems = [
         <div class="container">
           <div class="section-heading">
             <p class="section-kicker">NOTICES</p>
-            <h2 id="notice-title" class="section-title">4steps의<br />새 소식을 확인하세요</h2>
-            <p class="section-copy">새로운 수업 개설과 프로그램 소식을 이곳에서 직접 안내드립니다.</p>
+            <h2 id="notice-title" class="section-title">공지사항</h2>
+            <p class="section-copy">새로운 수업 개설과 프로그램 소식을 확인하세요.</p>
           </div>
           {notices.length > 0 ? (
             <>
-              <div class="notice-list">
-                {notices.map(({ entry, Content }) => (
-                  <article class="notice-preview">
-                    {entry.data.images[0] && (
-                      <a class="notice-preview-media" href={`/announcements/${entry.id}`} aria-label={`${entry.data.title} 자세히 보기`}>
-                        <img src={entry.data.images[0]} alt={noticeImageAlt(entry.data.title, 0)} width="640" height="320" loading="lazy" decoding="async" />
-                      </a>
-                    )}
-                    <div>
-                      <time class="notice-preview-meta" datetime={entry.data.postedAt.toISOString()}>{formatNoticeDate(entry.data.postedAt)}</time>
-                      <h4><a href={`/announcements/${entry.id}`}>{entry.data.title}</a></h4>
-                      <div class="notice-preview-body"><Content /></div>
-                      <a class="notice-preview-link" href={`/announcements/${entry.id}`}>자세히 보기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
-                    </div>
+              <div id="notice-board" class="notice-board" data-notice-board data-page-size={noticesPerPage} aria-label="공지사항 목록">
+                {notices.map(({ entry, Content }, index) => (
+                  <article class="notice-row" data-notice-row data-notice-index={index}>
+                    <a class="notice-row-link" href={`/announcements/${entry.id}`} aria-label={`${entry.data.title} 자세히 보기`}>
+                      <div class="notice-row-meta">
+                        <span class="notice-row-number">No. {noticeEntries.length - index}</span>
+                        <time class="notice-row-date" datetime={entry.data.postedAt.toISOString()}>{noticeDateFormatter.format(entry.data.postedAt)}</time>
+                      </div>
+                      <h3 class="notice-row-title">{entry.data.title}</h3>
+                      <div class="notice-row-description"><Content /></div>
+                    </a>
                   </article>
                 ))}
               </div>
-              <a class="button notice-more" href="/announcements/">전체 공지 보기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+              <nav class="notice-pagination" data-notice-pagination aria-label="공지사항 페이지 선택">
+                {Array.from({ length: Math.ceil(notices.length / noticesPerPage) }, (_, index) => (
+                  <button class="notice-page-button" type="button" data-notice-page={index + 1} aria-label={`${index + 1}페이지`} aria-current={index === 0 ? "page" : undefined}>{index + 1}</button>
+                ))}
+              </nav>
+              <a class="notice-more" href="/announcements/">전체 공지 보기 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
             </>
           ) : (
             <p class="notice-empty">새로운 수업 개설 소식은 이곳에서 안내드립니다.</p>
@@ -1971,6 +1988,32 @@ const faqItems = [
         if (desktopNavigation.addEventListener) desktopNavigation.addEventListener("change", syncNavigation);
         else desktopNavigation.addListener(syncNavigation);
         syncNavigation();
+
+        const noticeBoard = document.querySelector("[data-notice-board]");
+        const noticePagination = document.querySelector("[data-notice-pagination]");
+        if (noticeBoard && noticePagination) {
+          const noticeRows = Array.from(noticeBoard.querySelectorAll("[data-notice-row]"));
+          const noticePageButtons = Array.from(noticePagination.querySelectorAll("[data-notice-page]"));
+          const noticePageSize = Number(noticeBoard.dataset.pageSize) || 3;
+          const noticePageCount = Math.max(1, Math.ceil(noticeRows.length / noticePageSize));
+
+          const renderNoticePage = (requestedPage) => {
+            const currentPage = Math.min(Math.max(Number(requestedPage) || 1, 1), noticePageCount);
+            noticeRows.forEach((row, index) => {
+              row.hidden = Math.floor(index / noticePageSize) + 1 !== currentPage;
+            });
+            noticePageButtons.forEach((button) => {
+              const isCurrent = Number(button.dataset.noticePage) === currentPage;
+              if (isCurrent) button.setAttribute("aria-current", "page");
+              else button.removeAttribute("aria-current");
+            });
+          };
+
+          noticePageButtons.forEach((button) => button.addEventListener("click", () => {
+            renderNoticePage(button.dataset.noticePage);
+          }));
+          renderNoticePage(1);
+        }
 
         const modal = document.getElementById("image-modal");
         const modalClose = document.getElementById("modal-close");
