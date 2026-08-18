@@ -56,10 +56,10 @@
 // here as a signal rather than as texture.
 
 #let ruled = rgb("#c6d0c8") // handwriting guides; dark enough for a home laser
-#let stroke-ruled = 0.5pt + ruled
-#let stroke-hairline = 0.4pt + line-soft
-#let stroke-field = (paint: muted.lighten(45%), thickness: 0.5pt, dash: "densely-dashed")
-#let stroke-margin = 0.7pt + coral-deep
+#let stroke-ruled = 0.2mm + ruled
+#let stroke-hairline = 0.25mm + line-soft
+#let stroke-field = (paint: rgb("#a8b3ae"), thickness: 0.2mm, dash: "densely-dashed")
+#let stroke-margin = 0.25mm + coral-deep
 
 // --- Typefaces --------------------------------------------------------------
 //
@@ -105,8 +105,8 @@
 #let margin-left = 29mm
 #let margin-right = 24mm
 
-#let head-ascent = 9mm
-#let foot-descent = 9mm
+#let head-ascent = 3.5mm
+#let foot-descent = 1mm
 
 #let block-width = page-width - margin-left - margin-right
 #let body-height = page-height - margin-top - margin-bottom
@@ -140,7 +140,7 @@
 #let space-between-questions = 6mm
 #let space-prompt-to-response = 1mm
 #let space-band-above = 9mm
-#let space-band-below = 6mm
+#let space-band-below = 9mm
 #let space-vocab-field = 2.4mm
 #let space-vocab-entry = 4.5mm
 

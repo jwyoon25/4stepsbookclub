@@ -137,8 +137,6 @@
   ),
 )
 
-#writing-continuation("1", [Is the narrator honest with us?])
-
 // --- Step 4: Vocabulary -----------------------------------------------------
 
 #section-band(

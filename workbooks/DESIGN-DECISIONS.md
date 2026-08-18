@@ -296,6 +296,17 @@ younger cohorts may want that raised. `line-gap` in `tokens.typ` is the single
 number most likely to need changing after the first real print with real
 students.
 
+The running head sits at 14 mm from the top edge and the footer at 14 mm from
+the bottom edge, matching the approved HTML composition. Handwriting and dashed
+field rules are 0.2 mm; the rust spine and quiet panel borders are 0.25 mm. The
+section opener follows the reference's fixed vertical stack so its step label,
+title, description, and first question do not drift as copy elsewhere changes.
+
+Vocabulary deliberately keeps the reference's roomier line-box rhythm: 2.4 mm
+before each field and 4.5 mm between entries, with enough breathing room around
+single-line fields to match the HTML layout. Pagination still happens between
+whole entries and remains content-dependent.
+
 Question numbers hang in the gutter outside the rule rather than indenting the
 text. They align down the page without taking measure from either the prompt or
 the answer lines.
