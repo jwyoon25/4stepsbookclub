@@ -16,3 +16,9 @@ content/
 The versioned definitions, field documentation, defaults, and a valid example
 are in [`../schema/`](../schema/README.md). No production curriculum has been
 added yet.
+
+Validate a workbook package from the repository root with:
+
+```bash
+npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
+```

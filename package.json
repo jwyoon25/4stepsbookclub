@@ -14,7 +14,12 @@
     "website:preview": "npm run preview --workspace website",
     "workbook:build": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
     "workbook:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
+    "workbook:validate": "node workbooks/scripts/validate-content.mjs",
     "workbook:specimen": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/specimen.typ workbooks/output/specimen.pdf",
     "workbook:specimen:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/specimen.typ workbooks/output/specimen.pdf"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

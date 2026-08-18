@@ -133,12 +133,21 @@ cover. It is not included in standalone lesson PDFs.
 
 ## Package-level validation
 
-The JSON Schemas validate individual files. The content build must additionally
-check that:
+Run the package validator from the repository root:
+
+```bash
+npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
+```
+
+With no path, the command validates the example package. The loader in
+`workbooks/lib/content.mjs` validates individual files and also checks that:
 
 - Every `lessonFiles` path exists inside the workbook directory.
+- A lesson path or symlink cannot escape the workbook directory.
 - Every lesson file validates against `lesson.schema.json`.
 - Lesson numbers are unique.
-- The manifest order is the order used in the complete PDF.
+- Manifest order is preserved as the complete-PDF order.
 
-These cross-file checks belong in the content validator added with the renderer.
+It returns normalized lesson data with omitted section defaults filled in.
+Response presets remain semantic; mapping them to physical lines and pages stays
+the renderer's responsibility.

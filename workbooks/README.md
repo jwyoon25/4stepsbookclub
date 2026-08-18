@@ -34,8 +34,15 @@ From the repository root:
 ```bash
 npm run workbook:specimen        # build the design specimen
 npm run workbook:specimen:watch  # rebuild it on every save
+npm run workbook:validate        # validate the example content package
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
+```
+
+Validate a production manifest by passing its path after `--`:
+
+```bash
+npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
 ```
 
 `workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
@@ -63,8 +70,12 @@ workbooks/
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
 │   └── logo/             # logomark and logotype, derived from the website assets
-├── content/              # Future book- and lesson-specific curriculum data.
+├── content/              # Production book- and lesson-specific curriculum data
+├── lib/
+│   └── content.mjs       # package loading, validation, and default application
 ├── output/               # Generated files; PDFs are ignored by Git.
+├── scripts/
+│   └── validate-content.mjs # command-line content validator
 ├── src/
 │   ├── main.typ          # Minimal Typst compilation smoke test.
 │   └── specimen.typ      # The design specimen.
@@ -76,10 +87,10 @@ workbooks/
 Components must not hard-code values. Change a workbook's feel by editing
 `tokens.typ`, not `components.typ`.
 
-The authoring requirements and JSON representation are settled, but the editor
-and renderer are not yet connected to them. The `content/`, `system/`, and
-`assets/` boundaries keep curriculum data independent from a particular
-authoring tool.
+The authoring requirements, JSON representation, and package loader are settled,
+but the editor and Typst renderer are not yet connected to them. The `content/`,
+`system/`, and `assets/` boundaries keep curriculum data independent from a
+particular authoring tool.
 
 ## Fonts
 

@@ -1,0 +1,218 @@
+import assert from "node:assert/strict";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+
+import {
+  defaultResponseSpaceFor,
+  loadWorkbookPackage,
+  WorkbookContentError,
+} from "../workbooks/lib/content.mjs";
+
+const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const examplePackage = join(
+  repositoryRoot,
+  "workbooks/schema/examples/example-book",
+);
+const exampleManifest = join(examplePackage, "workbook.json");
+
+async function readJson(filePath) {
+  return JSON.parse(await readFile(filePath, "utf8"));
+}
+
+async function writeJson(filePath, value) {
+  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function withTemporaryPackage(run) {
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "4steps-workbook-content-"));
+  const packageDirectory = join(temporaryRoot, "example-book");
+  await cp(examplePackage, packageDirectory, { recursive: true });
+
+  try {
+    return await run({
+      packageDirectory,
+      manifestPath: join(packageDirectory, "workbook.json"),
+      lessonPath: join(packageDirectory, "lessons/lesson-03.json"),
+    });
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+}
+
+test("loads a complete workbook package and applies semantic defaults", async () => {
+  const workbook = await loadWorkbookPackage(exampleManifest);
+
+  assert.equal(workbook.manifest.id, "example-book");
+  assert.equal(workbook.lessons.length, 1);
+  assert.equal(workbook.lessons[0].content.lessonNumber, 3);
+
+  const sections = workbook.lessons[0].content.sections;
+  assert.deepEqual(sections.readingComprehension[0].responseSpace, {
+    mode: "short-answer",
+  });
+  assert.deepEqual(sections.criticalThinkingAndAnalysis[0].responseSpace, {
+    mode: "short-paragraph",
+  });
+  assert.deepEqual(sections.paragraphWriting[0].responseSpace, {
+    mode: "full-page",
+  });
+
+  assert.deepEqual(sections.readingComprehension[1].responseSpace, {
+    mode: "custom-lines",
+    lines: 5,
+  });
+  assert.deepEqual(sections.criticalThinkingAndAnalysis[1].responseSpace, {
+    mode: "extended-answer",
+  });
+  assert.deepEqual(sections.paragraphWriting[1].responseSpace, {
+    mode: "multiple-pages",
+    pages: 2,
+  });
+});
+
+test("returns independent response-space defaults", () => {
+  const first = defaultResponseSpaceFor("readingComprehension");
+  first.mode = "full-page";
+
+  assert.deepEqual(defaultResponseSpaceFor("readingComprehension"), {
+    mode: "short-answer",
+  });
+  assert.throws(
+    () => defaultResponseSpaceFor("vocabulary"),
+    WorkbookContentError,
+  );
+});
+
+test("reports schema paths for invalid lesson content", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    delete lesson.sections.vocabulary[0].excerptContext;
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(
+          error.message,
+          /\/sections\/vocabulary\/0\/excerptContext/,
+        );
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects malformed response-space choices", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.sections.readingComprehension[0].responseSpace = {
+      mode: "custom-lines",
+    };
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /responseSpace/);
+        assert.match(error.message, /lines/);
+        return true;
+      },
+    );
+  });
+});
+
+test("rejects duplicate lesson numbers", async () => {
+  await withTemporaryPackage(
+    async ({ packageDirectory, manifestPath, lessonPath }) => {
+      const duplicatePath = join(packageDirectory, "lessons/lesson-04.json");
+      await cp(lessonPath, duplicatePath);
+
+      const manifest = await readJson(manifestPath);
+      manifest.lessonFiles.push("lessons/lesson-04.json");
+      await writeJson(manifestPath, manifest);
+
+      await assert.rejects(
+        loadWorkbookPackage(manifestPath),
+        /Duplicate lesson number 3/,
+      );
+    },
+  );
+});
+
+test("preserves manifest lesson order instead of sorting lesson numbers", async () => {
+  await withTemporaryPackage(
+    async ({ packageDirectory, manifestPath, lessonPath }) => {
+      const laterLessonPath = join(packageDirectory, "lessons/lesson-04.json");
+      const laterLesson = await readJson(lessonPath);
+      laterLesson.lessonNumber = 4;
+      await writeJson(laterLessonPath, laterLesson);
+
+      const manifest = await readJson(manifestPath);
+      manifest.lessonFiles = [
+        "lessons/lesson-04.json",
+        "lessons/lesson-03.json",
+      ];
+      await writeJson(manifestPath, manifest);
+
+      const workbook = await loadWorkbookPackage(manifestPath);
+      assert.deepEqual(
+        workbook.lessons.map(({ content }) => content.lessonNumber),
+        [4, 3],
+      );
+    },
+  );
+});
+
+test("rejects missing and unsafe lesson paths", async (t) => {
+  await t.test("missing lesson", async () => {
+    await withTemporaryPackage(async ({ manifestPath }) => {
+      const manifest = await readJson(manifestPath);
+      manifest.lessonFiles = ["lessons/missing.json"];
+      await writeJson(manifestPath, manifest);
+
+      await assert.rejects(
+        loadWorkbookPackage(manifestPath),
+        /Lesson file does not exist: lessons\/missing\.json/,
+      );
+    });
+  });
+
+  await t.test("path outside package", async () => {
+    await withTemporaryPackage(async ({ manifestPath }) => {
+      const manifest = await readJson(manifestPath);
+      manifest.lessonFiles = ["../outside.json"];
+      await writeJson(manifestPath, manifest);
+
+      await assert.rejects(
+        loadWorkbookPackage(manifestPath),
+        (error) => {
+          assert.ok(error instanceof WorkbookContentError);
+          assert.match(error.message, /lessonFiles\/0/);
+          return true;
+        },
+      );
+    });
+  });
+});
+
+test("reports malformed JSON without an internal stack trace", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    await writeFile(lessonPath, "{ definitely not JSON\n");
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /Invalid JSON/);
+        assert.match(error.message, /lesson-03\.json/);
+        return true;
+      },
+    );
+  });
+});
+
