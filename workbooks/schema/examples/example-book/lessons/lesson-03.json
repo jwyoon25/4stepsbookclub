@@ -10,6 +10,9 @@
     "readingComprehension": [
       {
         "prompt": "Where does the opening scene take place, and how much time has passed since the previous chapter?",
+        "responseGuidance": [
+          "Answer in 2–3 complete sentences."
+        ],
         "teacherGuidance": "The answer should identify the setting and state the elapsed time accurately."
       },
       {
@@ -25,6 +28,10 @@
     "criticalThinkingAndAnalysis": [
       {
         "prompt": "The narrator describes the decision as inevitable. Do you find that convincing? Explain using one detail from the reading.",
+        "responseGuidance": [
+          "Write one paragraph.",
+          "Use at least two quotations from the book."
+        ],
         "teacherGuidance": "Either position is acceptable when supported by a relevant textual detail and an explanation of how it supports the claim."
       },
       {
@@ -38,10 +45,11 @@
     "paragraphWriting": [
       {
         "prompt": "Is the narrator being honest with the reader, or managing what the reader is allowed to see? Defend your interpretation.",
-        "hints": [
+        "responseGuidance": [
+          "Write two paragraphs.",
           "State your position directly.",
-          "Use two moments from the reading as evidence.",
-          "Explain how each piece of evidence supports your position."
+          "Use at least three short quotations from the book.",
+          "Explain how each quotation supports your position."
         ],
         "exampleStructureOrRubric": "Claim, first piece of evidence and explanation, second piece of evidence and explanation, concluding insight.",
         "teacherGuidance": "A strong response maintains a clear interpretation, uses two relevant details, and explains rather than merely summarizes them."

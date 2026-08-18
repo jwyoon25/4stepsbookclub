@@ -25,11 +25,11 @@
   }
 }
 
-#let render-teacher-item(number, item, hints: none) = question(
+#let render-teacher-item(number, item) = question(
   str(number),
   item.at("prompt"),
   quote: optional(item, "quotation"),
-  hints: hints,
+  response-guidance: optional(item, "responseGuidance"),
   teacher: true,
   teacher-guidance: optional(item, "teacherGuidance"),
   rubric: optional(item, "exampleStructureOrRubric"),
@@ -40,7 +40,7 @@
   item,
   step,
   section-name,
-  hints: none,
+  finish-section: false,
 ) = {
   let space = item.at("responseSpace")
   let mode = space.at("mode")
@@ -55,7 +55,7 @@
       prompt,
       lines: first-page-count,
       quote: quote,
-      hints: hints,
+      response-guidance: optional(item, "responseGuidance"),
     )
 
     let remaining = line-count - first-page-count
@@ -71,21 +71,28 @@
       remaining -= page-lines
     }
   } else {
+    let page-count = if mode == "multiple-pages" { space.at("pages") } else { 1 }
+    let continuation-count = page-count - 1
     writing-prompt(
       str(number),
       prompt,
-      hints: hints,
+      response-guidance: optional(item, "responseGuidance"),
       quote: quote,
+      bottom-safety-lines: if finish-section and continuation-count == 0 {
+        response-transition-safety-lines
+      } else { 0 },
     )
 
-    let page-count = if mode == "multiple-pages" { space.at("pages") } else { 1 }
-    for _ in range(page-count - 1) {
+    for index in range(continuation-count) {
       response-continuation(
         str(number),
         prompt,
         step: step,
         section: section-name + " (continued)",
         break-before: false,
+        bottom-safety-lines: if finish-section and index == continuation-count - 1 {
+          response-transition-safety-lines
+        } else { 0 },
       )
     }
   }
@@ -116,16 +123,15 @@
     "Develop a clear response. Make a claim, support it with evidence, and explain the connection.",
   )
   for ((index, item)) in items.enumerate() {
-    let hints = optional(item, "hints")
     if edition == "Teacher" {
-      render-teacher-item(index + 1, item, hints: hints)
+      render-teacher-item(index + 1, item)
     } else {
       render-student-item(
         index + 1,
         item,
         3,
         name,
-        hints: hints,
+        finish-section: index == items.len() - 1,
       )
     }
   }
@@ -193,10 +199,6 @@
     ruled-tail("Anything you noticed that the questions didn't ask about")
   }
   render-writing-section(sections.at("paragraphWriting"), edition)
-  // Student writing surfaces deliberately fill their final page. Make the
-  // following section transition explicit so Vocabulary receives its own
-  // stable running furniture instead of being pushed there implicitly.
-  if edition != "Teacher" { pagebreak(weak: true) }
   render-vocabulary-section(sections.at("vocabulary"), edition)
 }
 

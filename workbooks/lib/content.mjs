@@ -123,6 +123,13 @@ function normalizeLesson(lesson) {
   }
 
   for (const prompt of normalized.sections.paragraphWriting) {
+    if (prompt.hints) {
+      prompt.responseGuidance = [
+        ...(prompt.responseGuidance ?? []),
+        ...prompt.hints,
+      ];
+      delete prompt.hints;
+    }
     prompt.responseSpace ??= {
       ...DEFAULT_RESPONSE_SPACES.paragraphWriting,
     };
@@ -217,4 +224,3 @@ export function defaultResponseSpaceFor(sectionName) {
 
   return { ...responseSpace };
 }
-

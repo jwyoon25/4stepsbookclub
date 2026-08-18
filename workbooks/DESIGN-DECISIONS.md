@@ -72,6 +72,20 @@ parentheses within their answer, for example `(p. 47)`. Questions do not carry a
 separate "Found on page(s)" field. Keeping the citation beside the sentence or
 quotation makes the connection clearer and removes redundant form furniture.
 
+### Guidance and requirements are part of the question
+
+Every Comprehension question, Analysis question, and Writing prompt may carry an
+optional tutor-authored guidance list. It can specify response length, paragraph
+structure, required quotations, evidence, or another useful constraint. The
+list appears in a `Guidance & requirements` panel directly beneath the prompt in
+both student and teacher editions because it tells the student how to answer; it
+is not answer-key content.
+
+Writing previously had a separate `Before you write` hints list. That concept is
+now folded into the common guidance list so tutors learn one control and the
+renderer has one student-facing treatment. Teacher-only expected answers and
+rubrics remain in visually separate panels.
+
 ### Where "how to use this workbook" lives
 
 Because there is no reliable back-of-cover page, the standing reference material

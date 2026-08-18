@@ -107,6 +107,9 @@
           },
           "description": "Omit to use the Short answer (3-line) default."
         },
+        "responseGuidance": {
+          "$ref": "#/$defs/responseGuidance"
+        },
         "teacherGuidance": {
           "$ref": "#/$defs/nonEmptyText"
         }
@@ -133,6 +136,9 @@
           },
           "description": "Omit to use the Short paragraph (6-line) default."
         },
+        "responseGuidance": {
+          "$ref": "#/$defs/responseGuidance"
+        },
         "teacherGuidance": {
           "$ref": "#/$defs/nonEmptyText"
         }
@@ -150,6 +156,7 @@
         },
         "hints": {
           "type": "array",
+          "description": "Deprecated version 1 input. The loader migrates these items into responseGuidance; new editors must not write this field.",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/nonEmptyText"
@@ -161,12 +168,23 @@
             "mode": "full-page"
           }
         },
+        "responseGuidance": {
+          "$ref": "#/$defs/responseGuidance"
+        },
         "exampleStructureOrRubric": {
           "$ref": "#/$defs/nonEmptyText"
         },
         "teacherGuidance": {
           "$ref": "#/$defs/nonEmptyText"
         }
+      }
+    },
+    "responseGuidance": {
+      "type": "array",
+      "description": "Optional tutor-authored response guidance or requirements shown unchanged in both student and teacher editions.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/nonEmptyText"
       }
     },
     "responseSpace": {

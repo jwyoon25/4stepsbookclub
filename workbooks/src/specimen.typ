@@ -122,7 +122,7 @@
   [Some readers finish this section believing the narrator is being honest with
     us; others believe they are managing what we are allowed to see. Which reading
     do you find more persuasive, and why?],
-  hints: (
+  response-guidance: (
     [Begin with a sentence that states your position directly.],
     [Choose two moments from Chapters 9–13 as evidence. Quote briefly.],
     [After each quotation, explain what it shows — do not let it speak for itself.],

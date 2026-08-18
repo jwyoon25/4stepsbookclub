@@ -68,6 +68,7 @@ Each question contains:
 
 - Question text — required
 - Passage or quotation from the book — optional
+- Guidance and requirements — optional; shown in student and teacher versions
 - Student response space — Short answer (3 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
@@ -80,6 +81,7 @@ Each question contains:
 
 - Question text — required
 - Passage or quotation from the book — optional
+- Guidance and requirements — optional; shown in student and teacher versions
 - Student response space — Short paragraph (6 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
@@ -91,12 +93,19 @@ number of lines.
 Each writing item contains:
 
 - Writing prompt — required
-- `Before you write` hints or steps — optional
+- Guidance and requirements — optional; shown in student and teacher versions
 - Response space — one page by default
 - Example structure or rubric — optional
 
 The tutor may replace the default with any response-space preset or any positive
 number of lines. A lesson may contain more than one writing prompt.
+
+Every Comprehension question, Analysis question, and Writing prompt uses the
+same optional **Guidance and requirements** list. Tutors may add one or more
+short directions such as “Answer in three sentences,” “Write two paragraphs,”
+or “Use at least three quotations from the book.” The list is part of the
+question and appears unchanged in both editions. It is separate from
+teacher-only answer guidance and rubrics.
 
 ## Response-space choices
 

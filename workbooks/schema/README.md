@@ -51,6 +51,9 @@ type or manage them.
   Analysis is stored with the lesson because teacher PDFs are a required output.
   Writing guidance may also be supplied. None of it is rendered in a student
   PDF.
+- Optional `responseGuidance` may be attached to any Comprehension question,
+  Analysis question, or Writing prompt. It is a list of student-facing
+  directions or requirements and is rendered unchanged in both editions.
 
 JSON Schema's `default` keyword documents a value; validation does not insert it
 into the source file. The builder and renderer must apply these defaults when a
@@ -110,6 +113,38 @@ For two or more full response pages, `pages` is the total number of pages:
 
 This provides fast common choices without taking away the tutor's ability to
 request any positive line count.
+
+## Guidance fields
+
+`responseGuidance` is the single student-facing guidance field for every kind of
+written response. Each array item becomes one bullet in a `Guidance &
+requirements` panel. Using one consistent field avoids a separate Writing-only
+`hints` concept in the builder.
+
+For compatibility with early version 1 content, the package loader still
+accepts a deprecated Writing `hints` array and migrates its items into
+`responseGuidance`. New content and the staff editor must only write
+`responseGuidance`; normalized build data never contains `hints`.
+
+```json
+{
+  "prompt": "Was the narrator's choice justified?",
+  "responseGuidance": [
+    "Write two paragraphs.",
+    "Use at least three short quotations from the book.",
+    "Explain how each quotation supports your position."
+  ],
+  "teacherGuidance": "Accept either position when the evidence is relevant and explained."
+}
+```
+
+The similarly named fields have different audiences:
+
+| Field | Purpose | Student PDF | Teacher PDF |
+| --- | --- | --- | --- |
+| `responseGuidance` | Optional length, structure, quotation, or evidence requirements | Shown | Shown |
+| `teacherGuidance` | Expected answer or teaching note | Hidden | Shown |
+| `exampleStructureOrRubric` | Optional Writing assessment support | Hidden | Shown |
 
 ## Vocabulary excerpt context
 

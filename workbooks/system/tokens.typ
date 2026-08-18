@@ -178,6 +178,11 @@
 #let response-first-page-lines = 14
 #let response-continuation-lines = 26
 
+// Automatically filled final Writing pages keep this many line gaps in reserve
+// before the Vocabulary transition. This lets the next sticky section move as
+// one unit without overflowing beyond Typst's resolved final page counter.
+#let response-transition-safety-lines = 2
+
 // Keeps a filled surface clear of the footer.
 #let surface-bottom-guard = 4mm
 

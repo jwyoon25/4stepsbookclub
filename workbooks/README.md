@@ -72,7 +72,9 @@ Complete-workbook PDFs contain the workbook cover, exactly one required
 not repeated inside those lessons. Standalone lesson PDFs contain their own copy
 directly after the lesson cover. Student editions contain response lines;
 teacher editions replace those surfaces with the stored teacher guidance and
-optional writing rubric.
+optional writing rubric. Optional tutor-authored `Guidance & requirements`
+lists stay attached to their questions in both editions because they are
+directions for the student, not answer-key content.
 
 `workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
 grammar with placeholder content. It is the file to look at when changing

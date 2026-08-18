@@ -332,7 +332,8 @@
     stroke: 0.5pt + line-soft,
     text(font: sans, size: 9pt, fill: muted)[
       The amount of response space is chosen by your tutor for each question.
-      Continue on a separate sheet or in your document if you need more room.
+      Follow any Guidance & requirements box attached to the question, and
+      continue on a separate sheet or in your document if you need more room.
     ],
   )
   pagebreak()
@@ -476,7 +477,10 @@
   text(font: serif, size: size-quote, fill: ink-soft, body),
 )
 
-#let scaffold(step, items) = block(
+// Tutor-authored directions that are part of the question in both editions.
+// A list keeps separate requirements scannable and gives the future editor one
+// repeatable control for length, structure, quotation, and evidence guidance.
+#let response-guidance-panel(step, items) = block(
   width: 100%,
   above: 4mm,
   below: 0mm,
@@ -484,7 +488,7 @@
   radius: 2pt,
   fill: step-wash.at(step - 1),
   {
-    caps("Before you write", size: 7pt, fill: step-deep.at(step - 1))
+    caps("Guidance & requirements", size: 7pt, fill: step-deep.at(step - 1))
     v(2.4mm)
     set text(font: sans, size: 8.5pt, fill: ink-soft)
     stack(
@@ -521,7 +525,7 @@
   prompt,
   lines: lines-medium,
   quote: none,
-  hints: none,
+  response-guidance: none,
   teacher: false,
   teacher-guidance: none,
   rubric: none,
@@ -539,7 +543,7 @@
       ))
       block(below: 0pt, prompt)
       if quote != none { quoted(step, quote) }
-      if hints != none { scaffold(step, hints) }
+      if response-guidance != none { response-guidance-panel(step, response-guidance) }
       if teacher {
         if teacher-guidance != none { teacher-panel("Teacher guidance", teacher-guidance) }
         if rubric != none { teacher-panel("Example structure / rubric", rubric) }
@@ -559,16 +563,22 @@
 // Fills whatever vertical space remains on the page with ruled lines. This
 // exists because a writing surface must never break unlabelled, and an author
 // cannot know where a page will break — the layout engine decides that.
-#let fill-with-lines(minimum: 0) = context {
+#let fill-with-lines(minimum: 0, safety-lines: 0) = context {
   let free = page-height - margin-bottom - surface-bottom-guard - here().position().y
-  let n = calc.max(minimum, int(free / line-gap))
+  let n = calc.max(minimum, int(free / line-gap) - safety-lines)
   block(above: 0pt, below: 0pt, response-lines(n))
 }
 
 // A writing prompt gets a page of its own, without ever forcing a page break.
 // See DESIGN-DECISIONS.md — an explicit break here would strand the section band
 // on the page it left behind, which is the orphan this design exists to prevent.
-#let writing-prompt(number, prompt, hints: none, quote: none) = {
+#let writing-prompt(
+  number,
+  prompt,
+  response-guidance: none,
+  quote: none,
+  bottom-safety-lines: 0,
+) = {
   context {
     let step = active-section().step
     block(
@@ -583,14 +593,14 @@
         ))
         block(below: 0pt, prompt)
         if quote != none { quoted(step, quote) }
-        if hints != none { scaffold(step, hints) }
+        if response-guidance != none { response-guidance-panel(step, response-guidance) }
         v(space-prompt-to-response)
         block(above: 0pt, below: 0pt, response-lines(lines-writing-min))
       },
     )
   }
   // Top up the remainder of the page, seamlessly continuing the same surface.
-  fill-with-lines()
+  fill-with-lines(safety-lines: bottom-safety-lines)
 }
 
 // An additional, deliberate writing page. Labelled on both sides of the break:
@@ -603,6 +613,7 @@
   section: "Paragraph Writing (continued)",
   lines: none,
   break-before: true,
+  bottom-safety-lines: 0,
 ) = {
   if break-before { pagebreak(weak: true) }
   section-marker(section, step: step, force: true)
@@ -613,7 +624,11 @@
     ))
     text(font: serif, size: 10.5pt, fill: muted)[#echo — continued]
   })
-  if lines == none { fill-with-lines() } else { response-lines(lines) }
+  if lines == none {
+    fill-with-lines(safety-lines: bottom-safety-lines)
+  } else {
+    response-lines(lines)
+  }
 }
 
 #let writing-continuation(number, echo, step: 3, section: "Paragraph Writing (continued)") = response-continuation(

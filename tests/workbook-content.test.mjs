@@ -59,6 +59,30 @@ test("loads a complete workbook package and applies semantic defaults", async ()
   assert.deepEqual(sections.paragraphWriting[0].responseSpace, {
     mode: "full-page",
   });
+  assert.deepEqual(
+    sections.readingComprehension[0].responseGuidance,
+    ["Answer in 2–3 complete sentences."],
+  );
+  assert.deepEqual(
+    sections.criticalThinkingAndAnalysis[0].responseGuidance,
+    [
+      "Write one paragraph.",
+      "Use at least two quotations from the book.",
+    ],
+  );
+  assert.deepEqual(
+    sections.paragraphWriting[0].responseGuidance,
+    [
+      "Write two paragraphs.",
+      "State your position directly.",
+      "Use at least three short quotations from the book.",
+      "Explain how each quotation supports your position.",
+    ],
+  );
+  assert.equal(
+    sections.readingComprehension[1].responseGuidance,
+    undefined,
+  );
 
   assert.deepEqual(sections.readingComprehension[1].responseSpace, {
     mode: "custom-lines",
@@ -123,6 +147,41 @@ test("rejects malformed response-space choices", async () => {
         return true;
       },
     );
+  });
+});
+
+test("rejects blank items in optional response guidance", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    lesson.sections.criticalThinkingAndAnalysis[0].responseGuidance = ["   "];
+    await writeJson(lessonPath, lesson);
+
+    await assert.rejects(
+      loadWorkbookPackage(manifestPath),
+      (error) => {
+        assert.ok(error instanceof WorkbookContentError);
+        assert.match(error.message, /responseGuidance/);
+        return true;
+      },
+    );
+  });
+});
+
+test("migrates legacy Writing hints into shared response guidance", async () => {
+  await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
+    const lesson = await readJson(lessonPath);
+    const prompt = lesson.sections.paragraphWriting[1];
+    prompt.hints = ["Plan the scene before drafting."];
+    await writeJson(lessonPath, lesson);
+
+    const workbook = await loadWorkbookPackage(manifestPath);
+    const normalizedPrompt =
+      workbook.lessons[0].content.sections.paragraphWriting[1];
+
+    assert.deepEqual(normalizedPrompt.responseGuidance, [
+      "Plan the scene before drafting.",
+    ]);
+    assert.equal(normalizedPrompt.hints, undefined);
   });
 });
 
@@ -215,4 +274,3 @@ test("reports malformed JSON without an internal stack trace", async () => {
     );
   });
 });
-
