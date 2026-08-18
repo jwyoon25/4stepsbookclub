@@ -20,6 +20,8 @@
   span: "Lessons 1–12  ·  Complete workbook",
 )
 
+#how-to-page()
+
 #lesson-cover(
   lesson: "Lesson 3",
   title: "[Lesson Title]",
@@ -27,7 +29,12 @@
   framing: [This lesson asks you to look closely at how the narrator's account of
     events differs from what actually happens. Read the chapters once for the
     story, then a second time with the questions in front of you.],
-  sections: ("Comprehension", "Analysis", "Writing", "Vocabulary"),
+  sections: (
+    (name: "Comprehension", detail: "5 questions"),
+    (name: "Analysis", detail: "3 questions"),
+    (name: "Writing", detail: "1 prompt"),
+    (name: "Vocabulary", detail: "9 words"),
+  ),
   note: [*Writing your answers in Google Docs?* Label each answer with its code —
     L3-C2, L3-A1, and so on — so your tutor can match your responses to the
     workbook.],
@@ -38,7 +45,7 @@
 #section-band(
   1,
   "Comprehension",
-  "Short, factual answers. One or two sentences is enough. Note the page you found it on.",
+  "Short, factual answers. Keep them concise and cite supporting pages in parentheses.",
 )
 
 #question(

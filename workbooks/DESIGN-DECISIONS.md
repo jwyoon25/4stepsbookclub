@@ -180,29 +180,28 @@ The workbook must be fully usable printed black-and-white. All hierarchy works
 through type size, weight, and spacing. Color, if used at all, carries only
 secondary meaning and never the primary signal.
 
-### The page is the mark
+### Editorial page system and four-step cover rail
 
-The 2026-08 brand identity is a sheet of ruled notebook paper: cream ground, soft
-rules alternating solid and dashed, a rust vertical margin rule, the numeral four
-in butter. A reading workbook is the thing that logo is a picture of.
+The workbook uses the visual system ported from the approved workbook design:
+white paper, a rust editorial rule, restrained serif typography, and a fixed
+green–coral–teal–purple sequence for Read, Think, Speak, and Write.
 
-So the workbook does not decorate itself with the logo. It reproduces the paper,
-and lets the parts that are already functional carry the brand:
+- **Workbook covers** carry a 24 mm full-height rail split into four equal colour
+  bands. Each band names its step and section vertically. The wide brand logotype,
+  a thin rust rule, large book title, author, lesson range, and website mark form
+  the remaining hierarchy.
+- **Lesson covers** use the same four colour bands without vertical labels. They
+  show the lesson identity, chapter range, framing copy, optional instructions,
+  derived section item counts, Google Docs/teacher note, and name/date fields.
+- **Interior pages** keep a rust rule at 24 mm and begin content at 29 mm. Plain
+  question numbers hang outside the rule. Four tabs at the outer edge repeat the
+  method colours, with the current step wider and more saturated.
+- **Solid rules mean "write here"; dashed rules mean "fill this in."** Response
+  lines are solid; name and date fields are dashed. Page references are not a
+  field and remain parenthetical citations within the student's response.
 
-- **A rust margin rule** runs the full height of every interior page at 30 mm.
-  Question numbers hang in the gutter outside it; the text block begins clear of
-  it. It is the reason an unfilled page bottom now reads as paper with room left
-  on it rather than as a layout that ran out — the earlier draft had no vertical
-  structure, so every short page looked like a mistake.
-- **Solid rules mean "write here"; dashed rules mean "fill this in."** The mark
-  alternates the two, and the workbook reuses that alternation as a signal rather
-  than as texture. Response lines are solid; name and date fields are dashed.
-- **Covers reproduce the paper in full** — cream ground, rules edge to edge, the
-  rust rule, the logomark at full strength. Nobody writes an answer on a cover,
-  so it is the one place the brand is allowed to be loud.
-
-Interior pages stay on white. A full-bleed cream ground is expensive on a home
-printer and greys down pencil, and students print these themselves.
+All pages stay white. This preserves the approved visual composition, reduces
+home-printer ink coverage, and keeps pencil and annotation contrast high.
 
 ### The centred watermark is withdrawn
 
@@ -235,8 +234,8 @@ tab belong to the new section, even when the page opens with the tail of the
 previous one.
 
 This reverses the earlier rule, which gave the page to whichever section was
-already running. That produced pages carrying a green Analysis band under a lit
-butter Comprehension tab, with a head naming the wrong section — indefensible
+already running. That produced pages carrying an Analysis band under a lit
+Comprehension tab, with a head naming the wrong section — indefensible
 once the tabs existed, because the tabs are a finder and someone flipping for
 Analysis has to land on the page the Analysis band is on.
 
@@ -285,11 +284,11 @@ to whatever the build machine happened to have.
 
 ### Page metrics
 
-A4. Margins are 36 mm left, 26 mm right, 20 mm top, 18 mm bottom, giving a
-148 mm text block. The margins are asymmetric because the page has a spine, not
-because of binding: the left margin is wide enough to hold the rust rule at
-30 mm and a 10 mm number gutter outside it. Nothing depends on whether a sheet is
-left- or right-hand, because students print single-sided.
+A4. Margins are 29 mm left, 24 mm right, 20 mm top, 18 mm bottom, giving a
+157 mm text block. The margins are asymmetric because the page has a spine, not
+because of binding: the rust rule sits at 24 mm and the 8 mm question-number
+gutter hangs outside it. Nothing depends on whether a sheet is left- or
+right-hand, because students print single-sided.
 
 Body text is 11 pt — larger than a typical adult book, because younger students
 handwrite in these. Ruled lines are 8.5 mm apart, which suits a teenage hand;
@@ -307,13 +306,14 @@ the answer lines.
 | --- | --- | --- |
 | `ink` | `#17342f` | The brand's black; a deep forest green |
 | `muted` | `#5f7069` | Secondary type and furniture |
-| `paper` | `#f7f3ea` | The cream of the mark; covers and panels |
+| `paper` | `#f7f3ea` | Warm neutral for restrained callout panels |
 | `coral-deep` | `#b84431` | The margin rule |
 | `ruled` | `#c6d0c8` | Handwriting guides; dark enough for a home laser |
 
-Section colours are the brand's method palette in method order — butter, sage,
-aqua, lilac, for Reading Comprehension, Critical Thinking & Analysis, Paragraph
-Writing, and Vocabulary. The palette ties them to READ · THINK · SPEAK · WRITE.
+Section colours follow the approved design in method order: green `#a9cdb0`,
+coral `#f0b6a4`, teal `#96cdc9`, and purple `#bfb2dc`, for Reading
+Comprehension, Critical Thinking & Analysis, Paragraph Writing, and Vocabulary.
+The palette ties them to READ · THINK · SPEAK · WRITE.
 
 **These four are fills, never type.** Every one of them fails contrast as text on
 white. Each has a `-deep` partner in `tokens.typ` for the rare place a section

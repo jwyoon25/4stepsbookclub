@@ -13,10 +13,9 @@
 // Taken from the website's design tokens (website/src/components/SiteChrome.astro)
 // and the logo SVGs, so the workbook and the site cannot drift apart.
 //
-// The mark is a sheet of ruled notebook paper: cream ground, soft rules, a rust
-// vertical margin rule, the numeral four in butter. The workbook is the thing
-// the logo is a picture of, so it does not decorate itself with the logo — it
-// reproduces the paper.
+// The workbook uses the brand's editorial palette and paper-rule motif without
+// imitating a notebook on every surface. White pages keep home printing clean;
+// the rust spine and four method colours provide the recurring identity.
 
 #let ink = rgb("#17342f") // forest green; the brand's black
 #let ink-soft = rgb("#24483f")
@@ -24,7 +23,7 @@
 #let muted = rgb("#5f7069")
 #let faint = rgb("#8a978f") // small labels and quiet furniture
 
-#let paper = rgb("#f7f3ea") // the cream of the mark; covers and tinted panels
+#let paper = rgb("#f7f3ea") // warm neutral for restrained callouts
 #let paper-deep = rgb("#eee7da")
 #let canvas = rgb("#fffdf8")
 
@@ -43,9 +42,11 @@
 // contrast as type on white. Each has a `-deep` partner for the rare place a
 // section has to be named in its own colour.
 
-#let step-fill = (rgb("#f2c55c"), rgb("#9dc5a5"), rgb("#8bc7c3"), rgb("#b9abd8"))
-#let step-deep = (rgb("#a4741d"), rgb("#4f7d5b"), rgb("#3a7570"), rgb("#6d5c99"))
-#let step-wash = (rgb("#fdf5e2"), rgb("#eef5ef"), rgb("#ebf5f4"), rgb("#f2eef8"))
+#let step-fill = (rgb("#a9cdb0"), rgb("#f0b6a4"), rgb("#96cdc9"), rgb("#bfb2dc"))
+#let step-deep = (rgb("#4f7d5b"), rgb("#a9503a"), rgb("#3a7570"), rgb("#6d5c99"))
+#let step-wash = (rgb("#f0f5ef"), rgb("#fdf0ec"), rgb("#eff8f7"), rgb("#f3f0f8"))
+#let step-pale = (rgb("#e4ede3"), rgb("#f7ddd5"), rgb("#dcf0ed"), rgb("#e8e2f1"))
+#let step-actions = ("Read", "Think", "Speak", "Write")
 
 // --- Rules ------------------------------------------------------------------
 //
@@ -73,8 +74,8 @@
 
 // --- Type scale -------------------------------------------------------------
 
-#let size-cover-title = 30pt
-#let size-cover-series = 9.5pt
+#let size-cover-title = 44pt
+#let size-cover-series = 8.5pt
 #let size-lesson-title = 24pt
 #let size-section-title = 15pt
 #let size-body = 11pt // prompts — the reading size of the workbook
@@ -92,11 +93,8 @@
 // sheet is printed left- or right-hand, because students print these themselves,
 // often single-sided.
 //
-// The left margin is wide because the page has a spine. A rust margin rule runs
-// the full height at `rule-x`, question numbers hang outside it in the gutter,
-// and the text block begins clear of it. This is what makes an unfilled page
-// bottom read as paper rather than as a hole — the earlier draft had no vertical
-// structure, so every short page looked like a mistake.
+// A rust spine sits at 24 mm; content starts 5 mm to its right. Question numbers
+// hang on the outside of the spine, leaving the reading measure uninterrupted.
 
 #let paper-size = "a4"
 #let page-width = 210mm
@@ -104,8 +102,8 @@
 
 #let margin-top = 20mm
 #let margin-bottom = 18mm
-#let margin-left = 36mm
-#let margin-right = 26mm
+#let margin-left = 29mm
+#let margin-right = 24mm
 
 #let head-ascent = 9mm
 #let foot-descent = 9mm
@@ -114,9 +112,9 @@
 #let body-height = page-height - margin-top - margin-bottom
 
 // The margin rule, and the gutter left of it where question numbers sit.
-#let rule-x = 30mm
-#let gutter-width = 10mm
-#let gutter-dx = -16mm // from the text block's left edge
+#let rule-x = 24mm
+#let gutter-width = 8mm
+#let gutter-dx = -15mm // from the text block's left edge
 
 // --- Section tabs -----------------------------------------------------------
 //
@@ -186,14 +184,14 @@
 // Keeps a filled surface clear of the footer.
 #let surface-bottom-guard = 4mm
 
-// --- Cover paper ------------------------------------------------------------
-//
-// Covers reproduce the mark: cream ground, ruled lines edge to edge, rust
-// margin rule. Interior pages do not — a full-bleed cream ground is expensive
-// on a home printer and greys down pencil. See DESIGN-DECISIONS.md.
+// --- Cover geometry ---------------------------------------------------------
 
-#let cover-rule-gap = 9mm
-#let cover-rule-top = 24mm
+// Workbook and lesson covers share a full-height, four-band method rail. The
+// rest of the sheet is white, matching the interior and reducing ink coverage.
+#let cover-rail-width = 24mm
+#let cover-content-left = 40mm
+#let cover-content-right = 24mm
+#let cover-logo-width = 54mm
 
 // --- Assets -----------------------------------------------------------------
 

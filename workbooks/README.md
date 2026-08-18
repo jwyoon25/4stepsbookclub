@@ -82,13 +82,13 @@ anything in `system/`. Generated PDFs are ignored by Git.
 
 ## The design in one paragraph
 
-The brand mark is a sheet of ruled notebook paper, and a reading workbook is the
-thing that mark is a picture of — so the workbook reproduces the paper rather
-than decorating itself with the logo. A rust margin rule runs down every interior
-page with question numbers hanging outside it; solid rules mean "write here" and
-dashed rules mean "fill this in"; four index tabs on the outer edge show which of
-the four sections you are in. Covers reproduce the cream ruled ground in full.
-Reasoning for all of it is in [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md).
+The workbook uses a clean editorial system on white A4 pages. Workbook and
+lesson covers share a full-height green–coral–teal–purple method rail; interior
+pages use a rust spine with question numbers hanging outside it and four index
+tabs showing the active step. Solid rules mean "write here" and dashed rules
+mean "fill this in." The wide logo lockup, serif titles, quiet sans-serif
+furniture, and warm callout panels complete the ported design. Reasoning for all
+of it is in [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md).
 
 ## Project shape
 

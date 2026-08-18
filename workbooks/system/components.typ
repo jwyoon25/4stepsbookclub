@@ -30,7 +30,8 @@
 // of the text block. The tabs are a finder: someone flipping for Analysis should
 // land on the page where the Analysis band is and see the Analysis tab lit, not
 // the previous section's. An earlier draft gave the page to whichever section
-// was already running, which left pages carrying a green band under a butter tab
+// was already running, which left pages carrying one section band under another
+// section's active tab
 // and a head naming the wrong section.
 //
 // The half-page test is the guard on that: a band that starts near the foot of a
@@ -91,7 +92,7 @@
   )),
 )
 
-// A short dashed field to be filled in — a name, a date, a page number.
+// A short dashed field to be filled in — currently name and date.
 #let dashed-field(label, width: 100%, label-width: 17mm) = box(width: width, height: 8mm, {
   place(bottom + left, dy: -1.9mm, caps(label, fill: muted))
   place(bottom + left, dx: label-width, line(length: 100% - label-width, stroke: stroke-field))
@@ -126,7 +127,7 @@
       rect(
         width: if on { tab-width-active } else { tab-width },
         height: tab-height,
-        fill: if on { step-fill.at(i) } else { step-fill.at(i).lighten(62%) },
+        fill: if on { step-fill.at(i) } else { step-pale.at(i) },
         radius: (right: tab-radius),
         stroke: none,
       ),
@@ -138,7 +139,7 @@
   let section = active-section()
   if section != none {
     margin-rule()
-    section-tabs(section.step)
+    if section.step >= 1 and section.step <= 4 { section-tabs(section.step) }
   }
 }
 
@@ -218,31 +219,55 @@
 
 // --- Covers -----------------------------------------------------------------
 //
-// Covers reproduce the mark literally: cream ground, ruled lines edge to edge,
-// rust margin rule. This is the one place the brand is allowed to be loud,
-// because nobody writes an answer on a cover.
-
-#let cover-paper() = {
+// Covers share a full-height four-step rail. Workbook covers name the method in
+// the rail; lesson covers keep the same structure but leave the bands quiet.
+#let cover-paper(show-labels: false) = {
   place(top + left, dx: -margin-left, dy: -margin-top, rect(
-    width: page-width, height: page-height, fill: paper, stroke: none,
+    width: page-width, height: page-height, fill: white, stroke: none,
   ))
-  // Ruled lines run the full sheet, alternating solid and dashed the way the
-  // mark does.
-  let n = int((page-height - cover-rule-top) / cover-rule-gap)
-  for i in range(n) {
-    place(top + left, dx: -margin-left, dy: -margin-top + cover-rule-top + i * cover-rule-gap, line(
-      length: page-width,
-      stroke: if calc.rem(i, 2) == 0 {
-        0.5pt + ruled
-      } else {
-        (paint: ruled.lighten(28%), thickness: 0.5pt, dash: "densely-dashed")
-      },
+  let band-height = page-height / 4
+  let short-names = ("Comprehension", "Analysis", "Writing", "Vocabulary")
+  for i in range(4) {
+    place(top + left, dx: -margin-left, dy: -margin-top + i * band-height, rect(
+      width: cover-rail-width, height: band-height, fill: step-pale.at(i), stroke: none,
     ))
+    if show-labels {
+      place(
+        top + left,
+        dx: -margin-left,
+        dy: -margin-top + i * band-height,
+        box(
+          width: cover-rail-width,
+          height: band-height,
+          align(center + horizon, rotate(
+            -90deg,
+            origin: center,
+            box(width: 66mm, align(center, {
+              caps(str(i + 1) + "  " + step-actions.at(i), size: 10pt, fill: ink, tracking: 0.16em)
+              h(2mm)
+              text(font: sans, size: 8.5pt, fill: muted, "— " + short-names.at(i))
+            })),
+          )),
+        ),
+      )
+    }
   }
-  place(top + left, dx: rule-x - margin-left, dy: -margin-top, line(
-    angle: 90deg, length: page-height, stroke: 0.8pt + coral-deep,
-  ))
 }
+
+#let cover-rule() = place(
+  top + left,
+  dx: cover-content-left - margin-left,
+  dy: 57mm - margin-top,
+  line(length: page-width - cover-content-left - cover-content-right, stroke: 1.1pt + coral-deep),
+)
+
+#let cover-site-mark() = grid(
+  columns: (7mm, auto),
+  column-gutter: 2.5mm,
+  align: horizon,
+  image(logomark-small, width: 7mm),
+  text(font: sans, size: 10pt, fill: muted, tracking: 0.04em, "4stepsbookclub.com"),
+)
 
 #let workbook-cover(
   book: "",
@@ -253,88 +278,146 @@
   edition: "Student",
 ) = {
   section-marker(none)
-  cover-paper()
-  v(14mm)
-  grid(
-    columns: (1fr, auto),
-    align: horizon,
-    box(width: 46mm, image(logomark, width: 100%)),
-    if edition == "Teacher" {
-      box(
-        inset: (x: 4mm, y: 2.5mm),
-        radius: 2pt,
-        fill: paper-deep,
-        stroke: 0.6pt + coral-deep,
-        caps("Teacher guide", size: 8pt, fill: coral-deep),
-      )
-    },
+  cover-paper(show-labels: true)
+  cover-rule()
+  place(
+    top + left,
+    dx: cover-content-left - margin-left,
+    dy: 22mm - margin-top,
+    image(logotype, width: cover-logo-width),
   )
-  v(18mm)
-  caps(series, size: size-cover-series, fill: coral-deep)
-  v(6mm)
-  text(font: serif, size: size-cover-title, weight: "bold", fill: ink, book)
-  v(4mm)
-  text(font: serif, size: 13pt, fill: muted, author)
-  if subtitle != none {
-    v(5mm)
-    text(font: sans, size: 10pt, fill: ink-soft, subtitle)
+  place(
+    top + left,
+    dx: 110mm - margin-left,
+    dy: 23mm - margin-top,
+    box(width: page-width - 110mm - cover-content-right, align(right, {
+      caps(series, size: size-cover-series)
+      v(4mm)
+      caps(span, size: size-cover-series)
+    })),
+  )
+  if edition == "Teacher" {
+    place(
+      top + left,
+      dx: 144mm - margin-left,
+      dy: 39mm - margin-top,
+      box(
+        inset: (x: 3mm, y: 1.8mm),
+        radius: 2pt,
+        fill: step-wash.at(1),
+        stroke: 0.6pt + coral-deep,
+        caps("Teacher guide", size: 7pt, fill: coral-deep),
+      ),
+    )
   }
-  v(1fr)
-  text(font: sans, size: 10pt, fill: ink-soft, span)
-  v(8mm)
-  name-date-fields()
-  v(2mm)
+  place(
+    top + left,
+    dx: cover-content-left - margin-left,
+    dy: 74mm - margin-top,
+    box(width: page-width - cover-content-left - 34mm, text(
+      font: serif, size: size-cover-title, weight: "bold", fill: ink, book,
+    )),
+  )
+  place(
+    top + left,
+    dx: cover-content-left - margin-left,
+    dy: 134mm - margin-top,
+    text(font: serif, size: 14pt, fill: muted, author),
+  )
+  if subtitle != none {
+    place(
+      top + left,
+      dx: cover-content-left - margin-left,
+      dy: 153mm - margin-top,
+      box(width: 124mm, text(font: sans, size: 10pt, fill: ink-soft, subtitle)),
+    )
+  }
+  place(
+    top + left,
+    dx: 131mm - margin-left,
+    dy: 263mm - margin-top,
+    cover-site-mark(),
+  )
   pagebreak()
 }
 
-#let instruction-row(number, title, body) = grid(
-  columns: (9mm, 1fr),
-  column-gutter: 4mm,
+#let instruction-row(title, body) = grid(
+  columns: (38mm, 1fr),
+  column-gutter: 5mm,
   align: top,
-  box(
-    width: 7mm,
-    height: 7mm,
-    radius: 100%,
-    fill: paper-deep,
-    align(center + horizon, text(font: sans, size: 8pt, weight: "semibold", fill: coral-deep, number)),
-  ),
+  text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, title),
+  text(font: sans, size: 9.5pt, fill: muted, body),
+)
+
+#let how-to-step(step, name, description) = grid(
+  columns: (15mm, 27mm, 1fr),
+  column-gutter: 5mm,
+  align: horizon,
+  rect(width: 15mm, height: 8.5mm, fill: step-fill.at(step - 1), radius: (right: tab-radius)),
   {
-    text(font: serif, size: 12pt, weight: "bold", fill: ink, title)
-    v(1.5mm)
-    text(font: sans, size: 9pt, fill: ink-soft, body)
+    text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, str(step) + "  " + step-actions.at(step - 1))
+    v(1mm)
+    text(font: sans, size: 8pt, fill: faint, name)
   },
+  text(font: sans, size: 9pt, fill: muted, description),
 )
 
 #let how-to-page() = {
-  section-marker(none)
-  caps("Before you begin", size: 9pt, fill: coral-deep)
-  v(4mm)
+  section-marker("Front matter", step: 0, force: true)
   text(font: serif, size: 24pt, weight: "bold", fill: ink, "How to use this workbook")
-  v(6mm)
-  text(font: serif, size: 11pt, fill: ink-body)[
-    Each lesson follows the same four steps: Reading Comprehension, Critical
-    Thinking & Analysis, Paragraph Writing, and Vocabulary. Read the assigned
-    chapters first, then return to the text as you answer.
-  ]
-  v(10mm)
+  v(5mm)
+  block(width: 122mm, text(font: serif, size: 11pt, fill: ink-body)[Each lesson covers a set of chapters and moves through four steps. Read the chapters once for the story, then work through the questions with the book open beside you.])
+  v(12mm)
+  caps("Choosing how to answer")
+  v(4mm)
   stack(
-    spacing: 7mm,
-    instruction-row("1", "Choose how you will respond", [Print and handwrite, annotate the PDF in an app such as GoodNotes, or type longer responses in Google Docs.]),
-    instruction-row("2", "Cite the page in your response", [When you quote or refer to a specific detail, put the page number in parentheses in your answer, for example (p. 47).]),
-    instruction-row("3", "Label typed answers", [In Google Docs, label each answer with its lesson, section, and question code: L3-C2, L3-A1, or L3-W1.]),
-    instruction-row("4", "Use the four sections differently", [Comprehension checks what happened; Analysis asks what it means; Writing develops an argument or interpretation; Vocabulary helps you return to important moments in the chapter.]),
+    spacing: 3.5mm,
+    instruction-row("Print and handwrite", [Write on the ruled lines. The space provided is chosen by your tutor for each question.]),
+    instruction-row("Annotate the PDF", [Use GoodNotes or another app that lets you write directly on the ruled lines.]),
+    instruction-row("Type in Google Docs", [Label each answer with its lesson, section, and question code so your tutor can match it to the workbook.]),
   )
-  v(1fr)
+  v(3.5mm)
+  text(font: sans, size: 8.5pt, fill: ink-soft)[Whichever method you use, follow any *Guidance & requirements* box attached to the question.]
+  v(9mm)
   block(
-    inset: 5mm,
+    inset: (x: 6mm, y: 5mm),
     radius: 2pt,
     fill: canvas,
     stroke: 0.5pt + line-soft,
-    text(font: sans, size: 9pt, fill: muted)[
-      The amount of response space is chosen by your tutor for each question.
-      Follow any Guidance & requirements box attached to the question, and
-      continue on a separate sheet or in your document if you need more room.
-    ],
+    grid(
+      columns: (32mm, 1fr),
+      column-gutter: 7mm,
+      {
+        text(font: serif, size: 17pt, weight: "bold", fill: coral-deep, "L3-C2")
+        v(2mm)
+        text(font: sans, size: 7pt, fill: faint, tracking: 0.06em, "Lesson 3 · Comprehension · 2")
+      },
+      text(font: sans, size: 9pt, fill: ink-soft)[Use *C* for Comprehension, *A* for Analysis, and *W* for Writing. Questions restart at 1 in every section. When you quote or point to a detail, cite the page inside your response—for example, *(p. 47)*.],
+    ),
+  )
+  v(10mm)
+  caps("The four steps")
+  v(4mm)
+  stack(
+    spacing: 3.2mm,
+    how-to-step(1, "Comprehension", [Answer from the text. Keep factual responses concise and cite supporting pages in parentheses.]),
+    how-to-step(2, "Analysis", [Interpret the reading, explain your reasoning, and point to specific evidence.]),
+    how-to-step(3, "Writing", [Develop a claim, support it with evidence, and explain the connection.]),
+    how-to-step(4, "Vocabulary", [Return to important words and the moments in which they appear in the reading.]),
+  )
+  v(10mm)
+  caps("Lines and fields")
+  v(4mm)
+  stack(
+    spacing: 3mm,
+    grid(columns: (32mm, 1fr), column-gutter: 5mm, align: horizon,
+      line(length: 32mm, stroke: stroke-ruled),
+      text(font: sans, size: 9.5pt, fill: muted, "A solid line is for writing on."),
+    ),
+    grid(columns: (32mm, 1fr), column-gutter: 5mm, align: horizon,
+      line(length: 32mm, stroke: stroke-field),
+      text(font: sans, size: 9.5pt, fill: muted, "A dashed line is a field to fill in, such as your name or date."),
+    ),
   )
   pagebreak()
 }
@@ -355,75 +438,96 @@
   pagebreak(weak: true)
   section-marker(none)
   cover-paper()
-  v(12mm)
-  grid(
-    columns: (1fr, auto, auto),
-    column-gutter: 5mm,
-    align: horizon,
-    caps(lesson, size: 11pt, fill: coral-deep),
-    if edition == "Teacher" { caps("Teacher guide", size: 8pt, fill: coral-deep) },
-    box(width: 30mm, image(logomark, width: 100%)),
+  cover-rule()
+  place(
+    top + left,
+    dx: cover-content-left - margin-left,
+    dy: 23mm - margin-top,
+    {
+      caps(lesson, size: 11pt, fill: coral-deep, tracking: 0.16em)
+      v(4mm)
+      caps("Reading workbook", size: 8.5pt)
+    },
   )
-  v(1fr)
-  text(font: serif, size: size-lesson-title, weight: "bold", fill: ink, title)
-  v(3mm)
-  text(font: serif, size: 12pt, fill: muted, chapters)
-  v(8mm)
-  block(width: 128mm, text(font: serif, size: size-body, fill: ink-body, framing))
-
-  if instructions != none {
-    v(5mm)
-    block(
-      width: 128mm,
-      inset: (x: 4mm, y: 3.2mm),
-      radius: 2pt,
-      fill: canvas,
-      stroke: 0.5pt + line-soft,
-      {
-        caps("For this lesson", size: 7pt, fill: coral-deep)
-        v(1.6mm)
-        text(font: sans, size: 8.5pt, fill: ink-soft, instructions)
-      },
+  place(
+    top + left,
+    dx: 132mm - margin-left,
+    dy: 22mm - margin-top,
+    image(logotype, width: cover-logo-width),
+  )
+  if edition == "Teacher" {
+    place(
+      top + left,
+      dx: 40mm - margin-left,
+      dy: 43mm - margin-top,
+      caps("Teacher guide", size: 7pt, fill: coral-deep),
     )
   }
+  v(60mm)
+  pad(left: cover-content-left - margin-left, {
+    text(font: serif, size: size-lesson-title, weight: "bold", fill: ink, title)
+    v(3mm)
+    text(font: serif, size: 12pt, fill: muted, chapters)
+    v(8mm)
+    block(width: 124mm, text(font: serif, size: size-body, fill: ink-body, framing))
 
-  // The four sections of this lesson, shown as the tabs they will appear as.
-  if sections.len() > 0 {
-    v(10mm)
-    caps("In this lesson", fill: muted)
-    v(4mm)
-    block(width: 100%, stack(
-      spacing: 3mm,
-      ..sections.enumerate().map(((i, s)) => grid(
-        columns: (tab-width-active, 1fr),
-        column-gutter: 5mm,
-        align: horizon,
-        rect(
-          width: tab-width-active, height: tab-height,
-          fill: step-fill.at(i), radius: (right: tab-radius), stroke: none,
-        ),
+    if instructions != none {
+      v(5mm)
+      block(
+        width: 124mm,
+        inset: (x: 4mm, y: 3.2mm),
+        radius: 2pt,
+        fill: canvas,
+        stroke: 0.5pt + line-soft,
         {
-          text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, s)
-          h(3mm)
-          text(font: sans, size: size-furniture, fill: faint, "Step " + str(i + 1))
+          caps("For this lesson", size: 7pt, fill: coral-deep)
+          v(1.6mm)
+          text(font: sans, size: 8.5pt, fill: ink-soft, instructions)
         },
-      )),
-    ))
-  }
+      )
+    }
+
+    // The four sections of this lesson, shown as the tabs they will appear as.
+    if sections.len() > 0 {
+      v(10mm)
+      caps("In this lesson", fill: muted)
+      v(4mm)
+      block(width: 100%, stack(
+        spacing: 3mm,
+        ..sections.enumerate().map(((i, s)) => grid(
+          columns: (tab-width-active, 1fr),
+          column-gutter: 5mm,
+          align: horizon,
+          rect(
+            width: tab-width-active, height: tab-height,
+            fill: step-fill.at(i), radius: (right: tab-radius), stroke: none,
+          ),
+          {
+            text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, s.name)
+            h(2mm)
+            text(font: sans, size: size-furniture, fill: muted,
+              "·  Step " + str(i + 1) + " " + step-actions.at(i) + "  ·  " + s.detail)
+          },
+        )),
+      ))
+    }
+  })
 
   v(1fr)
-  if note != none {
-    block(
-      width: 100%,
-      inset: (x: 4mm, y: 3.4mm),
-      radius: 2pt,
-      fill: canvas,
-      stroke: 0.5pt + line-soft,
-      text(font: sans, size: 8.5pt, fill: ink-soft, note),
-    )
-    v(7mm)
-  }
-  name-date-fields(width: 100%)
+  pad(left: cover-content-left - margin-left, {
+    if note != none {
+      block(
+        width: 100%,
+        inset: (x: 4mm, y: 3.4mm),
+        radius: 2pt,
+        fill: canvas,
+        stroke: 0.5pt + line-soft,
+        text(font: sans, size: 8.5pt, fill: ink-soft, note),
+      )
+      v(7mm)
+    }
+    name-date-fields(width: 100%)
+  })
   v(2mm)
   pagebreak()
 }
@@ -453,7 +557,7 @@
         fill: c, radius: (right: tab-radius), stroke: none,
       ))
       v(band-bar-height + 3.5mm)
-      caps("Step " + str(step), size: size-furniture, fill: step-deep.at(step - 1))
+      caps("Step " + str(step) + "  ·  " + step-actions.at(step - 1), size: size-furniture, fill: step-deep.at(step - 1))
       v(1.6mm)
       text(font: serif, size: size-section-title, weight: "bold", fill: ink, name)
       v(2.6mm)

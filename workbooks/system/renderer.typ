@@ -10,6 +10,11 @@
 
 #let optional(data, key, default: none) = data.at(key, default: default)
 
+#let item-count(items, singular, plural) = {
+  let n = items.len()
+  str(n) + " " + if n == 1 { singular } else { plural }
+}
+
 #let response-line-count(space) = {
   let mode = space.at("mode")
   if mode == "short-answer" {
@@ -164,6 +169,12 @@
   let number = lesson.at("lessonNumber")
   let label = "Lesson " + str(number)
   let sections = lesson.at("sections")
+  let section-summaries = (
+    (name: section-names.at(0), detail: item-count(sections.at("readingComprehension"), "question", "questions")),
+    (name: section-names.at(1), detail: item-count(sections.at("criticalThinkingAndAnalysis"), "question", "questions")),
+    (name: section-names.at(2), detail: item-count(sections.at("paragraphWriting"), "prompt", "prompts")),
+    (name: section-names.at(3), detail: item-count(sections.at("vocabulary"), "word", "words")),
+  )
   lesson-start(label)
   lesson-cover(
     lesson: label,
@@ -171,7 +182,7 @@
     chapters: lesson.at("readingRange"),
     framing: optional(lesson, "framingNote", default: ""),
     instructions: optional(lesson, "studentInstructions"),
-    sections: section-names,
+    sections: section-summaries,
     edition: edition,
     note: if edition == "Teacher" {
       [Teacher guidance is shown beside each question and is omitted from the student version.]
