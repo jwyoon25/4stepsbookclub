@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import NoticeLayout from "../../components/NoticeLayout.astro";
-import { formatNoticeDate, noticeImageAlt, sortNotices } from "../../data/notices";
+import { formatNoticeDate, sortNotices } from "../../data/notices";
 
 const notices = sortNotices(await getCollection("notices"));
 const pageTitle = "공지사항 | 4steps Book Club";
@@ -19,11 +19,6 @@ const pageDescription = "4steps Book Club의 새로운 수업 개설과 프로�
     <div class="notice-grid" aria-label="공지사항 목록">
       {notices.map((notice) => (
         <article class="notice-list-card">
-          {notice.data.images[0] && (
-            <a class="notice-list-media" href={`/announcements/${notice.id}`} aria-label={`${notice.data.title} 자세히 보기`}>
-              <img src={notice.data.images[0]} alt={noticeImageAlt(notice.data.title, 0)} width="640" height="320" loading="lazy" decoding="async" />
-            </a>
-          )}
           <div>
             <time class="notice-meta" datetime={notice.data.postedAt.toISOString()}>{formatNoticeDate(notice.data.postedAt)}</time>
             <h2>{notice.data.title}</h2>
