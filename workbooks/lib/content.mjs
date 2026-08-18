@@ -15,13 +15,16 @@ const DEFAULT_RESPONSE_SPACES = Object.freeze({
 });
 const DEFAULT_SERIES_TITLE = "4steps Book Club Workbook";
 
-const FIRST_PAGE_LINE_COUNTS = Object.freeze({
+// Layout validation reserves at least this many first-page lines. Full-page
+// modes render additional lines dynamically when the page has room.
+const MINIMUM_FIRST_PAGE_LINE_COUNTS = Object.freeze({
   "short-answer": 3,
   "short-paragraph": 6,
   "extended-answer": 12,
   "full-page": 14,
   "multiple-pages": 14,
 });
+const RESPONSE_LINE_LAYOUT_UNITS = 54;
 
 const MAX_LESSON_COVER_UNITS = 700;
 const MAX_VOCABULARY_ENTRY_UNITS = 1900;
@@ -217,12 +220,12 @@ function firstPageLineCount(responseSpace) {
   if (responseSpace.mode === "custom-lines") {
     return Math.min(responseSpace.lines, 14);
   }
-  return FIRST_PAGE_LINE_COUNTS[responseSpace.mode];
+  return MINIMUM_FIRST_PAGE_LINE_COUNTS[responseSpace.mode];
 }
 
 function assertQuestionLayout(question, filePath, location) {
   const firstLines = firstPageLineCount(question.responseSpace);
-  const maximum = 1800 - firstLines * 65;
+  const maximum = 1800 - firstLines * RESPONSE_LINE_LAYOUT_UNITS;
   const actual =
     layoutUnits(question.prompt) +
     layoutUnits(question.quotation) +

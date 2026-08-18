@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { getDocument, OPS } from "pdfjs-dist/legacy/build/pdf.mjs";
 
 const A4_WIDTH_POINTS = 595.276;
 const A4_HEIGHT_POINTS = 841.89;
@@ -52,6 +52,66 @@ function isUnrotatedText(item) {
   );
 }
 
+function multiplyTransforms(left, right) {
+  const [a1, b1, c1, d1, e1, f1] = left;
+  const [a2, b2, c2, d2, e2, f2] = right;
+  return [
+    a1 * a2 + c1 * b2,
+    b1 * a2 + d1 * b2,
+    a1 * c2 + c1 * d2,
+    b1 * c2 + d1 * d2,
+    a1 * e2 + c1 * f2 + e1,
+    b1 * e2 + d1 * f2 + f1,
+  ];
+}
+
+function inspectRuledLines(operatorList) {
+  const stack = [];
+  let state = {
+    transform: [1, 0, 0, 1, 0, 0],
+    strokeColor: "",
+  };
+  const lines = [];
+
+  for (let index = 0; index < operatorList.fnArray.length; index += 1) {
+    const operation = operatorList.fnArray[index];
+    const argumentsList = operatorList.argsArray[index];
+
+    if (operation === OPS.save) {
+      stack.push({
+        transform: [...state.transform],
+        strokeColor: state.strokeColor,
+      });
+    } else if (operation === OPS.restore) {
+      state = stack.pop() ?? state;
+    } else if (operation === OPS.transform) {
+      state.transform = multiplyTransforms(state.transform, argumentsList);
+    } else if (operation === OPS.setStrokeRGBColor) {
+      state.strokeColor = String(argumentsList[0]).toLowerCase();
+    } else if (operation === OPS.constructPath) {
+      const bounds = argumentsList?.[2];
+      if (!bounds) {
+        continue;
+      }
+
+      const width = Math.abs(Number(bounds[2]) - Number(bounds[0]));
+      const height = Math.abs(Number(bounds[3]) - Number(bounds[1]));
+      if (
+        state.strokeColor === "#c6d0c8" &&
+        width >= 400 &&
+        height <= 0.1
+      ) {
+        lines.push({
+          width,
+          pageY: state.transform[5],
+        });
+      }
+    }
+  }
+
+  return lines.sort((left, right) => right.pageY - left.pageY);
+}
+
 function assertTextWithinPage(item, pageNumber, width, height, filePath) {
   if (!item.str || !isUnrotatedText(item)) {
     return;
@@ -84,6 +144,7 @@ export async function inspectWorkbookPdf(filePath) {
       const page = await document.getPage(pageNumber);
       const viewport = page.getViewport({ scale: 1 });
       const textContent = await page.getTextContent();
+      const operatorList = await page.getOperatorList();
       const items = textContent.items.filter((item) => "str" in item);
       const text = items.map(({ str }) => str).join(" ");
       const headerText = items
@@ -98,6 +159,7 @@ export async function inspectWorkbookPdf(filePath) {
         text,
         canonical: canonicalText(text),
         headerCanonical: canonicalText(headerText),
+        ruledLines: inspectRuledLines(operatorList),
         items,
       });
     }
@@ -136,6 +198,16 @@ export async function auditWorkbookPdf(filePath, target) {
         page.height,
         filePath,
       );
+    }
+    for (const line of page.ruledLines) {
+      if (
+        line.pageY < -BOUNDS_TOLERANCE_POINTS ||
+        line.pageY > page.height + BOUNDS_TOLERANCE_POINTS
+      ) {
+        throw new WorkbookPdfAuditError(
+          `A response rule leaves the page bounds in ${filePath} on page ${page.number}.`,
+        );
+      }
     }
 
     if (page.canonical.includes("HOWTOUSETHISWORKBOOK")) {

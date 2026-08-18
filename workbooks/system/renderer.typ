@@ -45,6 +45,7 @@
   number,
   item,
   step,
+  first-in-section: false,
 ) = {
   let space = item.at("responseSpace")
   let mode = space.at("mode")
@@ -65,7 +66,7 @@
 
     let remaining = line-count - first-page-count
     while remaining > 0 {
-      let page-lines = calc.min(remaining, response-continuation-lines)
+      let page-lines = calc.min(remaining, response-continuation-max-lines)
       response-continuation(
         str(number),
         prompt,
@@ -77,6 +78,7 @@
   } else {
     let page-count = if mode == "multiple-pages" { space.at("pages") } else { 1 }
     let continuation-count = page-count - 1
+    if not first-in-section { pagebreak(weak: true) }
     writing-prompt(
       str(number),
       prompt,
@@ -109,7 +111,12 @@
       if edition == "Teacher" {
         render-teacher-item(index + 1, item, step)
       } else {
-        render-student-item(index + 1, item, step)
+        render-student-item(
+          index + 1,
+          item,
+          step,
+          first-in-section: index == 0,
+        )
       }
     }
   })
@@ -131,6 +138,7 @@
           index + 1,
           item,
           3,
+          first-in-section: index == 0,
         )
       }
     }

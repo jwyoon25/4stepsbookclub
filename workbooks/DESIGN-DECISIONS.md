@@ -138,18 +138,19 @@ The lesson cover absorbs what would otherwise be a separate lesson opener block:
 lesson number, title, chapter range, framing note, and section list. Content
 pages then begin directly with the first section band.
 
-### Writing surface uses deterministic page geometry
+### Writing surfaces fill a deterministic page region
 
 A writing prompt gets one response page by default. That page contains the
-prompt, its optional guidance, and a fixed 14-line first response surface. The
-fixed geometry is deliberate: calculating lines from the remaining page height
-made the document's pagination depend on its own unresolved position, which
-could change page totals between Typst layout passes.
+prompt, its optional guidance, and as many complete 7 mm writing rows as fit
+between that content and the standard bottom boundary. The ruled region owns
+the remaining fractional page height, so its capacity is derived locally and
+does not depend on unstable page-position queries.
 
 Tutors may override the line count or request deliberate continuation pages.
 Custom line counts use up to 14 lines with the prompt and then split into
-explicitly labelled continuation pages of up to 26 lines. Tutors never place
-page breaks themselves.
+explicitly labelled continuation pages of up to 35 lines. Tutors never place
+page breaks themselves. A finite response block is indivisible: if its prompt,
+guidance, and lines do not all fit, the complete block moves to the next page.
 
 Longer responses get an additional, deliberate continuation page. The running
 head identifies the section, and the page itself uses the compact label
@@ -164,9 +165,10 @@ but tutors may override them per item.
 
 Short answer maps to 3 lines and Short paragraph to 6. Extended answer is
 provisionally 12 lines and described as approximately half a page. That mapping
-is deliberately not locked: it must be reviewed after the final line spacing and
-page geometry are settled. Content stores the semantic choice rather than the
-derived number, so revising the mapping will not require curriculum edits.
+is deliberately not locked: it must be reviewed after the final page design is
+approved with the current 7 mm writing rhythm. Content stores the semantic
+choice rather than the derived number, so revising the mapping will not require
+curriculum edits.
 
 ### Grayscale legibility is load-bearing
 
@@ -268,10 +270,9 @@ gutter hangs outside it. Nothing depends on whether a sheet is left- or
 right-hand, because students print single-sided.
 
 Body text is 11 pt — larger than a typical adult book, because younger students
-handwrite in these. Ruled lines are 8.5 mm apart, which suits a teenage hand;
-younger cohorts may want that raised. `line-gap` in `tokens.typ` is the single
-number most likely to need changing after the first real print with real
-students.
+handwrite in these. Ruled lines are 7 mm apart. `line-gap` in `tokens.typ` is the
+single source of truth for that rhythm; the PDF integration tests verify the
+rendered distance so code, documentation, and output cannot silently diverge.
 
 The running head sits at 14 mm from the top edge and the footer at 14 mm from
 the bottom edge, matching the approved HTML composition. Handwriting rules are

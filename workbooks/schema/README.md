@@ -102,11 +102,18 @@ The simple preset modes are `short-answer`, `short-paragraph`,
 | `short-answer` | 3 lines; approximately 1–2 sentences | Locked |
 | `short-paragraph` | 6 lines | Locked |
 | `extended-answer` | Provisionally 12 lines; approximately half a page | Revisit after final page design |
-| `full-page` | Fill one response page with lines | Locked |
+| `full-page` | Fill one response page with 7 mm lines | Locked |
 
 The semantic `extended-answer` value is stored instead of the derived line
-count. Its page-space mapping can therefore change after final line spacing is
-known without editing lesson content.
+count. Its page-space mapping can therefore change after the final page design
+is approved without editing lesson content.
+
+Full-page modes derive their rendered line count from the remaining height down
+to the standard bottom boundary. Exact finite line counts remain atomic; when a
+prompt, guidance, and all requested lines cannot fit together, the whole item
+moves to the next page. Exact responses longer than the 14-line prompt-page cap
+continue on explicitly labelled pages that hold up to 35 lines at the standard
+7 mm rhythm.
 
 For an exact positive number of lines:
 

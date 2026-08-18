@@ -34,6 +34,18 @@
   )),
 )
 
+// Fill the current page region with as many complete standard writing rows as
+// fit. The fractional-height block owns the remaining region, so every full-page
+// response finishes at the same bottom boundary without hard-coded line counts.
+#let response-lines-fill() = block(
+  width: 100%,
+  height: 1fr,
+  layout(size => {
+    let count = calc.floor(size.height / line-gap)
+    response-lines(count)
+  }),
+)
+
 // Select the largest approved size whose measured content fits a fixed cover
 // region. Measurement is local and deterministic; unlike page-position queries,
 // it cannot change pagination between layout passes.
@@ -593,7 +605,7 @@
   step: 1,
 ) = {
   block(
-    breakable: true,
+    breakable: false,
     width: 100%,
     above: space-between-questions,
     below: 0pt,
@@ -621,8 +633,9 @@
 
 // --- Writing prompt ---------------------------------------------------------
 
-// A writing prompt includes a deterministic first response surface. Additional
-// pages are emitted explicitly and carry their own compact continuation label.
+// A full-page writing prompt keeps its prompt material together, then gives the
+// rest of the physical page to a flexible ruled surface. Additional pages are
+// emitted explicitly and carry their own compact continuation label.
 #let writing-prompt(
   number,
   prompt,
@@ -631,22 +644,22 @@
   step: 3,
 ) = {
   block(
-      breakable: false,
-      width: 100%,
-      above: space-between-questions,
-      below: 0pt,
-      {
-        place(top + left, dx: gutter-dx, dy: 0.6mm, box(
-          width: gutter-width,
-          align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
-        ))
-        block(below: 0pt, prompt)
-        if quote != none { quoted(step, quote) }
-        if response-guidance != none { response-guidance-panel(step, response-guidance) }
-        v(space-prompt-to-response)
-        block(above: 0pt, below: 0pt, response-lines(lines-writing-min))
-      },
+    breakable: false,
+    width: 100%,
+    above: space-between-questions,
+    below: 0pt,
+    {
+      place(top + left, dx: gutter-dx, dy: 0.6mm, box(
+        width: gutter-width,
+        align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
+      ))
+      block(below: 0pt, prompt)
+      if quote != none { quoted(step, quote) }
+      if response-guidance != none { response-guidance-panel(step, response-guidance) }
+      v(space-prompt-to-response)
+    },
   )
+  response-lines-fill()
 }
 
 // An additional, deliberate response page. The running head identifies the
@@ -669,9 +682,9 @@
     )
   })
   if lines == none {
-    response-lines(response-continuation-lines)
+    response-lines-fill()
   } else {
-    response-lines(lines)
+    block(breakable: false, response-lines(lines))
   }
 }
 

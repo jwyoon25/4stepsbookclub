@@ -115,14 +115,21 @@ same tutor-facing chooser:
 - **Short answer** — 3 lines, intended for 1–2 sentences
 - **Short paragraph** — 6 lines
 - **Extended answer** — provisionally 12 lines and approximately half a page
-- **Full page** — all available writing lines on one response page
+- **Full page** — all available 7 mm writing lines on one response page
 - **Multiple pages** — the tutor chooses the number of full response pages
 - **Custom lines** — the tutor enters any positive number of lines
 
 The `Extended answer` mapping is not locked. Its current 12-line / half-page
-description must be reviewed after the final page geometry and line spacing are
-locked. Content records store the semantic choice `Extended answer`, not the
-number 12, so changing that mapping will not require curriculum data edits.
+description must be reviewed after the final page design is approved with the
+current 7 mm writing rhythm. Content records store the semantic choice
+`Extended answer`, not the number 12, so changing that mapping will not require
+curriculum data edits.
+
+Finite line-count responses stay together with their prompt and optional
+guidance. If the complete block does not fit in the remaining page space, the
+system moves it intact to the next page. Full-page and multiple-page modes fill
+to the standard bottom boundary, and every extra page is explicitly labelled
+`Question N Continued`.
 
 ## Vocabulary
 

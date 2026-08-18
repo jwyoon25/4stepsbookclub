@@ -14,6 +14,11 @@ const examplePackage = join(
   repositoryRoot,
   "workbooks/schema/examples/example-book",
 );
+const fontsDirectory = join(repositoryRoot, "workbooks/assets/fonts");
+const paginationBoundaryFixture = join(
+  repositoryRoot,
+  "tests/fixtures/workbook-pagination-boundary.typ",
+);
 const typstAvailable =
   spawnSync("typst", ["--version"], { stdio: "ignore" }).status === 0;
 
@@ -57,6 +62,7 @@ test(
       ]);
 
       assert.equal(targets.length, expectedPages.size);
+      let studentWorkbookReport;
       for (const target of targets) {
         const report = await inspectWorkbookPdf(target.outputPath);
         assert.equal(
@@ -64,6 +70,26 @@ test(
           expectedPages.get(basename(target.outputPath)),
           basename(target.outputPath),
         );
+        if (basename(target.outputPath) === "example-book-workbook-student.pdf") {
+          studentWorkbookReport = report;
+        }
+      }
+
+      const writingPages = studentWorkbookReport.pages.filter((page) =>
+        page.headerCanonical.includes("PARAGRAPHWRITING"),
+      );
+      assert.deepEqual(
+        writingPages.map((page) => page.ruledLines.length),
+        [26, 36, 35],
+      );
+      for (const page of writingPages) {
+        assert.ok(page.ruledLines.at(-1).pageY >= 50);
+        assert.ok(page.ruledLines.at(-1).pageY <= 75);
+        for (let index = 1; index < page.ruledLines.length; index += 1) {
+          const gap =
+            page.ruledLines[index - 1].pageY - page.ruledLines[index].pageY;
+          assert.ok(Math.abs(gap - (7 * 72) / 25.4) <= 0.1);
+        }
       }
 
       const stagedFiles = (await readdir(outputDirectory)).filter((name) =>
@@ -71,6 +97,49 @@ test(
       );
       assert.deepEqual(stagedFiles, []);
     });
+  },
+);
+
+test(
+  "moves a six-line response intact when only part would fit",
+  { skip: !typstAvailable },
+  async () => {
+    const temporaryRoot = await mkdtemp(
+      join(tmpdir(), "4steps-workbook-boundary-"),
+    );
+    const outputPath = join(temporaryRoot, "pagination-boundary.pdf");
+
+    try {
+      const result = spawnSync(
+        "typst",
+        [
+          "compile",
+          "--root",
+          repositoryRoot,
+          "--font-path",
+          fontsDirectory,
+          paginationBoundaryFixture,
+          outputPath,
+        ],
+        { encoding: "utf8" },
+      );
+      assert.equal(result.status, 0, result.stderr);
+
+      const report = await inspectWorkbookPdf(outputPath);
+      assert.equal(report.pageCount, 2);
+      assert.doesNotMatch(
+        report.pages[0].canonical,
+        /THISSIXLINERESPONSEMUSTMOVETOTHENEXTPAGEINTACT/,
+      );
+      assert.match(
+        report.pages[1].canonical,
+        /THISSIXLINERESPONSEMUSTMOVETOTHENEXTPAGEINTACT/,
+      );
+      assert.equal(report.pages[0].ruledLines.length, 0);
+      assert.equal(report.pages[1].ruledLines.length, 6);
+    } finally {
+      await rm(temporaryRoot, { recursive: true, force: true });
+    }
   },
 );
 

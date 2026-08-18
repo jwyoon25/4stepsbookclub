@@ -145,32 +145,29 @@
 
 // --- Handwriting response areas ---------------------------------------------
 //
-// 8.5mm suits a teenage hand. This is the single number most likely to need
-// changing after the first real print with real students.
+// 7mm keeps handwriting comfortable while allowing full-page response surfaces
+// to use the page efficiently. Keep this as the single source of truth.
 
-#let line-gap = 8.5mm
+#let line-gap = 7mm
 
 // Named response sizes, in ruled lines.
 #let lines-short = 3
 #let lines-medium = 4
 #let lines-extended = 6
 
-// The first page of a full-page response includes the prompt, any guidance, and
-// this fixed writing surface. Fixed geometry keeps pagination reproducible.
-#let lines-writing-min = 14
-
 // Tutor-facing response-space presets. The extended-answer mapping is
-// provisional until final page geometry and line spacing are locked; lesson
-// content stores the semantic preset rather than this derived number.
+// provisional until the final page design is approved; lesson content stores
+// the semantic preset rather than this derived number.
 #let response-short-answer-lines = 3
 #let response-short-paragraph-lines = 6
 #let response-extended-answer-lines = 12
 
 // Exact custom responses longer than this are split onto explicitly labelled
-// continuation pages. A continuation page can safely hold this many lines below
-// its repeated prompt label.
+// continuation pages. The first-page cap reserves room for variable prompt and
+// guidance content. A dedicated continuation page safely holds up to 35 lines
+// at the standard 7mm rhythm.
 #let response-first-page-lines = 14
-#let response-continuation-lines = 26
+#let response-continuation-max-lines = 35
 
 // --- Cover geometry ---------------------------------------------------------
 

@@ -245,6 +245,10 @@ test("rejects a prompt and guidance combination that cannot fit its response spa
     lesson.sections.paragraphWriting[0].responseGuidance = [
       "guide ".repeat(26).trim(),
       "evidence ".repeat(20).trim(),
+      "structure ".repeat(18).trim(),
+      "quotation ".repeat(18).trim(),
+      "explanation ".repeat(15).trim(),
+      "conclusion ".repeat(16).trim(),
     ];
     await writeJson(lessonPath, lesson);
 
