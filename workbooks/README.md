@@ -3,9 +3,12 @@
 The internal publishing system that generates 4steps Bookclub workbooks with
 Typst.
 
-The design system is implemented and proven by a specimen; what does not exist
-yet is a content format. Lessons are still written directly in Typst, and
-`content/` is empty on purpose — see "Project shape" below.
+The design system is implemented and proven by a specimen. The tutor-facing
+requirements are locked in
+[CONTENT-WORKFLOW-DECISIONS.md](CONTENT-WORKFLOW-DECISIONS.md), and their JSON
+model is defined in [schema/](schema/README.md). The editor and data-driven
+renderer are not implemented yet, so lessons are still written directly in
+Typst — see "Project shape" below.
 
 ## Prerequisites
 
@@ -55,6 +58,8 @@ Reasoning for all of it is in [DESIGN-DECISIONS.md](DESIGN-DECISIONS.md).
 workbooks/
 ├── README.md
 ├── DESIGN-DECISIONS.md   # settled decisions and deferred questions, with reasoning
+├── CONTENT-WORKFLOW-DECISIONS.md # locked authoring fields, defaults, and outputs
+├── schema/               # versioned JSON Schemas, documentation, and examples
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
 │   └── logo/             # logomark and logotype, derived from the website assets
@@ -71,9 +76,10 @@ workbooks/
 Components must not hard-code values. Change a workbook's feel by editing
 `tokens.typ`, not `components.typ`.
 
-The content representation is still undecided, which is why `content/` is empty.
-The `content/`, `system/`, and `assets/` boundaries leave room to introduce that
-separation without committing to a schema prematurely.
+The authoring requirements and JSON representation are settled, but the editor
+and renderer are not yet connected to them. The `content/`, `system/`, and
+`assets/` boundaries keep curriculum data independent from a particular
+authoring tool.
 
 ## Fonts
 

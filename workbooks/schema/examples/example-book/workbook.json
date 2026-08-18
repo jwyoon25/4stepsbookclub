@@ -1,0 +1,13 @@
+{
+  "$schema": "../../workbook.schema.json",
+  "schemaVersion": 1,
+  "id": "example-book",
+  "bookTitle": "The Example Book",
+  "author": "A. N. Author",
+  "seriesTitle": "4steps Book Club Workbook",
+  "lessonRange": "Lesson 3",
+  "coverSubtitle": "A schema example",
+  "lessonFiles": [
+    "lessons/lesson-03.json"
+  ]
+}

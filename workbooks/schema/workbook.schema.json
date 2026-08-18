@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://4stepsbookclub.com/schemas/workbook.schema.json",
+  "title": "4steps workbook manifest",
+  "description": "Workbook-level metadata and the ordered list of lesson files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "bookTitle",
+    "author",
+    "seriesTitle",
+    "lessonRange",
+    "lessonFiles"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "Optional editor hint pointing to this schema."
+    },
+    "schemaVersion": {
+      "const": 1,
+      "description": "Version of the 4steps workbook content model."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Stable system-generated workbook identifier."
+    },
+    "bookTitle": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "author": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "seriesTitle": {
+      "$ref": "#/$defs/nonEmptyText",
+      "default": "4steps Book Club Workbook"
+    },
+    "lessonRange": {
+      "$ref": "#/$defs/nonEmptyText",
+      "description": "Human-readable cover label, for example: Lessons 1–12."
+    },
+    "coverSubtitle": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "lessonFiles": {
+      "type": "array",
+      "description": "Lesson JSON files in final workbook order.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^lessons/[a-z0-9][a-z0-9._-]*\\.json$"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyText": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  }
+}

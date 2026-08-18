@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://4stepsbookclub.com/schemas/lesson.schema.json",
+  "title": "4steps workbook lesson",
+  "description": "Tutor-authored content for one lesson, including teacher-version guidance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "lessonNumber",
+    "title",
+    "readingRange",
+    "sections"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "Optional editor hint pointing to this schema."
+    },
+    "schemaVersion": {
+      "const": 1,
+      "description": "Version of the 4steps workbook content model."
+    },
+    "lessonNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "readingRange": {
+      "$ref": "#/$defs/nonEmptyText",
+      "description": "Human-readable chapter or page range."
+    },
+    "framingNote": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "studentInstructions": {
+      "$ref": "#/$defs/nonEmptyText"
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readingComprehension",
+        "criticalThinkingAndAnalysis",
+        "paragraphWriting",
+        "vocabulary"
+      ],
+      "properties": {
+        "readingComprehension": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/comprehensionQuestion"
+          }
+        },
+        "criticalThinkingAndAnalysis": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/analysisQuestion"
+          }
+        },
+        "paragraphWriting": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/writingPrompt"
+          }
+        },
+        "vocabulary": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/vocabularyEntry"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyText": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "comprehensionQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt",
+        "teacherGuidance"
+      ],
+      "properties": {
+        "prompt": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "quotation": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "responseLines": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3,
+          "description": "Omit to use the 3-line Reading Comprehension default."
+        },
+        "teacherGuidance": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "analysisQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt",
+        "teacherGuidance"
+      ],
+      "properties": {
+        "prompt": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "quotation": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "responseLines": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6,
+          "description": "Omit to use the 6-line Critical Thinking & Analysis default."
+        },
+        "teacherGuidance": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "writingPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "hints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyText"
+          }
+        },
+        "response": {
+          "$ref": "#/$defs/writingResponse",
+          "default": {
+            "mode": "full-page",
+            "continuationPages": 0
+          }
+        },
+        "exampleStructureOrRubric": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "teacherGuidance": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "writingResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "full-page"
+            },
+            "continuationPages": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "lines"
+          ],
+          "properties": {
+            "mode": {
+              "const": "custom-lines"
+            },
+            "lines": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "continuationPages": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        }
+      ]
+    },
+    "vocabularyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "term",
+        "koreanMeaning",
+        "definition",
+        "contextNote",
+        "bookExcerpt"
+      ],
+      "properties": {
+        "term": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "koreanMeaning": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "definition": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "contextNote": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "bookExcerpt": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "chapterReference": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    }
+  }
+}

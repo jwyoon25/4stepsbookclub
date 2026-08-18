@@ -2,7 +2,9 @@
 
 A running log of settled design decisions and deliberately deferred questions for
 the workbook publishing system. The design is implemented in `system/` and proven
-in `src/specimen.typ`; there is still no content schema.
+in `src/specimen.typ`. The authoring requirements are locked in
+`CONTENT-WORKFLOW-DECISIONS.md`, and their JSON representation is defined in
+`schema/`; the editor and data-driven renderer are not yet implemented.
 
 The purpose of this file is to keep decisions and their reasoning attached to the
 project rather than living only in conversation. Add to it as decisions are made
@@ -108,10 +110,12 @@ The lesson cover absorbs what would otherwise be a separate lesson opener block:
 lesson number, title, chapter range, framing note, section list, and the
 name/date field. Content pages then begin directly with the first section band.
 
-### Writing surface: a page of its own, filled to the footer
+### Writing surface defaults to one page
 
-A writing prompt takes a page of its own, and its ruled surface fills that page
-down to the footer.
+A writing prompt gets one page of response space by default. Tutors may override
+the line count and request deliberate continuation pages. The layout engine,
+rather than the tutor, remains responsible for placing the prompt and its
+response surface safely on the page.
 
 This is a revision of the original plan, which allowed the surface to flow
 across a page break with a label on each side. Building it showed why that does
@@ -119,10 +123,10 @@ not work: the author cannot know where the break will land, so the label ends up
 in the wrong place and the surface splits silently — reproducing the reference
 PDF's worst habit, writing space separated from the prompt explaining it.
 
-It is implemented without any explicit page break. The prompt, its scaffold, and
-a minimum surface form one unbreakable block, tall enough that it cannot sit low
-on a page; when it does not fit, the engine moves the whole thing forward and
-carries the sticky section band with it. The surface is then topped up to the
+It is implemented without any author-supplied page break. The prompt, its
+scaffold, and its response surface form one unbreakable block; when it does not
+fit, the engine moves the whole thing forward and carries the sticky section
+band with it. For the default one-page response, the surface is topped up to the
 footer. An explicit break would have stranded the section band on the page it
 left behind — the exact orphan this design exists to prevent.
 
@@ -268,9 +272,8 @@ the answer lines.
 | `ruled` | `#c6d0c8` | Handwriting guides; dark enough for a home laser |
 
 Section colours are the brand's method palette in method order — butter, sage,
-aqua, lilac, for Comprehension, Analysis, Writing, Vocabulary. The sections keep
-their working names because that is what is actually on the page; the palette is
-what ties them to READ · THINK · SPEAK · WRITE.
+aqua, lilac, for Reading Comprehension, Critical Thinking & Analysis, Paragraph
+Writing, and Vocabulary. The palette ties them to READ · THINK · SPEAK · WRITE.
 
 **These four are fills, never type.** Every one of them fails contrast as text on
 white. Each has a `-deep` partner in `tokens.typ` for the rare place a section
@@ -280,25 +283,7 @@ Colour is never the only carrier of meaning — verified by rendering pages to
 grayscale and confirming the hierarchy still reads. Every section is also named
 in words and numbered.
 
-## Deferred — revisit before implementation locks
-
-### Tutor-declared writing space per prompt
-
-**Currently:** writing response space is a fixed default size for all extended
-writing prompts.
-
-**To explore:** letting tutors declare a response size per prompt (e.g.
-short / medium / extended / full-page) so a two-sentence reflection and a full
-analytical paragraph don't get identical space.
-
-**Why it's deferred:** worth discussing with tutors first. Fixed sizing is more
-consistent and easier to keep visually disciplined; per-prompt sizing is more
-efficient with paper and better matched to the actual task, but pushes a layout
-decision onto whoever authors content, and inconsistent authoring would show up
-directly as an inconsistent-looking workbook.
-
-**When revisiting:** if adopted, the sizes should stay a small fixed set of named
-options rather than free-form measurements, so the vertical rhythm survives.
+## Deferred — revisit only when the use case becomes real
 
 ### Bound-print build options
 
@@ -306,14 +291,3 @@ Mirrored margins and recto-start for lesson covers would both be correct if 4ste
 ever produces a professionally printed and bound workbook. Both are deliberately
 not built now — see "No page-parity dependence". Revisit only if a print run
 becomes real.
-
-### Teacher guide / answer key
-
-Not currently required. If added, subjective questions would likely carry
-evidence targets, acceptable interpretations, or grading guidance rather than
-fixed answers. The "before you write" scaffold block on writing prompts is the
-natural structural home for this.
-
-### Content schema
-
-Deliberately undecided until the visual design and page grammar are settled.

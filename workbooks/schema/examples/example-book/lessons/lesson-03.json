@@ -1,0 +1,72 @@
+{
+  "$schema": "../../../lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 3,
+  "title": "What the Narrator Leaves Out",
+  "readingRange": "Chapters 9–13",
+  "framingNote": "Read once for the story, then return to the chapters with the questions in front of you.",
+  "studentInstructions": "Support interpretive answers with a specific detail from the text.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "Where does the opening scene take place, and how much time has passed since the previous chapter?",
+        "teacherGuidance": "The answer should identify the setting and state the elapsed time accurately."
+      },
+      {
+        "prompt": "What has the narrator chosen not to reveal, and when does the omission become clear?",
+        "quotation": "It was easier, in the end, to say nothing at all.",
+        "responseLines": 5,
+        "teacherGuidance": "Accept answers that identify the concealed decision and point to the later conversation as the moment of disclosure."
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "The narrator describes the decision as inevitable. Do you find that convincing? Explain using one detail from the reading.",
+        "teacherGuidance": "Either position is acceptable when supported by a relevant textual detail and an explanation of how it supports the claim."
+      },
+      {
+        "prompt": "How does the repeated image change in meaning between Chapters 9 and 13?",
+        "responseLines": 8,
+        "teacherGuidance": "Look for a comparison of the image's earlier association with safety and its later association with concealment."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Is the narrator being honest with the reader, or managing what the reader is allowed to see? Defend your interpretation.",
+        "hints": [
+          "State your position directly.",
+          "Use two moments from the reading as evidence.",
+          "Explain how each piece of evidence supports your position."
+        ],
+        "exampleStructureOrRubric": "Claim, first piece of evidence and explanation, second piece of evidence and explanation, concluding insight.",
+        "teacherGuidance": "A strong response maintains a clear interpretation, uses two relevant details, and explains rather than merely summarizes them."
+      },
+      {
+        "prompt": "Write a short alternative account of the conversation from another character's point of view.",
+        "response": {
+          "mode": "custom-lines",
+          "lines": 10,
+          "continuationPages": 0
+        },
+        "teacherGuidance": "The response should remain consistent with the events while revealing a perspective or motive unavailable in the original narration."
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "resolute",
+        "koreanMeaning": "단호한",
+        "definition": "Determined and unwavering; refusing to be moved from a decision.",
+        "contextNote": "Usually describes a person and often carries a positive judgment.",
+        "bookExcerpt": "She remained resolute even as the others began to reconsider.",
+        "chapterReference": "Chapter 10"
+      },
+      {
+        "term": "pretext",
+        "koreanMeaning": "구실, 핑계",
+        "definition": "A stated reason that conceals the real one.",
+        "contextNote": "A pretext implies deliberate concealment rather than a simple mistake.",
+        "bookExcerpt": "The letter was a pretext; he had wanted only to see the house again."
+      }
+    ]
+  }
+}
