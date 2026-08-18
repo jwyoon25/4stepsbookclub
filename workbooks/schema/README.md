@@ -76,7 +76,7 @@ field is absent:
 
 | Content | Default |
 | --- | --- |
-| Series title | `4steps Book Club Workbook` |
+| Series title | `4steps Book Club Workbook`; the editor pre-fills it and the loader restores it when omitted |
 | Reading Comprehension response | Short answer (3 lines) |
 | Critical Thinking & Analysis response | Short paragraph (6 lines) |
 | Paragraph Writing response | Full page |

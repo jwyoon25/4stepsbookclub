@@ -13,6 +13,7 @@ const DEFAULT_RESPONSE_SPACES = Object.freeze({
   criticalThinkingAndAnalysis: Object.freeze({ mode: "short-paragraph" }),
   paragraphWriting: Object.freeze({ mode: "full-page" }),
 });
+const DEFAULT_SERIES_TITLE = "4steps Book Club Workbook";
 
 const FIRST_PAGE_LINE_COUNTS = Object.freeze({
   "short-answer": 3,
@@ -147,6 +148,12 @@ function normalizeLesson(lesson) {
     };
   }
 
+  return normalized;
+}
+
+function normalizeManifest(manifest) {
+  const normalized = structuredClone(manifest);
+  normalized.seriesTitle ??= DEFAULT_SERIES_TITLE;
   return normalized;
 }
 
@@ -293,7 +300,8 @@ export async function loadWorkbookPackage(manifestPath) {
     getValidators(),
   ]);
   assertValid(validators.workbook, manifest, absoluteManifestPath);
-  assertWrappableContent(manifest, absoluteManifestPath);
+  const normalizedManifest = normalizeManifest(manifest);
+  assertWrappableContent(normalizedManifest, absoluteManifestPath);
 
   const realManifestDirectory = await realpath(manifestDirectory);
   const lessons = [];
@@ -355,7 +363,7 @@ export async function loadWorkbookPackage(manifestPath) {
   return {
     manifestPath: absoluteManifestPath,
     directory: realManifestDirectory,
-    manifest: structuredClone(manifest),
+    manifest: normalizedManifest,
     lessons,
   };
 }

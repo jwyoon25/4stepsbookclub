@@ -110,6 +110,20 @@ test("returns independent response-space defaults", () => {
   );
 });
 
+test("applies the standard series title when the manifest omits it", async () => {
+  await withTemporaryPackage(async ({ manifestPath }) => {
+    const manifest = await readJson(manifestPath);
+    delete manifest.seriesTitle;
+    await writeJson(manifestPath, manifest);
+
+    const workbook = await loadWorkbookPackage(manifestPath);
+    assert.equal(
+      workbook.manifest.seriesTitle,
+      "4steps Book Club Workbook",
+    );
+  });
+});
+
 test("reports schema paths for invalid lesson content", async () => {
   await withTemporaryPackage(async ({ manifestPath, lessonPath }) => {
     const lesson = await readJson(lessonPath);

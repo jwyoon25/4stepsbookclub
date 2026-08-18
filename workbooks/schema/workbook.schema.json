@@ -10,7 +10,6 @@
     "id",
     "bookTitle",
     "author",
-    "seriesTitle",
     "lessonRange",
     "lessonFiles"
   ],
