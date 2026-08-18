@@ -787,23 +787,28 @@
   below: 0mm,
   {
     v(space-vocab-entry)
-    // The gloss sits directly beside its term rather than ranged right. A
-    // Korean meaning stranded at the far margin is a column to scan; next to
-    // the word it answers the question a student is actually asking.
-    place(top + left, dx: gutter-dx, dy: 1.2mm, box(
-      width: gutter-width,
-      align(right, text(font: sans, size: 8.5pt, weight: "semibold", fill: faint, number)),
-    ))
-    block(below: 0pt, {
-      text(font: serif, size: size-vocab-term, weight: "bold", fill: ink, term)
-      h(4mm)
-      text(font: sans, size: 10pt, fill: step-deep.at(3), gloss)
+    // The number and entry content share this post-spacing origin. Keeping the
+    // number outside this inner block would anchor it above the term whenever
+    // entry spacing changes.
+    block(width: 100%, {
+      // The gloss sits directly beside its term rather than ranged right. A
+      // Korean meaning stranded at the far margin is a column to scan; next to
+      // the word it answers the question a student is actually asking.
+      place(top + left, dx: gutter-dx, dy: 1.2mm, box(
+        width: gutter-width,
+        align(right, text(font: sans, size: 8.5pt, weight: "semibold", fill: faint, number)),
+      ))
+      block(below: 0pt, {
+        text(font: serif, size: size-vocab-term, weight: "bold", fill: ink, term)
+        h(4mm)
+        text(font: sans, size: 10pt, fill: step-deep.at(3), gloss)
+      })
+      v(1.8mm)
+      line(length: 100%, stroke: 0.5pt + step-fill.at(3))
+      if definition != none { vocab-field("Definition", definition) }
+      if from-book != none { vocab-field("From book", from-book) }
+      if excerpt-context != none { vocab-field("Excerpt context", excerpt-context) }
+      if chapter-reference != none { vocab-field("Chapter", chapter-reference) }
     })
-    v(1.8mm)
-    line(length: 100%, stroke: 0.5pt + step-fill.at(3))
-    if definition != none { vocab-field("Definition", definition) }
-    if from-book != none { vocab-field("From book", from-book) }
-    if excerpt-context != none { vocab-field("Excerpt context", excerpt-context) }
-    if chapter-reference != none { vocab-field("Chapter", chapter-reference) }
   },
 )
