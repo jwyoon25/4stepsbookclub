@@ -12,7 +12,9 @@
     "website:dev": "npm run dev --workspace website",
     "website:build": "npm run build --workspace website",
     "website:preview": "npm run preview --workspace website",
-    "workbook:build": "typst compile workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
-    "workbook:watch": "typst watch workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf"
+    "workbook:build": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
+    "workbook:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
+    "workbook:specimen": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/specimen.typ workbooks/output/specimen.pdf",
+    "workbook:specimen:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/specimen.typ workbooks/output/specimen.pdf"
   }
 }
