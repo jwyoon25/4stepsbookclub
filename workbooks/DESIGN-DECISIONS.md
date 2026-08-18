@@ -158,8 +158,9 @@ band with it. For the default one-page response, the surface is topped up to the
 footer. An explicit break would have stranded the section band on the page it
 left behind — the exact orphan this design exists to prevent.
 
-Longer responses get an additional, deliberate continuation page, labelled in
-the running head and with the prompt echoed at the top.
+Longer responses get an additional, deliberate continuation page. The running
+head identifies the section, and the page itself uses the compact label
+`Question 2 Continued` rather than repeating the full prompt.
 
 ### Tutors choose response space semantically or by exact line count
 

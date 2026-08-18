@@ -686,12 +686,11 @@
   fill-with-lines(safety-lines: bottom-safety-lines)
 }
 
-// An additional, deliberate writing page. Labelled on both sides of the break:
-// the running head says "(continued)" and the prompt is echoed here, so a
-// student writing on the second page can still see what was asked.
+// An additional, deliberate response page. The running head identifies the
+// section while a compact question label replaces the full repeated prompt.
 #let response-continuation(
   number,
-  echo,
+  _echo,
   step: 3,
   section: "Paragraph Writing (continued)",
   lines: none,
@@ -701,11 +700,13 @@
   if break-before { pagebreak(weak: true) }
   section-marker(section, step: step, force: true)
   block(sticky: true, width: 100%, above: 0mm, below: 5mm, {
-    place(top + left, dx: gutter-dx, dy: 0.4mm, box(
-      width: gutter-width,
-      align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
-    ))
-    text(font: serif, size: 10.5pt, fill: muted)[#echo — continued]
+    text(
+      font: sans,
+      size: 9.5pt,
+      weight: "semibold",
+      fill: step-deep.at(step - 1),
+      "Question " + number + " Continued",
+    )
   })
   if lines == none {
     fill-with-lines(safety-lines: bottom-safety-lines)
