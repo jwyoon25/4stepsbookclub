@@ -9,3 +9,5 @@ dist/
 
 # Generated Typst workbook PDFs
 workbooks/output/*.pdf
+workbooks/output/**/*.pdf
+workbooks/output/.build/

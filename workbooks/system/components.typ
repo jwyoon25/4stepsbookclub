@@ -15,6 +15,7 @@
 
 #let doc-book = state("book", "")
 #let doc-lesson = state("lesson", "")
+#let doc-edition = state("edition", "Student")
 
 // Which section a page belongs to cannot use `state`: a header is laid out at
 // the top of its page, before any state update made by content on that same
@@ -171,19 +172,25 @@
   if section == none { return }
   let total = counter(page).final().first()
   let current = counter(page).at(here()).first()
+  let lesson-label = doc-lesson.get()
+  let centre-label = if doc-edition.get() == "Teacher" {
+    if lesson-label == "" { "Teacher guide" } else { lesson-label + " · Teacher guide" }
+  } else {
+    lesson-label
+  }
   grid(
     columns: (auto, 1fr, auto),
     column-gutter: 4mm,
     align: horizon,
     wordmark(),
-    text(font: sans, size: size-furniture, fill: faint, doc-lesson.get()),
+    text(font: sans, size: size-furniture, fill: faint, centre-label),
     text(font: sans, size: size-furniture, fill: faint)[Page #current of #total],
   )
 }
 
 // --- Document wrapper -------------------------------------------------------
 
-#let workbook(book: "", lesson: "", body) = {
+#let workbook(book: "", lesson: "", edition: "Student", body) = {
   set page(
     paper: paper-size,
     margin: (
@@ -203,8 +210,11 @@
 
   doc-book.update(book)
   doc-lesson.update(lesson)
+  doc-edition.update(edition)
   body
 }
+
+#let lesson-start(lesson) = doc-lesson.update(lesson)
 
 // --- Covers -----------------------------------------------------------------
 //
@@ -234,22 +244,97 @@
   ))
 }
 
-#let workbook-cover(book: "", author: "", series: "", span: "") = {
+#let workbook-cover(
+  book: "",
+  author: "",
+  series: "",
+  span: "",
+  subtitle: none,
+  edition: "Student",
+) = {
   section-marker(none)
   cover-paper()
   v(14mm)
-  box(width: 46mm, image(logomark, width: 100%))
+  grid(
+    columns: (1fr, auto),
+    align: horizon,
+    box(width: 46mm, image(logomark, width: 100%)),
+    if edition == "Teacher" {
+      box(
+        inset: (x: 4mm, y: 2.5mm),
+        radius: 2pt,
+        fill: paper-deep,
+        stroke: 0.6pt + coral-deep,
+        caps("Teacher guide", size: 8pt, fill: coral-deep),
+      )
+    },
+  )
   v(18mm)
   caps(series, size: size-cover-series, fill: coral-deep)
   v(6mm)
   text(font: serif, size: size-cover-title, weight: "bold", fill: ink, book)
   v(4mm)
   text(font: serif, size: 13pt, fill: muted, author)
+  if subtitle != none {
+    v(5mm)
+    text(font: sans, size: 10pt, fill: ink-soft, subtitle)
+  }
   v(1fr)
   text(font: sans, size: 10pt, fill: ink-soft, span)
   v(8mm)
   name-date-fields()
   v(2mm)
+  pagebreak()
+}
+
+#let instruction-row(number, title, body) = grid(
+  columns: (9mm, 1fr),
+  column-gutter: 4mm,
+  align: top,
+  box(
+    width: 7mm,
+    height: 7mm,
+    radius: 100%,
+    fill: paper-deep,
+    align(center + horizon, text(font: sans, size: 8pt, weight: "semibold", fill: coral-deep, number)),
+  ),
+  {
+    text(font: serif, size: 12pt, weight: "bold", fill: ink, title)
+    v(1.5mm)
+    text(font: sans, size: 9pt, fill: ink-soft, body)
+  },
+)
+
+#let how-to-page() = {
+  section-marker(none)
+  caps("Before you begin", size: 9pt, fill: coral-deep)
+  v(4mm)
+  text(font: serif, size: 24pt, weight: "bold", fill: ink, "How to use this workbook")
+  v(6mm)
+  text(font: serif, size: 11pt, fill: ink-body)[
+    Each lesson follows the same four steps: Reading Comprehension, Critical
+    Thinking & Analysis, Paragraph Writing, and Vocabulary. Read the assigned
+    chapters first, then return to the text as you answer.
+  ]
+  v(10mm)
+  stack(
+    spacing: 7mm,
+    instruction-row("1", "Choose how you will respond", [Print and handwrite, annotate the PDF in an app such as GoodNotes, or type longer responses in Google Docs.]),
+    instruction-row("2", "Point back to the book", [Use the “Found on page(s)” field whenever it appears. A strong answer identifies the detail that supports it.]),
+    instruction-row("3", "Label typed answers", [In Google Docs, label each answer with its lesson, section, and question code: L3-C2, L3-A1, or L3-W1.]),
+    instruction-row("4", "Use the four sections differently", [Comprehension checks what happened; Analysis asks what it means; Writing develops an argument or interpretation; Vocabulary helps you return to important moments in the chapter.]),
+  )
+  v(1fr)
+  block(
+    inset: 5mm,
+    radius: 2pt,
+    fill: canvas,
+    stroke: 0.5pt + line-soft,
+    text(font: sans, size: 9pt, fill: muted)[
+      The amount of response space is chosen by your tutor for each question.
+      Continue on a separate sheet or in your document if you need more room.
+    ],
+  )
   pagebreak()
 }
 
@@ -261,16 +346,21 @@
   title: "",
   chapters: "",
   framing: "",
+  instructions: none,
   sections: (),
   note: none,
+  edition: "Student",
 ) = {
+  pagebreak(weak: true)
   section-marker(none)
   cover-paper()
   v(12mm)
   grid(
-    columns: (1fr, auto),
+    columns: (1fr, auto, auto),
+    column-gutter: 5mm,
     align: horizon,
     caps(lesson, size: 11pt, fill: coral-deep),
+    if edition == "Teacher" { caps("Teacher guide", size: 8pt, fill: coral-deep) },
     box(width: 30mm, image(logomark, width: 100%)),
   )
   v(1fr)
@@ -279,6 +369,22 @@
   text(font: serif, size: 12pt, fill: muted, chapters)
   v(8mm)
   block(width: 128mm, text(font: serif, size: size-body, fill: ink-body, framing))
+
+  if instructions != none {
+    v(5mm)
+    block(
+      width: 128mm,
+      inset: (x: 4mm, y: 3.2mm),
+      radius: 2pt,
+      fill: canvas,
+      stroke: 0.5pt + line-soft,
+      {
+        caps("For this lesson", size: 7pt, fill: coral-deep)
+        v(1.6mm)
+        text(font: sans, size: 8.5pt, fill: ink-soft, instructions)
+      },
+    )
+  }
 
   // The four sections of this lesson, shown as the tabs they will appear as.
   if sections.len() > 0 {
@@ -380,33 +486,6 @@
   text(font: serif, size: size-quote, fill: ink-soft, body),
 )
 
-// The atomic unit. `breakable: false` guarantees a prompt is never separated
-// from the space where its answer goes. The number hangs in the gutter outside
-// the margin rule, where it aligns down the page without stealing measure from
-// the prompt or from the answer lines.
-#let question(number, prompt, lines: lines-medium, quote: none, cite: true) = context {
-  let step = active-section().step
-  block(
-    breakable: false,
-    width: 100%,
-    above: space-between-questions,
-    below: 0pt,
-    {
-      place(top + left, dx: gutter-dx, dy: 0.6mm, box(
-        width: gutter-width,
-        align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
-      ))
-      block(below: 0pt, prompt)
-      if quote != none { quoted(step, quote) }
-      v(space-prompt-to-response)
-      response-lines(lines)
-      if cite { cite-field() }
-    },
-  )
-}
-
-// --- Writing prompt ---------------------------------------------------------
-
 #let scaffold(step, items) = block(
   width: 100%,
   above: 4mm,
@@ -425,6 +504,70 @@
   },
 )
 
+#let teacher-panel(label, body) = context {
+  let step = active-section().step
+  block(
+    width: 100%,
+    above: 3.5mm,
+    below: 0mm,
+    fill: step-wash.at(step - 1),
+    inset: (x: 4.5mm, y: 3.4mm),
+    stroke: (left: 2pt + step-deep.at(step - 1)),
+    radius: (right: 2pt),
+    {
+      caps(label, size: 7pt, fill: step-deep.at(step - 1))
+      v(1.8mm)
+      text(font: serif, size: 9.5pt, fill: ink-body, body)
+    },
+  )
+}
+
+// The atomic unit. `breakable: false` guarantees a prompt is never separated
+// from the space where its answer goes. The number hangs in the gutter outside
+// the margin rule, where it aligns down the page without stealing measure from
+// the prompt or from the answer lines.
+#let question(
+  number,
+  prompt,
+  lines: lines-medium,
+  quote: none,
+  cite: true,
+  hints: none,
+  teacher: false,
+  teacher-guidance: none,
+  rubric: none,
+) = context {
+  let step = active-section().step
+  block(
+    breakable: false,
+    width: 100%,
+    above: space-between-questions,
+    below: 0pt,
+    {
+      place(top + left, dx: gutter-dx, dy: 0.6mm, box(
+        width: gutter-width,
+        align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
+      ))
+      block(below: 0pt, prompt)
+      if quote != none { quoted(step, quote) }
+      if hints != none { scaffold(step, hints) }
+      if teacher {
+        if teacher-guidance != none { teacher-panel("Teacher guidance", teacher-guidance) }
+        if rubric != none { teacher-panel("Example structure / rubric", rubric) }
+        if teacher-guidance == none and rubric == none {
+          teacher-panel("Teacher guidance", [No additional guidance was provided for this prompt.])
+        }
+      } else {
+        v(space-prompt-to-response)
+        response-lines(lines)
+        if cite { cite-field() }
+      }
+    },
+  )
+}
+
+// --- Writing prompt ---------------------------------------------------------
+
 // Fills whatever vertical space remains on the page with ruled lines. This
 // exists because a writing surface must never break unlabelled, and an author
 // cannot know where a page will break — the layout engine decides that.
@@ -437,7 +580,7 @@
 // A writing prompt gets a page of its own, without ever forcing a page break.
 // See DESIGN-DECISIONS.md — an explicit break here would strand the section band
 // on the page it left behind, which is the orphan this design exists to prevent.
-#let writing-prompt(number, prompt, hints: none) = {
+#let writing-prompt(number, prompt, hints: none, quote: none, cite: false) = {
   context {
     let step = active-section().step
     block(
@@ -451,7 +594,9 @@
           align(right, text(font: sans, size: 9.5pt, weight: "semibold", fill: step-deep.at(step - 1), number)),
         ))
         block(below: 0pt, prompt)
+        if quote != none { quoted(step, quote) }
         if hints != none { scaffold(step, hints) }
+        if cite { cite-field() }
         v(space-prompt-to-response)
         block(above: 0pt, below: 0pt, response-lines(lines-writing-min))
       },
@@ -464,8 +609,15 @@
 // An additional, deliberate writing page. Labelled on both sides of the break:
 // the running head says "(continued)" and the prompt is echoed here, so a
 // student writing on the second page can still see what was asked.
-#let writing-continuation(number, echo, step: 3, section: "Writing (continued)") = {
-  pagebreak(weak: true)
+#let response-continuation(
+  number,
+  echo,
+  step: 3,
+  section: "Paragraph Writing (continued)",
+  lines: none,
+  break-before: true,
+) = {
+  if break-before { pagebreak(weak: true) }
   section-marker(section, step: step, force: true)
   block(sticky: true, width: 100%, above: 0mm, below: 5mm, {
     place(top + left, dx: gutter-dx, dy: 0.4mm, box(
@@ -474,8 +626,16 @@
     ))
     text(font: serif, size: 10.5pt, fill: muted)[#echo — continued]
   })
-  fill-with-lines()
+  if lines == none { fill-with-lines() } else { response-lines(lines) }
 }
+
+#let writing-continuation(number, echo, step: 3, section: "Paragraph Writing (continued)") = response-continuation(
+  number,
+  echo,
+  step: step,
+  section: section,
+  break-before: false,
+)
 
 // --- Vocabulary -------------------------------------------------------------
 
@@ -493,7 +653,11 @@
 // can call it at the end of any section without ever producing a stub.
 #let ruled-tail(title, minimum: 5) = context {
   let free = page-height - margin-bottom - surface-bottom-guard - here().position().y
-  let n = int((free - 15mm) / line-gap)
+  // Keep two lines of safety below the calculated surface. Filling the exact
+  // remainder makes Typst's final page counter observe a phantom trailing page
+  // even though the PDF renderer elides that empty page; one line is not enough
+  // once the label and block spacing are rounded during layout.
+  let n = int((free - 15mm) / line-gap) - 2
   if n >= minimum {
     v(11mm)
     caps(title, size: 7pt, fill: faint)
@@ -522,6 +686,7 @@
   definition: none,
   from-book: none,
   excerpt-context: none,
+  chapter-reference: none,
   index: 0,
 ) = block(
   breakable: false,
@@ -546,5 +711,6 @@
     if definition != none { vocab-field("Definition", definition) }
     if from-book != none { vocab-field("From book", from-book) }
     if excerpt-context != none { vocab-field("Excerpt context", excerpt-context) }
+    if chapter-reference != none { vocab-field("Chapter", chapter-reference) }
   },
 )

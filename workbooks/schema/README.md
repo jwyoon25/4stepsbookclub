@@ -151,3 +151,16 @@ With no path, the command validates the example package. The loader in
 It returns normalized lesson data with omitted section defaults filled in.
 Response presets remain semantic; mapping them to physical lines and pages stays
 the renderer's responsibility.
+
+## PDF rendering
+
+After validation, render every required output from the same manifest:
+
+```bash
+npm run workbook:render -- workbooks/content/the-book-id/workbook.json
+```
+
+The build planner creates complete-workbook and standalone-lesson PDFs for both
+student and teacher editions. It writes a temporary normalized JSON bundle for
+each build, passes it to the generic Typst entry point, and removes the bundle
+after compilation. Tutors never author Typst or pagination data.

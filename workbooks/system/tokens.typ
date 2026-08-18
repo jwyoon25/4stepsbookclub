@@ -165,6 +165,19 @@
 // orphaned.
 #let lines-writing-min = 14
 
+// Tutor-facing response-space presets. The extended-answer mapping is
+// provisional until final page geometry and line spacing are locked; lesson
+// content stores the semantic preset rather than this derived number.
+#let response-short-answer-lines = 3
+#let response-short-paragraph-lines = 6
+#let response-extended-answer-lines = 12
+
+// Exact custom responses longer than this are split onto explicitly labelled
+// continuation pages. A continuation page can safely hold this many lines below
+// its repeated prompt label.
+#let response-first-page-lines = 14
+#let response-continuation-lines = 26
+
 // Keeps a filled surface clear of the footer.
 #let surface-bottom-guard = 4mm
 

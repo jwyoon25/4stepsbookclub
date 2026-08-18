@@ -5,10 +5,10 @@ Typst.
 
 The design system is implemented and proven by a specimen. The tutor-facing
 requirements are locked in
-[CONTENT-WORKFLOW-DECISIONS.md](CONTENT-WORKFLOW-DECISIONS.md), and their JSON
-model is defined in [schema/](schema/README.md). The editor and data-driven
-renderer are not implemented yet, so lessons are still written directly in
-Typst — see "Project shape" below.
+[CONTENT-WORKFLOW-DECISIONS.md](CONTENT-WORKFLOW-DECISIONS.md), their JSON model
+is defined in [schema/](schema/README.md), and the data-driven renderer turns a
+validated content package into student and teacher PDFs. The staff editor is the
+remaining layer.
 
 ## Prerequisites
 
@@ -35,6 +35,7 @@ From the repository root:
 npm run workbook:specimen        # build the design specimen
 npm run workbook:specimen:watch  # rebuild it on every save
 npm run workbook:validate        # validate the example content package
+npm run workbook:render          # render every example PDF variant
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
 ```
@@ -44,6 +45,33 @@ Validate a production manifest by passing its path after `--`:
 ```bash
 npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
 ```
+
+Render that package with the same manifest entry point:
+
+```bash
+npm run workbook:render -- workbooks/content/the-book-id/workbook.json
+```
+
+By default, output is written to `workbooks/output/`. To choose another output
+directory:
+
+```bash
+npm run workbook:render -- workbooks/content/the-book-id/workbook.json \
+  --output-dir path/to/output
+```
+
+For a package with the ID `the-book-id`, the renderer creates:
+
+- `the-book-id-workbook-student.pdf`
+- `the-book-id-workbook-teacher.pdf`
+- `the-book-id-lesson-01-student.pdf` and one equivalent file per lesson
+- `the-book-id-lesson-01-teacher.pdf` and one equivalent file per lesson
+
+Complete-workbook PDFs contain the workbook cover, exactly one required
+`How to use this workbook` page, and every lesson in manifest order. Standalone
+lesson PDFs begin with the lesson cover and omit the instruction page. Student
+editions contain response lines; teacher editions replace those surfaces with
+the stored teacher guidance and optional writing rubric.
 
 `workbook:specimen` writes `output/specimen.pdf`, a nine-page proof of the page
 grammar with placeholder content. It is the file to look at when changing
@@ -72,25 +100,30 @@ workbooks/
 │   └── logo/             # logomark and logotype, derived from the website assets
 ├── content/              # Production book- and lesson-specific curriculum data
 ├── lib/
+│   ├── build.mjs         # output planning and Typst build orchestration
 │   └── content.mjs       # package loading, validation, and default application
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
+│   ├── render-content.mjs   # command-line PDF renderer
 │   └── validate-content.mjs # command-line content validator
 ├── src/
 │   ├── main.typ          # Minimal Typst compilation smoke test.
+│   ├── render.typ        # Generic JSON bundle entry point.
 │   └── specimen.typ      # The design specimen.
 └── system/
     ├── tokens.typ        # Every measurement, colour, and type size.
-    └── components.typ    # The page grammar.
+    ├── components.typ    # The page grammar.
+    └── renderer.typ      # Content-to-component mapping and edition behavior.
 ```
 
 Components must not hard-code values. Change a workbook's feel by editing
 `tokens.typ`, not `components.typ`.
 
-The authoring requirements, JSON representation, and package loader are settled,
-but the editor and Typst renderer are not yet connected to them. The `content/`,
-`system/`, and `assets/` boundaries keep curriculum data independent from a
-particular authoring tool.
+The authoring requirements, JSON representation, package loader, and Typst
+renderer are connected. The future editor only needs to create schema-valid
+content packages and invoke this existing build path. The `content/`, `system/`,
+and `assets/` boundaries keep curriculum data independent from a particular
+authoring tool.
 
 ## Fonts
 

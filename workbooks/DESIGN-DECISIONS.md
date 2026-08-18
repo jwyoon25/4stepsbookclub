@@ -4,7 +4,7 @@ A running log of settled design decisions and deliberately deferred questions fo
 the workbook publishing system. The design is implemented in `system/` and proven
 in `src/specimen.typ`. The authoring requirements are locked in
 `CONTENT-WORKFLOW-DECISIONS.md`, and their JSON representation is defined in
-`schema/`; the editor and data-driven renderer are not yet implemented.
+`schema/`. The data-driven renderer is implemented; the staff editor remains.
 
 The purpose of this file is to keep decisions and their reasoning attached to the
 project rather than living only in conversation. Add to it as decisions are made
