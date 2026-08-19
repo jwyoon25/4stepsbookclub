@@ -346,17 +346,32 @@ conditions into availability errors rather than automatic PDF-compute charges.
 - [Cloudflare Pages static-asset pricing](https://developers.cloudflare.com/pages/functions/pricing/)
 - [Cloudflare Pages custom headers](https://developers.cloudflare.com/pages/configuration/headers/)
 
-## Next authorized implementation step
+## Phase 1 progress
 
-Phase 0 has passed, so Phase 1 is authorized. Its first three steps are the real
-work and they are all on the content side, because the compiler side is already
-built and proven: extract the row-to-schema logic out of the `.xlsx` reader into
-a browser-safe pure module, keep a Node adapter over it for the existing
-command-line and HTTP paths, and add an Apps Script adapter that hands the
-preview raw Sheet matrices in place of the four checked fixtures.
+| Step | State |
+| --- | --- |
+| 1. Row-to-schema logic in a browser-safe shared module | done — `builder/browser/sheet-contract.mjs` |
+| 2. A Node adapter over it for the command line and service | done — `lib/sheet-import.mjs` is now only the `.xlsx` half |
+| 3. An Apps Script adapter supplying raw Sheet matrices | done — `builder/apps-script/SheetGrids.gs` |
+| 4. A browser compiler adapter loading sources, data, fonts, images | done in Phase 0 |
+| 5. **Validate workbook**, **Open preview**, **Create all approved PDFs** menu items | not started |
+| 6. Exact Sheet locations for validation and compilation errors | messages name tab, row, and column; the preview logs them, nothing highlights cells |
+| 7. Save PDFs to the timestamped Drive folder convention | not started; the gate writes single files to a gate folder |
+| 8. The native renderer behind a clearly identified fallback path | unchanged and still tested |
 
-Two decisions the gate leaves open and Phase 1 has to make:
+The response-space defaults, the layout budgets, and the wrapping limit moved to
+`builder/browser/content-rules.mjs` alongside the contract, so a preview applies
+what a disk build applies. `lib/content.mjs` keeps the filesystem and the JSON
+schemas.
 
+### What Phase 1 still has to decide
+
+- **Whether the browser validates against the JSON schemas.** It does not today.
+  The Sheet contract requires the same fields cell by cell and the layout budgets
+  refuse content that cannot fit, but the schemas' length and count limits go
+  unchecked in the browser, and the browser is on its way to becoming the export
+  path. Either compile the validators into the bundle or keep an export route
+  that passes through Node.
 - **Where the bundle is hosted.** The gate ran from `localhost`. The generated
   `_headers` file is ready for Cloudflare Pages, and the measured cold start
   excludes the one-time download a hosted bundle pays.
