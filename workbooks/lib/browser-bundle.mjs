@@ -189,7 +189,16 @@ const PAGE_FILES = Object.freeze([
 // find out which one the real environment supports.
 const ISOLATED_PAGE_PATH = "isolated/preview.html";
 
-const CACHE_FOREVER = "public, max-age=31536000, immutable";
+// The compiler engine and the brand assets are the expensive part of a cold
+// start and only change when a version or the brand changes, so they are cached
+// hard. Templates, workbook content, and the page itself are revalidated, so a
+// rebuilt bundle is never served from a stale cache.
+export const BUNDLE_CACHE_RULES = Object.freeze([
+  ["/vendor/*", "public, max-age=31536000, immutable"],
+  ["/project/assets/*", "public, max-age=31536000, immutable"],
+  ["/project/*", "no-cache"],
+  ["/fixtures/*", "no-cache"],
+]);
 
 function headersFile() {
   return [
@@ -200,14 +209,11 @@ function headersFile() {
     "  Cross-Origin-Opener-Policy: same-origin",
     "  Cross-Origin-Embedder-Policy: require-corp",
     "",
-    "/vendor/*",
-    `  Cache-Control: ${CACHE_FOREVER}`,
-    "  Cross-Origin-Resource-Policy: same-origin",
-    "",
-    "/project/*",
-    `  Cache-Control: ${CACHE_FOREVER}`,
-    "  Cross-Origin-Resource-Policy: same-origin",
-    "",
+    ...BUNDLE_CACHE_RULES.flatMap(([pattern, value]) => [
+      pattern,
+      `  Cache-Control: ${value}`,
+      "",
+    ]),
   ].join("\n");
 }
 

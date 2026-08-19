@@ -14,6 +14,7 @@
     "website:preview": "npm run preview --workspace website",
     "workbook:build": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
     "workbook:browser-bundle": "node workbooks/scripts/build-browser-bundle.mjs",
+    "workbook:browser-gate": "node workbooks/scripts/serve-browser-bundle.mjs",
     "workbook:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
     "workbook:validate": "node workbooks/scripts/validate-content.mjs",
     "workbook:import-sheet": "node workbooks/scripts/import-sheet.mjs",
