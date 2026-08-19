@@ -201,6 +201,51 @@ outline is a structural difference rather than a tonal one, so it survives
 grayscale, a bad photocopier, and a low-toner print — which is what separating
 an answer key from student instructions has to do.
 
+### Step verbs are assigned per section, not by index — provisional
+
+`step-actions` is `("Read", "Think", "Write", "Speak")`: Paragraph Writing carries
+WRITE and Vocabulary carries SPEAK.
+
+The previous list was the brand strip in its own order, zipped against the four
+sections by index. That produced two wrong labels, because the method does not map
+one-to-one onto the workbook: SPEAK is the live discussion and has no workbook
+section, and the site files vocabulary under READ. Paragraph Writing was labelled
+SPEAK, and Vocabulary — a reference section with no response space at all — was
+labelled WRITE.
+
+Giving WRITE to Paragraph Writing is settled and correct. **Vocabulary as SPEAK is
+provisional and Jayden intends to revisit it.** Two things to weigh when he does:
+
+- The site's own READ step is noted "Reading · Vocabulary", and its promise line
+  is the weekly vocabulary test. On that copy, vocabulary belongs to READ, and the
+  workbook now says otherwise. If the live class actually drills vocabulary orally
+  then SPEAK is right and `methodSteps` in `website/src/pages/index.astro` is what
+  needs updating — either way the two should not disagree.
+- The pressure that caused the original error is still here: four tabs want four
+  distinct verbs, and the method only supplies three that the workbook covers.
+  The alternative considered was to drop the verb from Vocabulary and label it as
+  a reference section, which resolves the mismatch instead of relocating it.
+
+Step numbers stay in book order, so the printed sequence is now
+READ · THINK · WRITE · SPEAK rather than the brand strip's
+READ · THINK · SPEAK · WRITE. Numbers on a section a student reads front to back
+have to ascend; the verb order gives way to that.
+
+### Vocabulary has not been settled as prep or review
+
+Independent of the label, the system says three different things about what the
+vocabulary section is for:
+
+| Where | What it says |
+| --- | --- |
+| `src/specimen.typ` | "Read these before you begin Chapter 9" — pre-reading prep |
+| `system/renderer.typ` (ships) | "Return to these words and the moments in which they appear" — post-reading review |
+| `how-to-page` | "Return to important words…" — post-reading review |
+
+The section is rendered last, which fits review and contradicts the specimen.
+Settling this decides where the section belongs in the lesson and which verb it
+takes, so it should be settled before the verb question is revisited.
+
 ### Grayscale legibility is load-bearing
 
 The workbook must be fully usable printed black-and-white. All hierarchy works

@@ -7,6 +7,10 @@ const A4_HEIGHT_POINTS = 841.89;
 const PAGE_TOLERANCE_POINTS = 1;
 const BOUNDS_TOLERANCE_POINTS = 1;
 
+// The expected band label for each section, spelled out rather than derived from
+// tokens.typ on purpose: this is the independent assertion that the rendered page
+// says what the design intends. If a verb changes in tokens.typ, this list must be
+// updated deliberately — the build failing is the point.
 const SECTION_CHECKS = [
   {
     step: 1,
@@ -20,12 +24,12 @@ const SECTION_CHECKS = [
   },
   {
     step: 3,
-    band: "STEP3SPEAK",
+    band: "STEP3WRITE",
     name: "PARAGRAPHWRITING",
   },
   {
     step: 4,
-    band: "STEP4WRITE",
+    band: "STEP4SPEAK",
     name: "VOCABULARY",
   },
 ];

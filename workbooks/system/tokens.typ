@@ -33,10 +33,15 @@
 
 // --- Section colours --------------------------------------------------------
 //
-// The four section colours are the brand's method palette, in method order.
-// The sections keep their working names — Comprehension, Analysis, Writing,
-// Vocabulary — because that is what is actually on the page; the palette is
-// what ties them to READ · THINK · SPEAK · WRITE.
+// The four section colours are the brand's method palette. The sections keep
+// their working names — Comprehension, Analysis, Writing, Vocabulary — because
+// that is what is actually on the page; the palette is what ties them to the
+// READ · THINK · SPEAK · WRITE method.
+//
+// `step-actions` assigns a verb per section, in book order, so the verb printed
+// beside a section is the verb for that section — not the verb that happens to
+// share its index in the brand's strip. Paragraph Writing is WRITE. Vocabulary
+// is SPEAK. Provisional: see "Step verbs" in DESIGN-DECISIONS.md.
 //
 // These are pastels. They are fills, never text: every one of them fails
 // contrast as type on white. Each has a `-deep` partner for the rare place a
@@ -46,7 +51,7 @@
 #let step-deep = (rgb("#4f7d5b"), rgb("#a9503a"), rgb("#3a7570"), rgb("#6d5c99"))
 #let step-wash = (rgb("#f0f5ef"), rgb("#fdf0ec"), rgb("#eff8f7"), rgb("#f3f0f8"))
 #let step-pale = (rgb("#e4ede3"), rgb("#f7ddd5"), rgb("#dcf0ed"), rgb("#e8e2f1"))
-#let step-actions = ("Read", "Think", "Speak", "Write")
+#let step-actions = ("Read", "Think", "Write", "Speak")
 
 // --- Rules ------------------------------------------------------------------
 //
