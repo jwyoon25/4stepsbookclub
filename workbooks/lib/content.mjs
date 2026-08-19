@@ -289,13 +289,34 @@ function assertLessonLayout(lesson, filePath) {
   });
 }
 
+function assertTeacherGuidance(lesson, filePath) {
+  for (const [sectionName, items] of [
+    ["readingComprehension", lesson.sections.readingComprehension],
+    ["criticalThinkingAndAnalysis", lesson.sections.criticalThinkingAndAnalysis],
+  ]) {
+    items.forEach((item, index) => {
+      if (typeof item.teacherGuidance === "string" && item.teacherGuidance.trim()) {
+        return;
+      }
+
+      throw new WorkbookContentError(
+        `Teacher guidance is required when teacher PDFs are requested in ${filePath}:\n` +
+          `  /sections/${sectionName}/${index}/teacherGuidance: add answer guidance or export student PDFs only.`,
+      );
+    });
+  }
+}
+
 /**
  * Load, validate, and normalize a complete workbook content package.
  *
  * The returned lesson order is the manifest order. Response-space presets stay
  * semantic; the renderer owns their eventual line/page geometry.
  */
-export async function loadWorkbookPackage(manifestPath) {
+export async function loadWorkbookPackage(
+  manifestPath,
+  { requireTeacherGuidance = true } = {},
+) {
   const absoluteManifestPath = resolve(manifestPath);
   const manifestDirectory = dirname(absoluteManifestPath);
   const [manifest, validators] = await Promise.all([
@@ -344,6 +365,9 @@ export async function loadWorkbookPackage(manifestPath) {
     const lesson = await readJson(realLessonPath);
     assertValid(validators.lesson, lesson, realLessonPath);
     assertWrappableContent(lesson, realLessonPath);
+    if (requireTeacherGuidance) {
+      assertTeacherGuidance(lesson, realLessonPath);
+    }
 
     const previousSource = lessonNumberSources.get(lesson.lessonNumber);
     if (previousSource) {

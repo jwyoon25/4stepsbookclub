@@ -67,6 +67,25 @@ test("resolves every output below the requested directory", () => {
   }
 });
 
+test("plans only the requested student edition", () => {
+  const workbook = {
+    manifest: { id: "book-alpha" },
+    lessons: [
+      { content: { lessonNumber: 2 } },
+      { content: { lessonNumber: 12 } },
+    ],
+  };
+
+  const targets = createBuildTargets(workbook, outputDirectory, ["student"]);
+
+  assert.deepEqual(targetNames(targets), [
+    "book-alpha-workbook-student.pdf",
+    "book-alpha-lesson-02-student.pdf",
+    "book-alpha-lesson-12-student.pdf",
+  ]);
+  assert.ok(targets.every(({ edition }) => edition === "student"));
+});
+
 test("recognizes successful Typst output that still contains warnings", () => {
   assert.equal(containsTypstWarning(""), false);
   assert.equal(containsTypstWarning("compiled successfully"), false);

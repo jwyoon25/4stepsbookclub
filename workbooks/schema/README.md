@@ -47,10 +47,11 @@ type or manage them.
   Authors do not enter printed numbers or labels such as `L3-C2`.
 - Every lesson contains all four section arrays, and every array has at least one
   item.
-- Required answer guidance for Reading Comprehension and Critical Thinking &
-  Analysis is stored with the lesson because teacher PDFs are a required output.
-  Writing guidance may also be supplied. None of it is rendered in a student
-  PDF.
+- Answer guidance for Reading Comprehension and Critical Thinking & Analysis is
+  stored with the lesson whenever teacher PDFs are requested. Student-only
+  exports may omit it; the renderer rejects a teacher export that does not
+  provide it. Writing guidance may also be supplied. None of it is rendered in
+  a student PDF.
 - Optional `responseGuidance` may be attached to any Comprehension question,
   Analysis question, or Writing prompt. It is a list of student-facing
   directions or requirements and is rendered unchanged in both editions.

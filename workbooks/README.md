@@ -150,6 +150,14 @@ Validate a production manifest by passing its path after `--`:
 npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
 ```
 
+Use the same student-only boundary during validation when answer guidance has
+not been authored yet:
+
+```bash
+npm run workbook:validate -- workbooks/content/the-book-id/workbook.json \
+  --editions student
+```
+
 Render that package with the same manifest entry point:
 
 ```bash
@@ -163,6 +171,16 @@ directory:
 npm run workbook:render -- workbooks/content/the-book-id/workbook.json \
   --output-dir path/to/output
 ```
+
+When teacher answer guidance is not ready yet, create only the student outputs:
+
+```bash
+npm run workbook:render -- workbooks/content/the-book-id/workbook.json \
+  --editions student
+```
+
+Teacher guidance remains required whenever `--editions teacher` or `--editions
+both` is requested; the student-only path does not invent answer guidance.
 
 For a package with the ID `the-book-id`, the renderer creates:
 

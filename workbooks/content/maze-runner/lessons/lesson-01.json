@@ -1,0 +1,227 @@
+{
+  "$schema": "../../../schema/lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 1,
+  "title": "The Box and the Glade",
+  "readingRange": "Chapters 1-12",
+  "framingNote": "Thomas enters the Glade without a past and must learn its rules before he can decide whether to challenge them.",
+  "studentInstructions": "Answer comprehension questions in complete sentences and support analysis answers with text details. For writing, choose one prompt and write a well-developed paragraph with a clear topic sentence, evidence, and explanation.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "What does Thomas remember when he first wakes up in the Box, and what important things has he forgotten?"
+      },
+      {
+        "prompt": "How is the Glade described when Thomas first arrives, and what makes the place feel both organized and frightening?"
+      },
+      {
+        "prompt": "Who are Alby, Newt, Chuck, and Gally, and how does each character respond to Thomas in his first few days?"
+      },
+      {
+        "prompt": "What does Thomas learn about the Maze, the Runners, the Grievers, and the rule that no one is allowed to enter the Maze at night?"
+      },
+      {
+        "prompt": "What unusual events happen after Thomas arrives, including Ben’s attack, the arrival of the girl, and Minho’s early return from the Maze?"
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "The novel begins with Thomas waking up in darkness with almost no memory. Why is this an effective way to begin the story?"
+      },
+      {
+        "prompt": "Thomas remembers general knowledge about the world, but not his personal identity or past relationships. What does this suggest about the difference between knowledge and identity?"
+      },
+      {
+        "prompt": "The Glade has rules, jobs, leaders, and punishments, even though the boys are trapped. What does this suggest about the importance of order in a dangerous situation?"
+      },
+      {
+        "prompt": "Alby often seems harsh and impatient with Thomas, while Newt is more understanding. Why might the novel present two different types of leadership so early in the story?"
+      },
+      {
+        "prompt": "Chuck is younger and less powerful than many of the other boys, but he quickly tries to help Thomas. Why is Chuck important to Thomas’s adjustment to the Glade?"
+      },
+      {
+        "prompt": "Gally immediately distrusts Thomas and claims that he has seen him before. How does Gally’s suspicion create tension and mystery in the opening chapters?"
+      },
+      {
+        "prompt": "Thomas feels afraid of the Maze, yet he is also strongly drawn to becoming a Runner. What does this reveal about his character?"
+      },
+      {
+        "prompt": "The Maze is physically dangerous, but it also represents mystery, control, and the unknown. What might the Maze symbolize in these early chapters?"
+      },
+      {
+        "prompt": "By the end of Lesson 1, does Thomas seem more like a helpless victim or someone with unusual potential? Explain your reasoning using specific moments from the text."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Choose ONE of the following prompts:\n1. In Chapters 1-12, Thomas enters the Glade with no memory, no control, and very few answers. How does James Dashner use Thomas’s confusion to help the reader experience the mystery of the Glade?\n2. The Glade is a prison-like place, but it also has rules, jobs, friendships, and leadership. What do these chapters suggest about how people create order when they are trapped in fear?\n3. Thomas is repeatedly warned to stay away from the Maze, yet he feels a powerful desire to understand it and become a Runner. What does this conflict suggest about courage, curiosity, and survival?",
+        "responseGuidance": [
+          "Write one well-developed paragraph with a clear topic sentence, evidence, explanation, and specific moments from the book."
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "lurch",
+        "koreanMeaning": "갑자기 휘청하다",
+        "definition": "to make a sudden, unsteady, and jerky movement.",
+        "bookExcerpt": "“At that moment, Thomas realized with a sickening lurch that he had no idea how old he was.”",
+        "excerptContext": "Thomas suddenly realizes that his memory loss includes even his own age.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "predicament",
+        "koreanMeaning": "곤경, 궁지",
+        "definition": "a difficult, unpleasant, or embarrassing situation.",
+        "bookExcerpt": "“He didn’t understand how this could be possible. His mind functioned without flaw, trying to calculate his surroundings and predicament.”",
+        "excerptContext": "Thomas is trapped in the dark Box and trying to understand the difficult situation he is in.",
+        "chapterReference": "Chapter 1"
+      },
+      {
+        "term": "ascent",
+        "koreanMeaning": "상승, 오름",
+        "definition": "a climb or walk to the summit of a mountain or hill; moving upward.",
+        "bookExcerpt": "“The room continued its ascent, swaying; Thomas grew immune to the ceaseless rattling of the chains that pulled him upward.”",
+        "excerptContext": "The Box is moving upward toward the Glade.",
+        "chapterReference": "Chapter 1"
+      },
+      {
+        "term": "ceaseless",
+        "koreanMeaning": "끊임없는",
+        "definition": "constant and unending.",
+        "bookExcerpt": "“The room continued its ascent, swaying; Thomas grew immune to the ceaseless rattling of the chains that pulled him upward.”",
+        "excerptContext": "The chains continue rattling without stopping as the Box rises.",
+        "chapterReference": "Chapter 1"
+      },
+      {
+        "term": "huddled",
+        "koreanMeaning": "옹기종기 모인, 웅크린",
+        "definition": "crowded or gathered closely together.",
+        "bookExcerpt": "“With a groan and then a clonk, the rising room halted; the sudden change jolted Thomas from his huddled position and threw him across the hard floor.”",
+        "excerptContext": "Thomas has curled himself tightly into a protective position while trapped inside the Box.",
+        "chapterReference": "Chapter 1"
+      },
+      {
+        "term": "amplified",
+        "koreanMeaning": "증폭된, 확대된",
+        "definition": "made larger or louder.",
+        "bookExcerpt": "“He groaned in frustration; his echo amplified through the air, like the haunted moan of death.”",
+        "excerptContext": "Thomas’s voice becomes much louder as it echoes through the enclosed Box.",
+        "chapterReference": "Chapter 1"
+      },
+      {
+        "term": "bizarre",
+        "koreanMeaning": "기이한, 특이한",
+        "definition": "very strange or unusual.",
+        "bookExcerpt": "“Thomas suddenly felt dizzy, his eyes flickering between the boys and the bizarre place in which he’d found himself.”",
+        "excerptContext": "Thomas is seeing the strange and unfamiliar Glade for the first time.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "devoid",
+        "koreanMeaning": "전혀 없는, 결여된",
+        "definition": "entirely lacking or free from.",
+        "bookExcerpt": "“A tall kid with blond hair and a square jaw sniffed at him, his face devoid of expression.”",
+        "excerptContext": "The boy’s face shows no visible emotion or expression.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "disorienting",
+        "koreanMeaning": "방향 감각을 잃게 하는",
+        "definition": "causing someone to lose their sense of direction or feel confused.",
+        "bookExcerpt": "“They popped out of the boys’ mouths so naturally it seemed odd for him not to understand. It was as if his memory loss had stolen a chunk of his language - it was disorienting.”",
+        "excerptContext": "Thomas hears unfamiliar Glader slang that everyone else seems to understand, leaving him confused and unsettled.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "dilapidated",
+        "koreanMeaning": "황폐한, 허물어져 가는",
+        "definition": "in a state of ruin or disrepair due to age or neglect.",
+        "bookExcerpt": "“An odd, dilapidated wooden building near one of the corners of the square contrasted greatly with the gray stone.”",
+        "excerptContext": "Thomas notices an old, damaged, and run-down wooden building in the Glade.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "menacing",
+        "koreanMeaning": "위협적인",
+        "definition": "suggesting the presence of danger; threatening.",
+        "bookExcerpt": "“Near that, maybe twenty feet to the south, stood a squat building made of rough concrete blocks, a menacing iron door its only entrance - there were no windows.”",
+        "excerptContext": "The mysterious building looks threatening and makes Thomas uneasy about what might be inside.",
+        "chapterReference": "Chapter 4"
+      },
+      {
+        "term": "cascading",
+        "koreanMeaning": "폭포처럼 떨어지는",
+        "definition": "falling or flowing downward in large amounts.",
+        "bookExcerpt": "“His hair was blond and cut long, cascading over his T-shirt.”",
+        "excerptContext": "Newt’s long blond hair falls downward over his shirt.",
+        "chapterReference": "Chapter 2"
+      },
+      {
+        "term": "claustrophobia",
+        "koreanMeaning": "폐쇄공포증",
+        "definition": "an extreme or irrational fear of confined places.",
+        "bookExcerpt": "“The walls were really closing - trapping him inside the Glade. An onrushing sense of claustrophobia stifled him, compressed his lungs, as if water filled their cavities.”",
+        "excerptContext": "As the enormous Doors close, Thomas feels trapped and has difficulty breathing.",
+        "chapterReference": "Chapter 4"
+      },
+      {
+        "term": "trepidation",
+        "koreanMeaning": "두려움, 공포",
+        "definition": "a feeling of fear or agitation about something that may happen.",
+        "bookExcerpt": "“Thomas felt one final moment of trepidation, a quick slice of fear through his body, and then it vanished.”",
+        "excerptContext": "Thomas experiences a brief burst of fear after the Doors of the Glade seal shut for the night.",
+        "chapterReference": "Chapter 4"
+      },
+      {
+        "term": "epiphany",
+        "koreanMeaning": "직관, 깨달음",
+        "definition": "a moment of sudden and great revelation or realization.",
+        "bookExcerpt": "“He didn’t get it. The feeling - the epiphany - was a strange one, foreign and familiar at the same time. But it felt … right.”",
+        "excerptContext": "Thomas suddenly realizes that he wants to become a Runner, even though he does not fully understand why.",
+        "chapterReference": "Chapter 5"
+      },
+      {
+        "term": "ominous",
+        "koreanMeaning": "불길한",
+        "definition": "giving the impression that something bad or unpleasant is going to happen.",
+        "bookExcerpt": "“He said it quietly enough that Thomas didn’t think anyone else heard, but it sounded ominous.”",
+        "excerptContext": "Alby calls a Gathering, and the way he says it suggests that something serious or bad may happen.",
+        "chapterReference": "Chapter 9"
+      },
+      {
+        "term": "palpable",
+        "koreanMeaning": "명백한, 감지할 수 있는",
+        "definition": "able to be touched or felt; so intense as to seem almost tangible.",
+        "bookExcerpt": "“Everyone immediately ran forward, forming a packed crowd around her, a palpable excitement hovering in the air.”",
+        "excerptContext": "The Gladers’ excitement about the mysterious girl is so strong that it almost feels physically noticeable.",
+        "chapterReference": "Chapter 8"
+      },
+      {
+        "term": "inexplicable",
+        "koreanMeaning": "설명할 수 없는",
+        "definition": "unable to be explained or accounted for.",
+        "bookExcerpt": "“He giggled as he elbowed Thomas in the ribs, a high-pitched snicker that inexplicably made Thomas like him more.”",
+        "excerptContext": "Thomas finds himself liking Chuck more even though he cannot explain exactly why. The novel uses the adverb form “inexplicably” in this sentence.",
+        "chapterReference": "Chapter 8"
+      },
+      {
+        "term": "dumbfounded",
+        "koreanMeaning": "어안이 벙벙한",
+        "definition": "greatly astonished or amazed.",
+        "bookExcerpt": "“Newt had read the message aloud for those who couldn’t see the paper, but instead of erupting in confusion, the Gladers all stood dumbfounded.”",
+        "excerptContext": "The message saying that the girl is the last one leaves all of the Gladers completely shocked and speechless.",
+        "chapterReference": "Chapter 9"
+      },
+      {
+        "term": "mesmerized",
+        "koreanMeaning": "매료된, 넋을 잃은",
+        "definition": "holding the attention of someone to the exclusion of all else.",
+        "bookExcerpt": "“Thomas wanted to look away, get out of there. But he couldn’t move; he was too mesmerized, too scared.”",
+        "excerptContext": "Thomas is terrified by Ben, but he is so completely absorbed by what he sees that he cannot look away.",
+        "chapterReference": "Chapter 11"
+      }
+    ]
+  }
+}

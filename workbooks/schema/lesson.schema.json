@@ -98,8 +98,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "prompt",
-        "teacherGuidance"
+        "prompt"
       ],
       "properties": {
         "prompt": {
@@ -133,8 +132,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "prompt",
-        "teacherGuidance"
+        "prompt"
       ],
       "properties": {
         "prompt": {

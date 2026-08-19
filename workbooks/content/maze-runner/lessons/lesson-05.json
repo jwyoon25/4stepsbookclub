@@ -1,0 +1,259 @@
+{
+  "$schema": "../../../schema/lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 5,
+  "title": "Escape and the World Beyond",
+  "readingRange": "Chapters 49-62",
+  "framingNote": "The Gladers must choose between the familiar danger of the Glade and the unknown danger beyond it.",
+  "studentInstructions": "Answer comprehension questions in complete sentences and support analysis answers with text details. For writing, choose one prompt and write a well-developed paragraph with a clear topic sentence, evidence, and explanation.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "What memories does Thomas recover after going through the Changing, and what does he learn about his connection to Teresa and the Creators?"
+      },
+      {
+        "prompt": "What plan do Thomas and the Gladers make for escaping the Maze, and why is the Griever Hole important?"
+      },
+      {
+        "prompt": "What happens during the final escape attempt, and how do the Gladers fight their way through the Grievers?"
+      },
+      {
+        "prompt": "What do the Gladers discover after entering the code and leaving the Maze?"
+      },
+      {
+        "prompt": "What happens to Chuck, Gally, and Thomas near the end of the novel, and how does this moment affect Thomas emotionally?"
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "Thomas learns that he and Teresa were somehow involved with the Creators before entering the Maze. Why does this make his identity more complicated?"
+      },
+      {
+        "prompt": "The Gladers must choose between staying in the Glade and risking death in the Maze. What does this choice suggest about the difference between survival and freedom?"
+      },
+      {
+        "prompt": "Some Gladers refuse to join the escape attempt because they are too afraid. Why is this reaction understandable, and what does it show about the psychological power of the Maze?"
+      },
+      {
+        "prompt": "The final escape requires teamwork, sacrifice, and trust. How do these chapters show that no one can survive the Maze completely alone?"
+      },
+      {
+        "prompt": "The code proves that the Maze was designed to be solved. How does this change the meaning of the Gladers’ suffering?"
+      },
+      {
+        "prompt": "Chuck’s death is one of the most emotional moments in the novel. Why is his sacrifice especially important to Thomas’s development?"
+      },
+      {
+        "prompt": "Gally’s actions near the end are partly caused by the Creators’ control over him. How does this make the reader question guilt, responsibility, and free will?"
+      },
+      {
+        "prompt": "The Gladers finally escape the Maze, but the world outside is not safe or simple. Why might Dashner end the novel with uncertainty instead of complete relief?"
+      },
+      {
+        "prompt": "By the end of the novel, what message does The Maze Runner suggest about courage, memory, sacrifice, and hope? Explain your reasoning using specific moments from the text."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Choose ONE of the following prompts:\n1. In the final chapters, the Gladers realize that staying in the Glade may be safer in the short term, but escaping the Maze is their only real chance at freedom. What does the novel suggest about the risks people must take to escape control?\n2. Chuck’s death deeply changes Thomas because Chuck represents innocence, friendship, and hope for a normal life. How does Chuck’s sacrifice help reveal one of the central messages of the novel?\n3. By the end of The Maze Runner, the Gladers escape one prison only to discover that the outside world is also dangerous and uncertain. How does this ending develop the novel’s themes of survival, truth, and hope?",
+        "responseGuidance": [
+          "Write one well-developed paragraph with a clear topic sentence, evidence, explanation, and specific moments from the book."
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "intensified",
+        "koreanMeaning": "더 강해진, 더 심해진",
+        "definition": "became stronger, more severe, or more extreme.",
+        "bookExcerpt": "“Their relentless attack intensified, and Thomas felt pain erupt over every inch of his body - needle pricks that told him he’d succeeded.”",
+        "excerptContext": "Thomas deliberately allows the Grievers to attack him because he wants to be stung and go through the Changing. As more Grievers swarm him, their attack becomes increasingly severe.",
+        "chapterReference": "Chapter 46"
+      },
+      {
+        "term": "delirious",
+        "koreanMeaning": "의식이 혼미한, 정신이 흐릿한",
+        "definition": "confused and unable to think clearly, often because of pain, illness, or shock.",
+        "bookExcerpt": "“Thomas felt the world swimming around him, felt delirious, nauseated.”",
+        "excerptContext": "Thomas has just been stung many times by the Grievers and collapses. As the others carry him into the Homestead, he becomes dizzy, confused, and sick.",
+        "chapterReference": "Chapter 46"
+      },
+      {
+        "term": "interminable",
+        "koreanMeaning": "끝없이 계속되는 것 같은, 지루할 정도로 긴",
+        "definition": "seeming to continue forever or for an extremely long time.",
+        "bookExcerpt": "“Finally, after an interminable wait, things began to change.”",
+        "excerptContext": "Thomas is going through the Changing and experiences a dark, empty state in which he cannot sense anything. The wait seems endless before the strange mist and returning memories finally appear.",
+        "chapterReference": "Chapter 47"
+      },
+      {
+        "term": "jubilation",
+        "koreanMeaning": "환희, 큰 기쁨",
+        "definition": "a feeling of great joy, especially after success or good news.",
+        "bookExcerpt": "“Chuck’s jubilation visibly crashed to the ground as his eyes sank down toward the floor.”",
+        "excerptContext": "Chuck is thrilled that Thomas has awakened after surviving the Changing. His happiness disappears when Thomas asks about the Grievers, because Chuck must tell him that Zart and other Gladers have been taken.",
+        "chapterReference": "Chapter 48"
+      },
+      {
+        "term": "composure",
+        "koreanMeaning": "침착함, 평정",
+        "definition": "calmness and self-control, especially in a stressful situation.",
+        "bookExcerpt": "“Thomas, still a bit queasy from the Changing, forced himself to take a second and gain his composure.”",
+        "excerptContext": "Thomas is speaking to the Keepers after going through the Changing. Before explaining the memories he recovered, he steadies himself so he can speak clearly.",
+        "chapterReference": "Chapter 49"
+      },
+      {
+        "term": "absurd",
+        "koreanMeaning": "터무니없는, 말도 안 되는",
+        "definition": "completely unreasonable, ridiculous, or difficult to believe.",
+        "bookExcerpt": "“He stopped, knowing it must all sound absurd.”",
+        "excerptContext": "Thomas is explaining that he and Teresa were unusually valuable to the Creators while the Maze was being designed. He realizes that what he is telling the Keepers sounds unbelievable.",
+        "chapterReference": "Chapter 50"
+      },
+      {
+        "term": "innovative",
+        "koreanMeaning": "혁신적인, 창의적인",
+        "definition": "introducing or using new, creative, or original ideas or methods.",
+        "bookExcerpt": "“Thomas helped Newt distribute the weapons, and even more innovative ones were created in their desperation to be prepared for the Grievers.”",
+        "excerptContext": "The Gladers are preparing for their dangerous escape attempt. They create unusual new weapons from materials such as wooden poles, barbed wire, knives, and broken glass.",
+        "chapterReference": "Chapter 53"
+      },
+      {
+        "term": "hysterical",
+        "koreanMeaning": "극도로 흥분한, 감정을 주체하지 못하는",
+        "definition": "extremely upset or excited and unable to control your emotions.",
+        "bookExcerpt": "“Alby sounded like he was begging - near hysterical.”",
+        "excerptContext": "Alby has admitted that he burned the Maps and is desperately trying to convince the others not to return to the outside world. His memories of burned land and the Flare have left him terrified and emotionally overwhelmed.",
+        "chapterReference": "Chapter 51"
+      },
+      {
+        "term": "fleeting",
+        "koreanMeaning": "잠깐의, 금세 사라지는",
+        "definition": "lasting for only a very short time.",
+        "bookExcerpt": "“He felt the slightest hint of peace, as fleeting as it was, and tried to enjoy it for however long it might last.”",
+        "excerptContext": "Thomas and Teresa sit together after discussing the dangerous plan to escape through the Griever Hole. Despite their fear, Thomas experiences a brief moment of peace while they hold hands.",
+        "chapterReference": "Chapter 52"
+      },
+      {
+        "term": "speculating",
+        "koreanMeaning": "추측하다, 짐작하다",
+        "definition": "forming guesses or ideas about something when all the facts are not known.",
+        "bookExcerpt": "“Well, everyone’s speculating they can only kill one of us. Maybe I sound like a shuck, but it gives me some hope.”",
+        "excerptContext": "Before the Gladers begin their escape attempt, Chuck explains that people are guessing the Grievers may kill only one person. Although nobody knows whether this is true, the possibility gives Chuck some hope.",
+        "chapterReference": "Chapter 54"
+      },
+      {
+        "term": "contemplated",
+        "koreanMeaning": "곰곰이 생각했다, 숙고했다",
+        "definition": "thought carefully about doing something.",
+        "bookExcerpt": "“Thomas had contemplated just jumping into the Hole right away and trying to punch in the code quickly, but he had no idea what to expect or what might be waiting for him.”",
+        "excerptContext": "Minho and the Runners are testing the Griever Hole before the planned escape. Thomas has considered entering it immediately to use the code, but the unknown dangers inside make that idea too risky.",
+        "chapterReference": "Chapter 53"
+      },
+      {
+        "term": "embark",
+        "koreanMeaning": "착수하다, 나서다",
+        "definition": "to begin a journey, task, or important undertaking.",
+        "bookExcerpt": "“Thomas couldn’t help shaking his head - here they were, about to embark on probably the most dangerous task of their lives, and Chuck was curious where he’d gotten his nickname.”",
+        "excerptContext": "The Gladers are eating one final meal before beginning their escape attempt. Thomas is amazed that Chuck is asking about his nickname just before they set out on such a dangerous mission.",
+        "chapterReference": "Chapter 54"
+      },
+      {
+        "term": "hastily",
+        "koreanMeaning": "서둘러, 급하게",
+        "definition": "in a hurried way, often with little time to prepare carefully.",
+        "bookExcerpt": "“Thomas found Minho and Teresa talking to each other near the left side of the Door, going over the hastily made plans to enter the escape code once they got into the Hole.”",
+        "excerptContext": "The Gladers are gathering at the West Door just before leaving for the Maze. Minho and Teresa are reviewing the escape plan, which had to be prepared quickly because they intend to leave that night.",
+        "chapterReference": "Chapter 54"
+      },
+      {
+        "term": "dormant",
+        "koreanMeaning": "활동을 멈춘, 휴면 상태의",
+        "definition": "temporarily inactive or not moving, but able to become active again.",
+        "bookExcerpt": "“Hopefully they’ll go dormant for a while. We should only need a minute or so to punch in the code.”",
+        "excerptContext": "After Alby sacrifices himself, the Grievers temporarily seem not to be attacking the others. Thomas hopes they will remain inactive long enough for him and Teresa to reach the Hole and enter the code.",
+        "chapterReference": "Chapter 55"
+      },
+      {
+        "term": "cacophony",
+        "koreanMeaning": "불협화음, 시끄럽게 뒤섞인 소리",
+        "definition": "a harsh, confusing mixture of loud and unpleasant sounds.",
+        "bookExcerpt": "“The sounds echoing off the walls were a cacophony of terror - human screams, metal clashing against metal, motors roaring, the haunted shrieks of the Grievers, saws spinning, claws clasping, boys yelling for help.”",
+        "excerptContext": "The Gladers are fighting the Grievers while Thomas, Teresa, and Chuck run toward the Cliff. Screams, machinery, weapons, and Griever noises combine into an overwhelming mixture of terrifying sounds.",
+        "chapterReference": "Chapter 56"
+      },
+      {
+        "term": "halfheartedly",
+        "koreanMeaning": "마지못해, 열의 없이",
+        "definition": "without much enthusiasm, effort, or determination.",
+        "bookExcerpt": "“Feeling his will fade into blackness, Thomas braced his feet and held up his fists halfheartedly.”",
+        "excerptContext": "Inside the Griever Hole, Teresa cannot get the final code word to work and more Grievers are approaching. Thomas begins to lose hope and prepares to fight without much confidence or determination left.",
+        "chapterReference": "Chapter 57"
+      },
+      {
+        "term": "elation",
+        "koreanMeaning": "큰 기쁨, 환희",
+        "definition": "a feeling of great happiness and excitement.",
+        "bookExcerpt": "“Thomas fell to the floor after being released by his captor’s claws, and despite the pain of several lacerations across his back and shoulders, elation surged through him so strongly he didn’t know how to react.”",
+        "excerptContext": "Teresa has pushed the “Kill the Maze” button, causing the Grievers to shut down. Although Thomas is injured, he is overwhelmed with joy and relief because their plan has worked.",
+        "chapterReference": "Chapter 58"
+      },
+      {
+        "term": "recoiled",
+        "koreanMeaning": "움찔하며 뒤로 물러났다",
+        "definition": "jerked or moved backward suddenly, usually because of shock, fear, or pain.",
+        "bookExcerpt": "“The tunnel began to twist, turning in a rough spiral, just enough to slow them down, and Thomas’s feet smacked right into Teresa, hitting her in the head; he recoiled and a feeling of complete misery sank over him.”",
+        "excerptContext": "Thomas and the others are sliding uncontrollably down a slick tunnel after leaving the Griever Hole. When his feet strike Teresa in the head, Thomas instinctively jerks backward.",
+        "chapterReference": "Chapter 58"
+      },
+      {
+        "term": "recollection",
+        "koreanMeaning": "기억, 회상",
+        "definition": "a memory of something that happened in the past.",
+        "bookExcerpt": "“But it was a cloudy kind of recollection - he couldn’t remember her name or what she had to do with the Maze, but she seemed familiar.”",
+        "excerptContext": "An adult woman from WICKED has entered the chamber where the Gladers have arrived. Thomas feels that he recognizes her, but his memory is too unclear for him to remember her name or role.",
+        "chapterReference": "Chapter 59"
+      },
+      {
+        "term": "condescending",
+        "koreanMeaning": "잘난 체하는, 깔보는 듯한",
+        "definition": "showing that you think you are more important or intelligent than someone else.",
+        "bookExcerpt": "“Her condescending tone shocked Thomas.”",
+        "excerptContext": "Minho angrily demands answers from the WICKED woman. She responds by telling him that he does not know what he is talking about and that she expected more maturity from him, speaking as though she is superior to him.",
+        "chapterReference": "Chapter 59"
+      },
+      {
+        "term": "ferocity",
+        "koreanMeaning": "맹렬함, 거센 기세",
+        "definition": "fierce, violent, or powerful intensity.",
+        "bookExcerpt": "“Maybe it was just the ferocity of the deluge.”",
+        "excerptContext": "Thomas and the other Gladers are rushing toward a bus in a massive rainstorm after escaping the WICKED chamber. The force of the pounding rain helps snap Thomas out of his emotional numbness.",
+        "chapterReference": "Chapter 60"
+      },
+      {
+        "term": "unprecedented",
+        "koreanMeaning": "전례 없는",
+        "definition": "never having happened or been known before.",
+        "bookExcerpt": "“Sun flares are normal, but these were unprecedented, massive, spiking higher and higher - and once they were noticed, it was only minutes before their heat slammed into Earth.”",
+        "excerptContext": "On the bus, one of the rescuers begins explaining what happened to the outside world. She says that these particular sun flares were unlike anything that had occurred before and caused enormous destruction.",
+        "chapterReference": "Chapter 61"
+      },
+      {
+        "term": "immaculate",
+        "koreanMeaning": "티 없이 깨끗한, 매우 깔끔한",
+        "definition": "perfectly clean, neat, and free from dirt or mess.",
+        "bookExcerpt": "“Their bus-driving leader left the Gladers in the hands of a small staff - nine or ten men and women dressed in pressed black pants and white shirts, their hair immaculate, their faces and hands clean.”",
+        "excerptContext": "The Gladers have reached a new building where clean, neatly dressed staff members receive them. Their appearance contrasts sharply with the dirty and dangerous conditions the Gladers have just escaped.",
+        "chapterReference": "Chapter 61"
+      },
+      {
+        "term": "nondescript",
+        "koreanMeaning": "특징 없는, 평범해서 눈에 띄지 않는",
+        "definition": "ordinary in appearance and lacking noticeable or distinctive features.",
+        "bookExcerpt": "“They had pulled into a muddy parking lot that surrounded a nondescript building with several rows of windows.”",
+        "excerptContext": "After escaping the Maze and traveling by bus, Thomas and the other Gladers arrive at a new building. From the outside, the building looks plain and has no particularly noticeable features.",
+        "chapterReference": "Chapter 61"
+      }
+    ]
+  }
+}

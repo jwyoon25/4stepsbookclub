@@ -1,0 +1,227 @@
+{
+  "$schema": "../../../schema/lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 2,
+  "title": "The Runners and the Changing",
+  "readingRange": "Chapters 13-24",
+  "framingNote": "Thomas survives a night in the Maze and begins learning that courage can require both action and discipline.",
+  "studentInstructions": "Answer comprehension questions in complete sentences and support analysis answers with text details. For writing, choose one prompt and write a well-developed paragraph with a clear topic sentence, evidence, and explanation.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "What happens when Thomas, Minho, and Alby survive the night in the Maze, and how do the other Gladers react when they return?"
+      },
+      {
+        "prompt": "Why is Thomas punished after entering the Maze, and what unexpected reward does he receive afterward?"
+      },
+      {
+        "prompt": "What does Minho begin teaching Thomas about the Runners’ work, including the Maps, the sections of the Maze, and the daily routine?"
+      },
+      {
+        "prompt": "What do the Gladers learn about the girl after she arrives, and why does her message cause fear and confusion?"
+      },
+      {
+        "prompt": "What strange change happens to the sky and the Glade, and why does this make the boys feel that their world is no longer stable?"
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "Thomas breaks one of the Glade’s most important rules by entering the Maze, but his actions save lives. What does this suggest about the difference between obedience and doing what is right?"
+      },
+      {
+        "prompt": "Minho originally seems sarcastic and impatient, but he becomes important to Thomas’s growth. How does Minho’s relationship with Thomas help develop Thomas as a character?"
+      },
+      {
+        "prompt": "The Runners are respected because they face the Maze every day, but their work also depends on discipline, memory, and careful record-keeping. What does this suggest about the novel’s definition of bravery?"
+      },
+      {
+        "prompt": "Thomas’s promotion to Runner creates disagreement among the Keepers. Why might the other Gladers feel threatened or suspicious of him?"
+      },
+      {
+        "prompt": "The girl’s arrival changes the pattern of life in the Glade because she is the first girl and because she brings the message that “everything is going to change.” Why is this moment important to the structure of the story?"
+      },
+      {
+        "prompt": "The Glade’s normal routine begins to break down after Thomas arrives. How does Dashner use these changes to create suspense and show that the Gladers’ sense of safety was fragile?"
+      },
+      {
+        "prompt": "Thomas feels a strange connection to the girl even though he does not fully understand why. How does this connection deepen the mystery of his identity and past?"
+      },
+      {
+        "prompt": "The Maps seem like a practical tool, but they also represent the Gladers’ hope of escape. Why is it important that the boys continue mapping the Maze even when they have not found a way out?"
+      },
+      {
+        "prompt": "By the end of Lesson 2, does Thomas’s arrival seem like a danger to the Glade or a possible turning point for escape? Explain your reasoning using specific moments from the text."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Choose ONE of the following prompts:\n1. In Chapters 13-24, Thomas breaks the rules but also proves himself through courage and quick thinking. What do these chapters suggest about when it may be necessary to challenge authority?\n2. The Gladers depend on routine, rules, and order to survive, but after Thomas and the girl arrive, that order begins to collapse. How does Dashner show that safety in the Glade is only temporary?\n3. The Maze is not only a physical challenge but also a puzzle that requires patience, intelligence, and teamwork. How do these chapters show that survival depends on both courage and strategy?",
+        "responseGuidance": [
+          "Write one well-developed paragraph with a clear topic sentence, evidence, explanation, and specific moments from the book."
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "unanimous",
+        "koreanMeaning": "만장일치의, 전원 동의의",
+        "definition": "agreed to by everyone involved.",
+        "bookExcerpt": "“Already had a Gathering of the Keepers this morning - made a unanimous decision by the sounds of it.”",
+        "excerptContext": "Chuck has just told Thomas that Ben survived Alby’s arrow and is being held in the Slammer. He explains that the Keepers all agreed on what should happen to Ben.",
+        "chapterReference": "Chapter 13"
+      },
+      {
+        "term": "tattered",
+        "koreanMeaning": "해지고 찢어진, 누더기가 된",
+        "definition": "old and torn, with ragged edges or pieces.",
+        "bookExcerpt": "“His clothes were tattered, barely hanging on; a bloody, thick bandage covered half his head and face.”",
+        "excerptContext": "Three Gladers are dragging Ben toward the East Door for his Banishment. The sentence describes his badly damaged clothes and the bandage covering his injury.",
+        "chapterReference": "Chapter 13"
+      },
+      {
+        "term": "ceremonious",
+        "koreanMeaning": "격식을 차린, 의례적인",
+        "definition": "very formal and serious, as if part of a ceremony.",
+        "bookExcerpt": "“Alby spoke in a loud, almost ceremonious voice, looking at no one and everyone at the same time.”",
+        "excerptContext": "Alby has fastened the Banishment collar around Ben’s neck. He is about to formally announce Ben’s punishment in front of the gathered Gladers.",
+        "chapterReference": "Chapter 14"
+      },
+      {
+        "term": "confrontation",
+        "koreanMeaning": "대치, 충돌",
+        "definition": "a tense or hostile face-to-face encounter or conflict.",
+        "bookExcerpt": "“Thomas quickly stepped behind a taller boy to avoid his own confrontation with Ben.”",
+        "excerptContext": "Ben is desperately begging the Gladers not to banish him and looking from person to person for help. Thomas hides behind another boy because he cannot bear to face Ben directly.",
+        "chapterReference": "Chapter 14"
+      },
+      {
+        "term": "nonchalant",
+        "koreanMeaning": "태연한, 아무렇지 않은",
+        "definition": "calm and unconcerned, especially when concern might be expected.",
+        "bookExcerpt": "“How could Minho act so nonchalant about it all?”",
+        "excerptContext": "The morning after Ben’s Banishment, Minho casually handles the piece of the Banishment Pole that the Grievers have returned. Thomas is disturbed by how little the event seems to affect him.",
+        "chapterReference": "Chapter 15"
+      },
+      {
+        "term": "sanitary",
+        "koreanMeaning": "위생적인, 청결한",
+        "definition": "clean in a way that helps prevent illness.",
+        "bookExcerpt": "“Didn’t seem like the most sanitary guy in the world to oversee all the cooking, Thomas thought.”",
+        "excerptContext": "Thomas sees Frypan for the first time while the cook is feeding the Gladers. Frypan’s beard, body hair, and food-smeared clothes make Thomas question how clean he is.",
+        "chapterReference": "Chapter 15"
+      },
+      {
+        "term": "approachable",
+        "koreanMeaning": "다가가기 쉬운, 말 걸기 편한",
+        "definition": "friendly and easy to talk to or ask for help.",
+        "bookExcerpt": "“This Keeper seemed a lot more approachable.”",
+        "excerptContext": "Thomas is working with Zart in the Gardens and wants to learn more about life in the Glade. Because Zart seems easier to talk to than some of the other Gladers, Thomas decides to start asking him questions.",
+        "chapterReference": "Chapter 16"
+      },
+      {
+        "term": "somber",
+        "koreanMeaning": "침울한, 어두운 분위기의",
+        "definition": "serious, sad, and quiet in mood.",
+        "bookExcerpt": "“That night dinner proved to be a somber affair, and it had nothing to do with the food.”",
+        "excerptContext": "Alby and Minho are long overdue from their trip into the Maze, and the other Runners have already returned. The Gladers eat dinner in a worried, gloomy mood as the time for the Doors to close approaches.",
+        "chapterReference": "Chapter 16"
+      },
+      {
+        "term": "dire",
+        "koreanMeaning": "심각한, 절박한",
+        "definition": "extremely serious or dangerous.",
+        "bookExcerpt": "“But fast enough, the dire reality of the situation began to hit Thomas, and his insides turned to rot.”",
+        "excerptContext": "Thomas is trapped in the Maze after dark with Minho and the badly injured Alby. Minho has told him that no one has ever survived a night outside the Glade, and Thomas begins to understand how dangerous their situation is.",
+        "chapterReference": "Chapter 17"
+      },
+      {
+        "term": "ingenious",
+        "koreanMeaning": "기발한, 독창적인",
+        "definition": "very clever and original in solving a problem.",
+        "bookExcerpt": "“You really think we’ve never had the ingenious thought of climbing the freaking walls?”",
+        "excerptContext": "Thomas suggests climbing the ivy-covered Maze walls as a way to escape danger. Minho responds sarcastically, pointing out that the Gladers have already considered what Thomas thinks is a clever solution.",
+        "chapterReference": "Chapter 17"
+      },
+      {
+        "term": "interspersed",
+        "koreanMeaning": "사이사이에 섞인, 중간중간 끼어 있는",
+        "definition": "mixed or scattered among other things.",
+        "bookExcerpt": "“The roar of engines interspersed with rolling, cranking sounds like chains hoisting machinery in an old, grimy factory.”",
+        "excerptContext": "Minho has panicked and run away, leaving Thomas alone with the injured Alby. As the Grievers approach, Thomas hears engine noises mixed with mechanical rolling and cranking sounds.",
+        "chapterReference": "Chapter 18"
+      },
+      {
+        "term": "exertion",
+        "koreanMeaning": "육체적 노력, 힘씀",
+        "definition": "physical effort, especially effort that makes you tired.",
+        "bookExcerpt": "“Thomas sat back against it himself, panting from exertion, thinking.”",
+        "excerptContext": "Thomas has tried both carrying and dragging Alby but finds him too heavy. After propping Alby against the wall again, Thomas is exhausted from the effort and tries to think of another plan.",
+        "chapterReference": "Chapter 18"
+      },
+      {
+        "term": "protruding",
+        "koreanMeaning": "튀어나온, 돌출된",
+        "definition": "sticking out from a surface or object.",
+        "bookExcerpt": "“But hair and spikes were not the only things protruding from the Griever’s body.”",
+        "excerptContext": "Thomas is seeing a Griever clearly at close range in the Maze. In addition to its hair and spikes, he notices mechanical arms sticking out from its body.",
+        "chapterReference": "Chapter 19"
+      },
+      {
+        "term": "relentlessly",
+        "koreanMeaning": "끊임없이, 가차 없이",
+        "definition": "without stopping, weakening, or giving up.",
+        "bookExcerpt": "“The sounds of his pursuer went on relentlessly, only now with the bone-shuddering addition of cracking and splitting rock joined in.”",
+        "excerptContext": "Thomas is moving sideways along the ivy-covered wall while a Griever follows him. The creature continues its pursuit without stopping, and the sounds of breaking stone are now added to the noise.",
+        "chapterReference": "Chapter 20"
+      },
+      {
+        "term": "momentum",
+        "koreanMeaning": "운동량",
+        "definition": "the motion of something moving that keeps carrying it in the same direction.",
+        "bookExcerpt": "“A sharp crack revealed a small victory, but any elation ended when he realized that the momentum of his swing was now pulling him back down to land right on top of the creature.”",
+        "excerptContext": "Thomas manages to kick one of the Griever’s mechanical arms while swinging from a vine. However, the continuing motion of his swing carries him back toward the creature instead of safely away from it.",
+        "chapterReference": "Chapter 20"
+      },
+      {
+        "term": "emanating",
+        "koreanMeaning": "~에서 나오는, 발산되는",
+        "definition": "coming or spreading out from a source.",
+        "bookExcerpt": "“And the faint light emanating from their pursuers made the oddity up ahead all the more apparent.”",
+        "excerptContext": "Minho and Thomas are running from the Grievers when Thomas notices something strange ahead. The light coming from the pursuing creatures makes the unusual darkness at the end of the corridor easier to see.",
+        "chapterReference": "Chapter 21"
+      },
+      {
+        "term": "comprehend",
+        "koreanMeaning": "이해하다, 파악하다",
+        "definition": "to understand something fully.",
+        "bookExcerpt": "“Thomas narrowed his eyes as they ran toward the wall of darkness, trying to comprehend what they were approaching.”",
+        "excerptContext": "The corridor ahead seems to end in darkness and open sky instead of another stone wall. Thomas struggles to understand what he is seeing before realizing that they have reached the Cliff.",
+        "chapterReference": "Chapter 21"
+      },
+      {
+        "term": "antidote",
+        "koreanMeaning": "해독제",
+        "definition": "a medicine or substance that works against a poison or other harmful substance.",
+        "bookExcerpt": "“It’s a medicine or antidote or something, already inside a medical syringe, ready to use.”",
+        "excerptContext": "After surviving the night in the Maze, Thomas asks Minho to explain the Grief Serum. Minho tells him that it comes from the Creators and is used to save people who have been stung by Grievers.",
+        "chapterReference": "Chapter 22"
+      },
+      {
+        "term": "adamantly",
+        "koreanMeaning": "단호하게, 완강하게",
+        "definition": "in a firm way that shows you will not change your mind.",
+        "bookExcerpt": "“Newt had adamantly refused when Thomas asked to see the person he’d risked his life for.”",
+        "excerptContext": "Alby has survived but is now painfully going through the Changing. Thomas wants to see him, but Newt firmly refuses and says that seeing Alby would only make things worse.",
+        "chapterReference": "Chapter 23"
+      },
+      {
+        "term": "chagrin",
+        "koreanMeaning": "당혹감, 낭패감",
+        "definition": "a feeling of annoyance or embarrassment when something turns out badly or not as hoped.",
+        "bookExcerpt": "“Once settled, he realized they were the Keepers, and to his chagrin that meant Gally was among them.”",
+        "excerptContext": "Thomas is sitting before the Keepers at a Gathering called specifically to discuss him. He realizes that Gally, whom he strongly dislikes and distrusts, is one of the boys who will help decide what happens to him.",
+        "chapterReference": "Chapter 24"
+      }
+    ]
+  }
+}

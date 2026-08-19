@@ -31,11 +31,34 @@ function twoDigitLessonNumber(number) {
   return String(number).padStart(2, "0");
 }
 
-export function createBuildTargets(workbook, outputDirectory = defaultOutputDirectory) {
-  const targets = [];
-  const editions = ["student", "teacher"];
+function normalizeEditions(editions) {
+  if (!Array.isArray(editions) || editions.length === 0) {
+    throw new WorkbookBuildError(
+      "At least one workbook edition must be requested: student or teacher.",
+    );
+  }
 
-  for (const edition of editions) {
+  const normalized = [
+    ...new Set(editions.map((edition) => String(edition).toLowerCase())),
+  ];
+  if (normalized.some((edition) => !["student", "teacher"].includes(edition))) {
+    throw new WorkbookBuildError(
+      `Unknown workbook edition. Choose student or teacher; received ${editions.join(", ")}.`,
+    );
+  }
+
+  return ["student", "teacher"].filter((edition) => normalized.includes(edition));
+}
+
+export function createBuildTargets(
+  workbook,
+  outputDirectory = defaultOutputDirectory,
+  editions = ["student", "teacher"],
+) {
+  const targets = [];
+  const requestedEditions = normalizeEditions(editions);
+
+  for (const edition of requestedEditions) {
     targets.push({
       scope: "workbook",
       edition,
@@ -164,11 +187,21 @@ async function compileTarget(workbook, target, temporaryDirectory) {
 
 export async function buildWorkbookPdfs(
   manifestPath,
-  { outputDirectory = defaultOutputDirectory } = {},
+  {
+    outputDirectory = defaultOutputDirectory,
+    editions = ["student", "teacher"],
+  } = {},
 ) {
   const absoluteOutputDirectory = resolve(outputDirectory);
-  const workbook = await loadWorkbookPackage(manifestPath);
-  const targets = createBuildTargets(workbook, absoluteOutputDirectory);
+  const requestedEditions = normalizeEditions(editions);
+  const workbook = await loadWorkbookPackage(manifestPath, {
+    requireTeacherGuidance: requestedEditions.includes("teacher"),
+  });
+  const targets = createBuildTargets(
+    workbook,
+    absoluteOutputDirectory,
+    requestedEditions,
+  );
 
   await mkdir(absoluteOutputDirectory, { recursive: true });
   await mkdir(temporaryBuildParent, { recursive: true });
