@@ -193,10 +193,15 @@ const ISOLATED_PAGE_PATH = "isolated/preview.html";
 // start and only change when a version or the brand changes, so they are cached
 // hard. Templates, workbook content, and the page itself are revalidated, so a
 // rebuilt bundle is never served from a stale cache.
+//
+// The patterns do not overlap, deliberately: a static host applies every rule
+// that matches and lets the last one win, while the gate server takes the first
+// match, and a rule that matched twice would mean two different answers.
 export const BUNDLE_CACHE_RULES = Object.freeze([
   ["/vendor/*", "public, max-age=31536000, immutable"],
   ["/project/assets/*", "public, max-age=31536000, immutable"],
-  ["/project/*", "no-cache"],
+  ["/project/system/*", "no-cache"],
+  ["/project/src/*", "no-cache"],
   ["/fixtures/*", "no-cache"],
 ]);
 
