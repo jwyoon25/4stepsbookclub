@@ -103,18 +103,23 @@ compiler.
 
 ### 4. Run the eight checks
 
-Reload the Sheet and choose **4steps → Browser compiler gate (Phase 0)**.
+Reload the Sheet, choose **4steps → Browser compiler gate (Phase 0)**, click
+**Open the preview window**, and click **Run every gate check**.
 
-| # | Check | How |
+That compiles all four workbooks, audits each one, compares each with native
+Typst, saves the largest to Drive, and fills in a verdict for every check. The
+individual controls are still there for repeating one of them by hand.
+
+| # | Check | Where its answer comes from |
 | --- | --- | --- |
-| 1 | The preview window opens from the Sheet menu | Click **Open the preview window** in the dialog |
+| 1 | The preview window opens from the Sheet menu | The dialog answers the window, which reports the connection |
 | 2 | Compiler, templates, four fonts, and logos load | The preview reports each stage as it happens |
-| 3 | A real standalone student lesson compiles and displays | Choose it and click **Compile and preview** |
-| 4 | Its teacher edition compiles and displays | Choose the teacher edition and compile again |
-| 5 | A representative complete workbook compiles | Choose the 12-lesson workbook and compile |
-| 6 | The largest expected PDF reaches Drive | With the complete workbook shown, click **Save to Google Drive** |
-| 7 | Zero diagnostics, audits pass, native parity holds | The compile refuses any diagnostic; click **Audit and compare with native** |
-| 8 | Cold start and refresh are usable | Read them from the measurements panel |
+| 3 | A real standalone student lesson compiles and displays | Compiled and shown in the viewer |
+| 4 | Its teacher edition compiles and displays | Compiled and shown in the viewer |
+| 5 | A representative complete workbook compiles | The 12-lesson workbook, both editions |
+| 6 | The largest expected PDF reaches Drive | The largest of the four is sent through the dialog |
+| 7 | Zero diagnostics, audits pass, native parity holds | The compile refuses any diagnostic; the gate server audits and compares |
+| 8 | Cold start and refresh are usable | Measured from the first load and from recompiling |
 
 The dialog also reports what the Apps Script iframe itself offers — shared
 memory, JSPI, cross-origin isolation. That answers whether a future version

@@ -102,8 +102,8 @@ h2 {
 main {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(320px, 380px) 1fr;
-  grid-template-rows: auto auto 1fr;
+  grid-template-columns: minmax(320px, 400px) 1fr;
+  grid-template-rows: auto auto auto 1fr;
   gap: 16px;
   padding: 16px 20px 20px;
   min-height: 0;
@@ -219,6 +219,25 @@ dd {
   font-family: var(--font-mono);
   font-size: 11px;
   overflow-wrap: anywhere;
+}
+
+/* The eight checks read as a list of questions and answers, not a table: the
+   questions are full sentences and the answers sit under them. */
+.gate {
+  display: block;
+}
+
+.gate dt {
+  margin-top: 8px;
+  color: var(--ink);
+}
+
+.gate dt:first-child {
+  margin-top: 0;
+}
+
+.gate dd {
+  color: var(--good);
 }
 
 .log {

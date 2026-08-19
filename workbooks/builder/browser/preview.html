@@ -31,6 +31,7 @@
           <select id="fixture"></select>
         </label>
         <div class="buttons">
+          <button id="run" type="button" disabled>Run every gate check</button>
           <button id="compile" type="button" disabled>Compile and preview</button>
           <button id="save" type="button" disabled>Save to Google Drive</button>
           <button id="verify" type="button" disabled>
@@ -38,6 +39,11 @@
           </button>
           <a id="download" class="button" hidden download>Download</a>
         </div>
+      </section>
+
+      <section class="panel" aria-label="Gate checks">
+        <h2>The eight checks</h2>
+        <dl id="gate" class="gate"></dl>
       </section>
 
       <section class="panel" aria-label="Measurements">

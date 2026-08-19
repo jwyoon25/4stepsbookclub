@@ -36,15 +36,30 @@ const ENGINE_CORE_MODULES = [
 const WORKER_URL = "/vendor/typst-wasm/worker/web-worker.js";
 const MESSAGE_PREFIX = "4steps-preview";
 
+// The eight checks from BUILDER-ARCHITECTURE-DECISION.md, in its order, so a
+// completed run reads as an answer to the record rather than a list of numbers.
+const GATE_ITEMS = [
+  "Open the preview window from the Sheet menu",
+  "Load the compiler, templates, fonts, and logos",
+  "Compile and display a real standalone student lesson",
+  "Compile and display its teacher edition",
+  "Compile a representative complete workbook",
+  "Transfer the largest PDF through Apps Script to Drive",
+  "Zero diagnostics, audits pass, parity with native",
+  "A usable cold start and refresh",
+];
+
 const elements = {
   environment: document.querySelector("#environment"),
   build: document.querySelector("#build"),
   fixture: document.querySelector("#fixture"),
+  run: document.querySelector("#run"),
   compile: document.querySelector("#compile"),
   save: document.querySelector("#save"),
   verify: document.querySelector("#verify"),
   download: document.querySelector("#download"),
   copy: document.querySelector("#copy"),
+  gate: document.querySelector("#gate"),
   measurements: document.querySelector("#measurements"),
   log: document.querySelector("#log"),
   viewer: document.querySelector("#viewer"),
@@ -56,8 +71,11 @@ const state = {
   fixtures: [],
   buildInfo: null,
   current: null,
+  lastCompiled: null,
   driveOrigin: null,
+  pendingSave: null,
   measurements: new Map(),
+  verdicts: new Map(),
   startedAt: performance.now(),
 };
 
@@ -72,16 +90,38 @@ function log(message, level = "info") {
   elements.log.scrollTop = elements.log.scrollHeight;
 }
 
-function record(name, value) {
-  state.measurements.set(name, value);
-  elements.measurements.replaceChildren(
-    ...[...state.measurements].flatMap(([label, measurement]) => {
+function definitions(target, entries) {
+  target.replaceChildren(
+    ...entries.flatMap(([label, value]) => {
       const term = document.createElement("dt");
       term.textContent = label;
       const description = document.createElement("dd");
-      description.textContent = measurement;
+      description.textContent = value;
       return [term, description];
     }),
+  );
+}
+
+function record(name, value) {
+  state.measurements.set(name, value);
+  definitions(elements.measurements, [...state.measurements]);
+}
+
+function orderedVerdicts() {
+  return [...state.verdicts].sort(([left], [right]) => left - right);
+}
+
+/** Record one gate item's verdict. Repeated answers accumulate in item order. */
+function verdict(item, result) {
+  const answers = state.verdicts.get(item) ?? [];
+  answers.push(result);
+  state.verdicts.set(item, answers);
+  definitions(
+    elements.gate,
+    orderedVerdicts().map(([number, results]) => [
+      `${number}. ${GATE_ITEMS[number - 1]}`,
+      results.join(" · "),
+    ]),
   );
 }
 
@@ -219,7 +259,10 @@ async function startCompiler() {
   );
 
   state.compiler = compiler;
-  record("Cold start", milliseconds(performance.now() - startedAt));
+  const coldStart = performance.now() - startedAt;
+  record("Cold start", milliseconds(coldStart));
+  verdict(2, `${megabytes(loaders.counted())} loaded on the ${state.backend} backend`);
+  verdict(8, `cold start ${milliseconds(coldStart)}`);
 }
 
 async function loadFixtures() {
@@ -245,6 +288,45 @@ async function loadFixtures() {
 
 // --- Compiling --------------------------------------------------------------
 
+/** Which of the eight checks a workbook answers. */
+function gateItemFor(fixture) {
+  if (fixture.scope === "workbook") {
+    return 5;
+  }
+  return fixture.edition === "student" ? 3 : 4;
+}
+
+async function compileFixture(fixture) {
+  const bundle = await (
+    await fetchOrThrow(`/fixtures/${fixture.id}.json`, `workbook ${fixture.id}`)
+  ).json();
+
+  log(`Compiling ${fixture.label}…`);
+  const startedAt = performance.now();
+  const pdf = await compileWorkbookPdf(state.compiler, bundle);
+  const duration = performance.now() - startedAt;
+
+  // Recompiling the same workbook is the refresh the gate asks about; the
+  // compiler reuses its previous work for it. Compiling a different workbook is
+  // a fresh compile and is recorded as one.
+  const refresh = state.lastCompiled === fixture.id;
+  state.lastCompiled = fixture.id;
+  record(refresh ? "Refresh compile" : "Compile", milliseconds(duration));
+  if (refresh) {
+    verdict(8, `refresh ${milliseconds(duration)}`);
+  }
+  record("PDF size", megabytes(pdf.byteLength));
+  record("Typst engine", readPdfCreator(pdf));
+
+  show(fixture, pdf);
+  log(
+    `Compiled ${fixture.label} in ${milliseconds(duration)} with zero ` +
+      `diagnostics (${megabytes(pdf.byteLength)}).`,
+    "good",
+  );
+  return { pdf, duration };
+}
+
 async function compileSelected() {
   const fixture = state.fixtures.find(({ id }) => id === elements.fixture.value);
   if (!fixture || !state.compiler) {
@@ -253,26 +335,7 @@ async function compileSelected() {
 
   setBusy(true);
   try {
-    const bundle = await (
-      await fetchOrThrow(`/fixtures/${fixture.id}.json`, `workbook ${fixture.id}`)
-    ).json();
-
-    log(`Compiling ${fixture.label}…`);
-    const startedAt = performance.now();
-    const pdf = await compileWorkbookPdf(state.compiler, bundle);
-    const duration = performance.now() - startedAt;
-
-    const first = !state.measurements.has("First compile");
-    record(first ? "First compile" : "Refresh compile", milliseconds(duration));
-    record("PDF size", megabytes(pdf.byteLength));
-    record("Typst engine", readPdfCreator(pdf));
-
-    show(fixture, pdf);
-    log(
-      `Compiled ${fixture.label} in ${milliseconds(duration)} with zero ` +
-        `diagnostics (${megabytes(pdf.byteLength)}).`,
-      "good",
-    );
+    await compileFixture(fixture);
   } catch (error) {
     log(error.message, "bad");
   } finally {
@@ -281,9 +344,7 @@ async function compileSelected() {
 }
 
 function show(fixture, pdf) {
-  if (state.current?.url) {
-    URL.revokeObjectURL(state.current.url);
-  }
+  clearPreview();
 
   const name = `${state.buildInfo.workbookId}-${fixture.id}-browser.pdf`;
   const url = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
@@ -297,7 +358,25 @@ function show(fixture, pdf) {
   elements.save.disabled = state.driveOrigin === null;
 }
 
+/**
+ * Stop showing a workbook that is no longer the selected one.
+ *
+ * The gate is judged by what the window displays, so a previous PDF must never
+ * sit under a different workbook's name.
+ */
+function clearPreview() {
+  if (state.current?.url) {
+    URL.revokeObjectURL(state.current.url);
+  }
+  state.current = null;
+  elements.viewer.removeAttribute("src");
+  elements.download.hidden = true;
+  elements.save.disabled = true;
+  elements.verify.disabled = true;
+}
+
 function setBusy(busy) {
+  elements.run.disabled = busy;
   elements.compile.disabled = busy;
   elements.fixture.disabled = busy;
   elements.compile.textContent = busy ? "Compiling…" : "Compile and preview";
@@ -333,20 +412,17 @@ function connectToDialog() {
       elements.save.disabled = state.current === null;
       record("Drive channel", `connected to ${event.origin}`);
       record("Drive run", message.session);
+      verdict(1, `opened from the Sheet dialog at ${event.origin}`);
       log(`Connected to the Google Sheet dialog at ${event.origin}.`, "good");
     } else if (message.type === `${MESSAGE_PREFIX}-saved`) {
-      record("Drive transfer", milliseconds(message.milliseconds));
-      log(`Saved ${message.name} to Google Drive: ${message.url}`, "good");
-      elements.save.disabled = false;
-      elements.save.textContent = "Save to Google Drive";
+      state.pendingSave?.resolve(message);
     } else if (message.type === `${MESSAGE_PREFIX}-save-failed`) {
-      log(`Google Drive rejected the transfer: ${message.error}`, "bad");
-      elements.save.disabled = false;
-      elements.save.textContent = "Save to Google Drive";
+      state.pendingSave?.reject(new Error(message.error));
     }
   });
 
   if (!window.opener) {
+    verdict(1, "no opener — this window was not opened by the Sheet dialog");
     log(
       "This window has no opener, so it cannot reach Google Drive. A " +
         "cross-origin-isolated page is cut off from the dialog that opened it; " +
@@ -362,28 +438,99 @@ function connectToDialog() {
   log("Announced this window to the Google Sheet dialog.");
 }
 
-function saveToDrive() {
+async function saveToDrive() {
   if (!state.current || !state.driveOrigin) {
-    return;
+    return null;
   }
 
   const { pdf, name, fixture } = state.current;
   elements.save.disabled = true;
   elements.save.textContent = "Saving…";
   log(`Sending ${name} (${megabytes(pdf.byteLength)}) to Apps Script…`);
-  window.opener.postMessage(
-    {
-      type: `${MESSAGE_PREFIX}-save`,
-      name,
-      fixture: fixture.id,
-      bytes: pdf.byteLength,
-      base64: toBase64(pdf),
-    },
-    state.driveOrigin,
-  );
+
+  try {
+    const saved = await new Promise((resolve, reject) => {
+      state.pendingSave = { resolve, reject };
+      window.opener.postMessage(
+        {
+          type: `${MESSAGE_PREFIX}-save`,
+          name,
+          fixture: fixture.id,
+          bytes: pdf.byteLength,
+          base64: toBase64(pdf),
+        },
+        state.driveOrigin,
+      );
+    });
+
+    record("Drive transfer", milliseconds(saved.milliseconds));
+    verdict(
+      6,
+      `${megabytes(pdf.byteLength)} saved in ${milliseconds(saved.milliseconds)}`,
+    );
+    log(`Saved ${saved.name} to Google Drive: ${saved.url}`, "good");
+    return saved;
+  } catch (error) {
+    verdict(6, `failed — ${error.message}`);
+    log(`Google Drive rejected the transfer: ${error.message}`, "bad");
+    return null;
+  } finally {
+    state.pendingSave = null;
+    elements.save.disabled = false;
+    elements.save.textContent = "Save to Google Drive";
+  }
 }
 
 // --- Independent verification ----------------------------------------------
+
+/**
+ * Ask the gate server to audit this PDF and compare it with native Typst.
+ *
+ * The browser cannot check its own work: the audit and the native renderer both
+ * live outside it. Sending the finished bytes back keeps the thing being judged
+ * the same thing the browser produced.
+ */
+async function verifyPdf(fixture, pdf) {
+  const response = await fetch("/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fixture: fixture.id, pdfBase64: toBase64(pdf) }),
+  });
+  if (response.status === 404) {
+    throw new Error(
+      "This bundle is being served as plain static files. Run it with " +
+        "`npm run workbook:browser-gate` to audit and compare from the browser.",
+    );
+  }
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.error ?? `Verification failed (${response.status}).`);
+  }
+
+  record("Audit", result.audit.passed ? "passed" : "failed");
+  log(
+    result.audit.passed
+      ? `PDF audit passed: ${result.audit.pageCount} pages.`
+      : `PDF audit failed: ${result.audit.error}`,
+    result.audit.passed ? "good" : "bad",
+  );
+
+  if (result.parity.compared) {
+    record("Native parity", result.parity.identical ? "identical" : "different");
+    log(
+      result.parity.identical
+        ? `Identical to the native renderer: ${result.parity.pageCount} pages, ` +
+          `${result.parity.textItems} text runs, no positional difference.`
+        : `Differs from the native renderer: ${result.parity.summary}`,
+      result.parity.identical ? "good" : "bad",
+    );
+  } else {
+    log(`Native comparison skipped: ${result.parity.reason}`, "warn");
+  }
+
+  return result;
+}
 
 async function verifyCurrentPdf() {
   if (!state.current) {
@@ -392,48 +539,9 @@ async function verifyCurrentPdf() {
 
   elements.verify.disabled = true;
   elements.verify.textContent = "Verifying…";
-  log("Auditing the browser-generated PDF and comparing it with native Typst…");
-
   try {
-    const response = await fetch("/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fixture: state.current.fixture.id,
-        pdfBase64: toBase64(state.current.pdf),
-      }),
-    });
-    if (response.status === 404) {
-      throw new Error(
-        "This bundle is being served as plain static files. Run it with " +
-          "`npm run workbook:browser-gate` to audit and compare from the browser.",
-      );
-    }
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error ?? `Verification failed (${response.status}).`);
-    }
-
-    record("Audit", result.audit.passed ? "passed" : "failed");
-    log(
-      result.audit.passed
-        ? `PDF audit passed: ${result.audit.pageCount} pages.`
-        : `PDF audit failed: ${result.audit.error}`,
-      result.audit.passed ? "good" : "bad",
-    );
-
-    if (result.parity.compared) {
-      record("Native parity", result.parity.identical ? "identical" : "different");
-      log(
-        result.parity.identical
-          ? `Identical to the native renderer: ${result.parity.pageCount} pages, ` +
-            `${result.parity.textItems} text runs, no positional difference.`
-          : `Differs from the native renderer: ${result.parity.summary}`,
-        result.parity.identical ? "good" : "bad",
-      );
-    } else {
-      log(`Native comparison skipped: ${result.parity.reason}`, "warn");
-    }
+    log("Auditing the browser-generated PDF and comparing it with native Typst…");
+    await verifyPdf(state.current.fixture, state.current.pdf);
   } catch (error) {
     log(error.message, "bad");
   } finally {
@@ -442,17 +550,97 @@ async function verifyCurrentPdf() {
   }
 }
 
+// --- The whole gate in one run ---------------------------------------------
+
+/**
+ * Compile every workbook, verify each one, and save the largest to Drive.
+ *
+ * The eight checks are pass or fail together, so answering them one at a time
+ * by hand invites a half-finished record. This answers all of them in order and
+ * leaves the largest workbook on screen.
+ */
+async function runEveryCheck() {
+  setBusy(true);
+  let clean = 0;
+  let largest = null;
+
+  try {
+    for (const fixture of state.fixtures) {
+      const item = gateItemFor(fixture);
+      try {
+        const { pdf, duration } = await compileFixture(fixture);
+        verdict(
+          item,
+          `${fixture.edition}: ${megabytes(pdf.byteLength)} in ${milliseconds(duration)}`,
+        );
+        if (largest === null || pdf.byteLength > largest.pdf.byteLength) {
+          largest = { fixture, pdf };
+        }
+
+        const result = await verifyPdf(fixture, pdf);
+        const compared = result.parity.compared;
+        const passed = result.audit.passed && (!compared || result.parity.identical);
+        if (passed) {
+          clean += 1;
+        }
+        verdict(
+          7,
+          passed
+            ? `${fixture.id}: audited, ${
+                compared ? "identical to native" : "no native comparison"
+              }`
+            : `${fixture.id}: FAILED`,
+        );
+      } catch (error) {
+        verdict(item, `failed — ${error.message}`);
+        log(error.message, "bad");
+      }
+    }
+
+    log(
+      `${clean} of ${state.fixtures.length} workbooks compiled cleanly, audited, ` +
+        "and matched the native renderer.",
+      clean === state.fixtures.length ? "good" : "bad",
+    );
+
+    // The largest PDF is the one the Drive transfer has to survive, and it is
+    // the one left on screen at the end of the run.
+    if (largest) {
+      show(largest.fixture, largest.pdf);
+      if (state.driveOrigin) {
+        await saveToDrive();
+      } else {
+        verdict(6, "not run — no Drive channel from this window");
+      }
+    }
+  } finally {
+    setBusy(false);
+  }
+}
+
 // --- Result record ----------------------------------------------------------
 
-async function copyResults() {
-  const rows = [...state.measurements]
+function resultsReport() {
+  const gate = orderedVerdicts()
+    .map(
+      ([number, results]) =>
+        `| ${number} | ${GATE_ITEMS[number - 1]} | ${results.join("; ")} |`,
+    )
+    .join("\n");
+  const measurements = [...state.measurements]
     .map(([label, value]) => `| ${label} | ${value} |`)
     .join("\n");
-  const report =
-    `### Phase 0 gate run — ${new Date().toISOString()}\n\n` +
-    `| Measurement | Result |\n| --- | --- |\n${rows}\n\n` +
-    `Log:\n\n\`\`\`\n${elements.log.textContent.trim()}\n\`\`\`\n`;
 
+  return (
+    `### Phase 0 gate run — ${new Date().toISOString()}\n\n` +
+    `| # | Check | Result |\n| --- | --- | --- |\n${gate}\n\n` +
+    `| Measurement | Result |\n| --- | --- |\n${measurements}\n\n` +
+    `Log:\n\n\`\`\`\n${elements.log.textContent.trim()}\n\`\`\`\n`
+  );
+}
+
+async function copyResults() {
+  const report = resultsReport();
   try {
     await navigator.clipboard.writeText(report);
     log("Copied the results table to the clipboard.", "good");
@@ -465,6 +653,8 @@ async function copyResults() {
 
 // --- Start ------------------------------------------------------------------
 
+elements.fixture.addEventListener("change", clearPreview);
+elements.run.addEventListener("click", runEveryCheck);
 elements.compile.addEventListener("click", compileSelected);
 elements.save.addEventListener("click", saveToDrive);
 elements.verify.addEventListener("click", verifyCurrentPdf);
@@ -477,8 +667,11 @@ try {
   await loadFixtures();
   if (backend !== "none") {
     await startCompiler();
+    elements.run.disabled = false;
     elements.compile.disabled = false;
-    log("Ready. Choose a workbook and compile it.", "good");
+    log("Ready. Run every check, or compile one workbook at a time.", "good");
+  } else {
+    verdict(2, "failed — no compiler backend in this browser");
   }
 } catch (error) {
   log(error.message, "bad");
