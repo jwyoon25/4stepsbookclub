@@ -14,6 +14,10 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 
+import Ajv2020 from "ajv/dist/2020.js";
+import standaloneCode from "ajv/dist/standalone/index.js";
+import addFormats from "ajv-formats";
+
 import { createBuildBundle } from "../builder/browser/build-targets.mjs";
 import { PROJECT_FILES } from "../builder/browser/workbook-compiler.mjs";
 import { loadWorkbookPackage } from "./content.mjs";
@@ -27,6 +31,8 @@ const defaultManifestPath = resolve(
   "schema/examples/example-book/workbook.json",
 );
 const defaultBundleDirectory = resolve(workbooksRoot, "output/browser-bundle");
+const schemaDirectory = resolve(workbooksRoot, "schema");
+const SCHEMA_VALIDATORS_PATH = "schema-validators.mjs";
 
 // A representative complete workbook is a full book, not the smoke-test lesson:
 // CONTENT-WORKFLOW-DECISIONS.md describes a lesson range such as `Lessons 1–12`,
@@ -225,6 +231,82 @@ function headersFile() {
   ].join("\n");
 }
 
+/**
+ * Turn the JSON schemas into a validator the browser can run.
+ *
+ * The schemas hold the limits the Sheet contract does not — how long a prompt
+ * may be, how many guidance lines an item may carry — and the browser is the
+ * export path now, so it has to apply them. Ajv itself is a Node library, but
+ * it can generate the validating code ahead of time, which is what this does:
+ * the schemas stay the only description of the rules, and what ships is a plain
+ * module with no library behind it.
+ *
+ * Ajv's generated code reaches for one helper, a UTF-16-aware string length.
+ * The published copy is CommonJS, so the module carries its own — fifteen lines
+ * that a browser can load, rather than a bundler to load fifteen lines.
+ */
+function replaceUcs2LengthRequire(generated) {
+  const required = /require\("ajv\/dist\/runtime\/ucs2length"\)\.default/gu;
+  const replaced = generated.replace(required, "ucs2length");
+  const remaining = replaced.match(/require\((["'`])(.*?)\1\)/u);
+  if (remaining) {
+    throw new BrowserBundleError(
+      `The generated schema validator needs ${remaining[2]}, which no browser ` +
+        "can load. Inline it the way ucs2length is inlined, or the bundle will " +
+        "fail only once someone opens it.",
+    );
+  }
+  return replaced;
+}
+
+export async function generateSchemaValidators() {
+  const [workbookSchema, lessonSchema] = await Promise.all(
+    ["workbook.schema.json", "lesson.schema.json"].map(async (name) =>
+      JSON.parse(await readFile(resolve(schemaDirectory, name), "utf8")),
+    ),
+  );
+
+  // The same options `lib/content.mjs` compiles with, so a disk build and a
+  // browser export cannot disagree about what the schemas mean.
+  const ajv = new Ajv2020({
+    allErrors: true,
+    strict: true,
+    code: { source: true, esm: true },
+  });
+  addFormats(ajv);
+  ajv.addSchema(workbookSchema, "workbook");
+  ajv.addSchema(lessonSchema, "lesson");
+
+  const generated = standaloneCode(ajv, {
+    validateWorkbook: "workbook",
+    validateLesson: "lesson",
+  });
+
+  return [
+    "// Generated from workbooks/schema/*.json by lib/browser-bundle.mjs.",
+    "// Edit the schemas, not this file.",
+    "function ucs2length(str) {",
+    "  const len = str.length;",
+    "  let length = 0;",
+    "  let pos = 0;",
+    "  while (pos < len) {",
+    "    length += 1;",
+    "    const value = str.charCodeAt(pos);",
+    "    pos += 1;",
+    "    if (value >= 0xd800 && value <= 0xdbff && pos < len) {",
+    "      const next = str.charCodeAt(pos);",
+    "      if ((next & 0xfc00) === 0xdc00) {",
+    "        pos += 1;",
+    "      }",
+    "    }",
+    "  }",
+    "  return length;",
+    "}",
+    "",
+    replaceUcs2LengthRequire(generated),
+  ].join("\n");
+}
+
 async function copyInto(sourcePath, bundleDirectory, bundlePath) {
   const destination = join(bundleDirectory, bundlePath);
   await mkdir(dirname(destination), { recursive: true });
@@ -280,6 +362,14 @@ export async function writeBrowserBundle({
       resolve(browserSourceDirectory, "preview.html"),
       bundleDirectory,
       ISOLATED_PAGE_PATH,
+    ),
+  );
+
+  files.push(
+    await writeInto(
+      bundleDirectory,
+      SCHEMA_VALIDATORS_PATH,
+      await generateSchemaValidators(),
     ),
   );
 

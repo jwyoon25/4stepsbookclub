@@ -28,6 +28,7 @@ import {
 } from "/build-targets.mjs";
 import {
   assertLessonLayout,
+  assertSchemaValid,
   assertWrappableContent,
   normalizeLesson,
   normalizeManifest,
@@ -38,6 +39,10 @@ import {
   MINIMUM_MAX_ARCHIVE_BYTES,
   packPdfArchives,
 } from "/pdf-archive.mjs";
+// Generated from `workbooks/schema/*.json` when the bundle is built. The
+// schemas hold the length and count limits nothing else does, and this window
+// is the export path, so it applies them exactly as a disk build does.
+import { validateLesson, validateWorkbook } from "/schema-validators.mjs";
 import {
   createWorkbookManifest,
   locateContentPath,
@@ -389,16 +394,19 @@ async function refreshFromSheet() {
     const startedAt = performance.now();
     const { grids, spreadsheetName } = await requestSheetGrids();
     const { metadata, lessons, sources } = parseWorkbookGrids(grids);
-    const manifest = normalizeManifest(
-      createWorkbookManifest(metadata, lessons, {
-        workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
-      }),
-    );
+    // The same order a disk build applies: the schema first, because it decides
+    // what the later rules are even allowed to assume about the content.
+    const parsedManifest = createWorkbookManifest(metadata, lessons, {
+      workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
+    });
+    assertSchemaValid(validateWorkbook, parsedManifest, "the Workbook tab");
+    const manifest = normalizeManifest(parsedManifest);
     assertWrappableContent(manifest, "the Workbook tab");
 
     const normalized = lessons.map((lesson) => {
       const source = `lesson ${lesson.lessonNumber}`;
       try {
+        assertSchemaValid(validateLesson, lesson, source);
         assertWrappableContent(lesson, source);
         const normalizedLesson = normalizeLesson(lesson);
         assertLessonLayout(normalizedLesson, source);

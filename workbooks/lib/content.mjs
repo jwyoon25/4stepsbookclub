@@ -18,6 +18,7 @@ import addFormats from "ajv-formats";
 
 import {
   assertLessonLayout,
+  assertSchemaValid,
   assertTeacherGuidance,
   assertWrappableContent,
   normalizeLesson,
@@ -80,35 +81,6 @@ function getValidators() {
   return validatorsPromise;
 }
 
-function validationLocation(error) {
-  let location = error.instancePath || "/";
-
-  if (error.keyword === "required") {
-    location = `${location === "/" ? "" : location}/${error.params.missingProperty}`;
-  } else if (error.keyword === "additionalProperties") {
-    location = `${location === "/" ? "" : location}/${error.params.additionalProperty}`;
-  }
-
-  return location || "/";
-}
-
-function assertValid(validator, value, filePath) {
-  if (validator(value)) {
-    return;
-  }
-
-  const details = validator.errors
-    .map(
-      (error) =>
-        `  ${validationLocation(error)}: ${error.message ?? "is invalid"}`,
-    )
-    .join("\n");
-
-  throw new WorkbookContentError(
-    `Content does not match the schema in ${filePath}:\n${details}`,
-  );
-}
-
 function isInside(parentPath, candidatePath) {
   const pathFromParent = relative(parentPath, candidatePath);
   return (
@@ -135,7 +107,7 @@ export async function loadWorkbookPackage(
     readJson(absoluteManifestPath),
     getValidators(),
   ]);
-  assertValid(validators.workbook, manifest, absoluteManifestPath);
+  assertSchemaValid(validators.workbook, manifest, absoluteManifestPath);
   const normalizedManifest = normalizeManifest(manifest);
   assertWrappableContent(normalizedManifest, absoluteManifestPath);
 
@@ -175,7 +147,7 @@ export async function loadWorkbookPackage(
     }
 
     const lesson = await readJson(realLessonPath);
-    assertValid(validators.lesson, lesson, realLessonPath);
+    assertSchemaValid(validators.lesson, lesson, realLessonPath);
     assertWrappableContent(lesson, realLessonPath);
     if (requireTeacherGuidance) {
       assertTeacherGuidance(lesson, realLessonPath);

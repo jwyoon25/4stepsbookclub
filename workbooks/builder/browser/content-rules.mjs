@@ -53,6 +53,49 @@ export class WorkbookContentError extends Error {
   }
 }
 
+/**
+ * Where a schema validator was pointing.
+ *
+ * Ajv reports a missing or unexpected property against the object that should
+ * have held it, so the property's own name is appended; everything else already
+ * addresses the value that failed.
+ */
+function schemaLocation(error) {
+  const instancePath = error.instancePath === "/" ? "" : error.instancePath;
+  if (error.keyword === "required") {
+    return `${instancePath}/${error.params.missingProperty}`;
+  }
+  if (error.keyword === "additionalProperties") {
+    return `${instancePath}/${error.params.additionalProperty}`;
+  }
+  return instancePath || "/";
+}
+
+/**
+ * Refuse content the JSON schemas reject.
+ *
+ * The schemas hold the limits nothing else does — how long a prompt may be, how
+ * many guidance lines an item may carry — and they are the same limits wherever
+ * the content came from. The caller supplies a compiled validator, because
+ * compiling one needs a schema loader that a browser and a filesystem do
+ * differently; what a failure means is decided here.
+ */
+export function assertSchemaValid(validator, value, source) {
+  if (validator(value)) {
+    return;
+  }
+
+  const errors = validator.errors ?? [];
+  const details = errors
+    .map((error) => `  ${schemaLocation(error)}: ${error.message ?? "is invalid"}`)
+    .join("\n");
+
+  throw new WorkbookContentError(
+    `Content does not match the schema in ${source}:\n${details}`,
+    { path: errors.length > 0 ? schemaLocation(errors[0]) : undefined },
+  );
+}
+
 /** Apply the response-space defaults and fold legacy hints into guidance. */
 export function normalizeLesson(lesson) {
   const normalized = structuredClone(lesson);

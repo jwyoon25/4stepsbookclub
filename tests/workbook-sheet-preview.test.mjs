@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
+import { pathToFileURL } from "node:url";
 
 import {
   createTargetBundle,
@@ -8,9 +12,11 @@ import {
 } from "../workbooks/builder/browser/build-targets.mjs";
 import {
   assertLessonLayout,
+  assertSchemaValid,
   normalizeLesson,
   normalizeManifest,
 } from "../workbooks/builder/browser/content-rules.mjs";
+import { generateSchemaValidators } from "../workbooks/lib/browser-bundle.mjs";
 import {
   createWorkbookManifest,
   locateContentPath,
@@ -27,6 +33,18 @@ import { createWorkbookTypstCompiler } from "../workbooks/lib/typst-compiler.mjs
 
 const typstAvailable =
   spawnSync("typst", ["--version"], { stdio: "ignore" }).status === 0;
+
+/** Load the generated validator the way a browser loads it: as a plain module. */
+async function withGeneratedSchemaValidators() {
+  const directory = await mkdtemp(join(tmpdir(), "4steps-schema-validators-"));
+  const modulePath = join(directory, "schema-validators.mjs");
+  try {
+    await writeFile(modulePath, await generateSchemaValidators());
+    return await import(pathToFileURL(modulePath).href);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
 
 function grid(sheetName, dataRows) {
   const headers = SHEET_HEADERS[sheetName];
@@ -129,20 +147,22 @@ function workbookGrids({ teacherGuidance = "Look for the concealed decision." } 
  */
 function previewWorkbook(grids) {
   const { metadata, lessons, sources } = parseWorkbookGrids(grids);
-  const manifest = normalizeManifest(
-    createWorkbookManifest(metadata, lessons, {
-      workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
-    }),
-  );
+  const parsedManifest = createWorkbookManifest(metadata, lessons, {
+    workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
+  });
+  assertSchemaValid(schemas.validateWorkbook, parsedManifest, "the Workbook tab");
+  const manifest = normalizeManifest(parsedManifest);
+
   const normalized = lessons.map((lesson) => {
-    const normalizedLesson = normalizeLesson(lesson);
     try {
+      assertSchemaValid(schemas.validateLesson, lesson, `lesson ${lesson.lessonNumber}`);
+      const normalizedLesson = normalizeLesson(lesson);
       assertLessonLayout(normalizedLesson, `lesson ${lesson.lessonNumber}`);
+      return normalizedLesson;
     } catch (error) {
       error.cell = locateContentPath(sources, lesson.lessonNumber, error.path);
       throw error;
     }
-    return normalizedLesson;
   });
 
   return {
@@ -153,9 +173,13 @@ function previewWorkbook(grids) {
 }
 
 let compiler;
+// The very module the bundle ships. Generated rather than written, so what the
+// browser enforces cannot drift from what `workbooks/schema/` says.
+let schemas;
 
 before(async () => {
   ({ compiler } = await createWorkbookTypstCompiler());
+  schemas = await withGeneratedSchemaValidators();
 });
 
 after(async () => {
@@ -226,25 +250,66 @@ test("names the cell for a problem no single column caused", () => {
   );
 });
 
+/** Ordinary prose of a given length, so nothing trips the wrapping limit. */
+function proseOf(characterCount) {
+  return "the quiet argument continued into a fourth and final day "
+    .repeat(Math.ceil(characterCount / 57))
+    .slice(0, characterCount)
+    .trim();
+}
+
 test("traces a layout failure back to the row it was typed on", () => {
   const grids = workbookGrids();
-  // Lesson 2's second vocabulary entry, given an excerpt no reference page can
-  // hold. The rule that refuses it counts characters and has never seen a
-  // spreadsheet, so the row has to be recovered from the parse.
-  const [word, korean, definition, excerpt, context] = [
+  // Lesson 2's second vocabulary entry. Every field is inside its own schema
+  // limit; together they are more than one reference page holds. The rule that
+  // refuses it counts characters and has never seen a spreadsheet, so the row
+  // has to be recovered from the parse.
+  grids.Vocabulary.push([
+    "",
+    2,
+    2,
     "obdurate",
     "완고한",
-    "Stubbornly refusing to change an opinion.",
-    "He had never once, in all the years she had known him, ".repeat(40),
-    "The argument has reached its third day.",
-  ];
-  grids.Vocabulary.push(["", 2, 2, word, korean, definition, excerpt, context, ""]);
+    proseOf(600),
+    proseOf(600),
+    proseOf(700),
+    "",
+  ]);
 
   assert.throws(
     () => previewWorkbook(grids),
     (error) => {
       assert.equal(error.name, "WorkbookContentError");
+      assert.match(error.message, /too long for the standardized workbook layout/u);
       assert.equal(error.path, "/sections/vocabulary/1");
+      assert.deepEqual(error.cell, { sheet: "Vocabulary", row: 7 });
+      return true;
+    },
+  );
+});
+
+test("traces a schema failure back to the row it was typed on", () => {
+  const grids = workbookGrids();
+  // The same entry with one field over its own limit. The schema catches this
+  // before the layout budget gets to add anything up, and names the field.
+  grids.Vocabulary.push([
+    "",
+    2,
+    2,
+    "obdurate",
+    "완고한",
+    "Stubbornly refusing to change an opinion.",
+    proseOf(900),
+    "The argument has reached its third day.",
+    "",
+  ]);
+
+  assert.throws(
+    () => previewWorkbook(grids),
+    (error) => {
+      assert.equal(error.name, "WorkbookContentError");
+      assert.match(error.message, /must NOT have more than 600 characters/u);
+      assert.equal(error.path, "/sections/vocabulary/1/bookExcerpt");
       assert.deepEqual(error.cell, { sheet: "Vocabulary", row: 7 });
       return true;
     },
@@ -290,4 +355,37 @@ describe("a workbook compiled straight from Sheet values", { skip: !typstAvailab
     assert.equal(result.audit.passed, true, result.audit.error);
     assert.deepEqual(result.text.differences, []);
   });
+});
+
+test("applies the schema limits the Sheet contract does not count", () => {
+  const grids = workbookGrids();
+  // Seven guidance lines in one cell. Nothing in the Sheet contract counts
+  // them, and the layout budget has room for them; the schema caps the list at
+  // six, and it is the schema that the disk build has always enforced.
+  grids.Comprehension[4][5] = Array.from(
+    { length: 7 },
+    (_, index) => `Requirement ${index + 1}`,
+  ).join("\n");
+
+  assert.throws(
+    () => previewWorkbook(grids),
+    (error) => {
+      assert.equal(error.name, "WorkbookContentError");
+      assert.match(error.message, /must NOT have more than 6 items/u);
+      assert.equal(
+        error.path,
+        "/sections/readingComprehension/0/responseGuidance",
+      );
+      // And the cell it was typed in, so the Sheet can show it.
+      assert.deepEqual(error.cell, { sheet: "Comprehension", row: 5 });
+      return true;
+    },
+  );
+});
+
+test("accepts the workbook a tutor actually typed", () => {
+  const { manifest, lessons } = previewWorkbook(workbookGrids());
+
+  assert.equal(manifest.bookTitle, "The Quiet Neighbour");
+  assert.equal(lessons.length, 2);
 });
