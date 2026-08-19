@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>4steps workbook preview</title>
+    <link rel="stylesheet" href="/preview.css" />
+    <!--
+      typst-wasm reaches for `nanotar` when a document pulls in a Typst package.
+      The workbook uses none, but the import is static, so the bare specifier
+      still has to resolve. Everything else in the bundle is loaded by URL.
+    -->
+    <script type="importmap">
+      { "imports": { "nanotar": "/vendor/nanotar/index.mjs" } }
+    </script>
+    <script type="module" src="/preview.mjs"></script>
+  </head>
+  <body>
+    <header>
+      <div class="title">
+        <h1>Workbook preview</h1>
+        <p id="build">Loading the bundle…</p>
+      </div>
+      <div class="chips" id="environment"></div>
+    </header>
+
+    <main>
+      <section class="panel controls" aria-label="Preview controls">
+        <label class="field">
+          <span>Workbook</span>
+          <select id="fixture"></select>
+        </label>
+        <div class="buttons">
+          <button id="compile" type="button" disabled>Compile and preview</button>
+          <button id="save" type="button" disabled>Save to Google Drive</button>
+          <button id="verify" type="button" disabled>
+            Audit and compare with native
+          </button>
+          <a id="download" class="button" hidden download>Download</a>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Measurements">
+        <h2>Measured</h2>
+        <dl id="measurements"></dl>
+        <button id="copy" class="quiet" type="button">Copy the results table</button>
+      </section>
+
+      <section class="panel log-panel" aria-label="Activity log">
+        <h2>Log</h2>
+        <div id="log" class="log"></div>
+      </section>
+
+      <section class="viewer-panel" aria-label="Generated PDF">
+        <iframe id="viewer" title="The generated workbook PDF"></iframe>
+      </section>
+    </main>
+  </body>
+</html>

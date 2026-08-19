@@ -13,6 +13,7 @@
     "website:build": "npm run build --workspace website",
     "website:preview": "npm run preview --workspace website",
     "workbook:build": "typst compile --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
+    "workbook:browser-bundle": "node workbooks/scripts/build-browser-bundle.mjs",
     "workbook:watch": "typst watch --root workbooks --font-path workbooks/assets/fonts workbooks/src/main.typ workbooks/output/workbook-smoke-test.pdf",
     "workbook:validate": "node workbooks/scripts/validate-content.mjs",
     "workbook:import-sheet": "node workbooks/scripts/import-sheet.mjs",
@@ -26,7 +27,8 @@
     "ajv-formats": "^3.0.1",
     "exceljs": "^4.4.0",
     "jszip": "^3.10.1",
-    "pdfjs-dist": "^5.4.624"
+    "pdfjs-dist": "^5.4.624",
+    "typst-wasm": "^1.0.0"
   },
   "overrides": {
     "exceljs": {

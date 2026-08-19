@@ -11,3 +11,6 @@ dist/
 workbooks/output/*.pdf
 workbooks/output/**/*.pdf
 workbooks/output/.build/
+
+# Generated browser-compiler bundle for the workbook builder
+workbooks/output/browser-bundle/
