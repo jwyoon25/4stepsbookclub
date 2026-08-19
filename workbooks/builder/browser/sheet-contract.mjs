@@ -96,15 +96,39 @@ export const RESPONSE_MODES = Object.freeze({
   "Custom lines": "custom-lines",
 });
 
+/**
+ * A workbook the Sheet cannot describe.
+ *
+ * The message names the cell so an author reading it knows where to look, and
+ * `cell` says the same thing in numbers so the Sheet itself can be made to
+ * point at it. Some problems are a whole tab's — a missing one, or a lesson
+ * with no questions anywhere — and carry no row.
+ */
 export class WorkbookSheetError extends Error {
-  constructor(message, options) {
+  constructor(message, { cell, ...options } = {}) {
     super(message, options);
     this.name = "WorkbookSheetError";
+    this.cell = cell;
   }
 }
 
 function location(sheetName, rowNumber, columnName) {
   return `"${sheetName}" row ${rowNumber}, ${columnName}`;
+}
+
+/** A problem with one cell, named in prose and in coordinates. */
+function cellError(grid, rowNumber, columnNumber, columnName, problem) {
+  return new WorkbookSheetError(
+    `${location(grid.name, rowNumber, columnName)} ${problem}`,
+    { cell: { sheet: grid.name, row: rowNumber, column: columnNumber } },
+  );
+}
+
+/** A problem with one row that no single column is responsible for. */
+function rowError(grid, rowNumber, columnNumber, message) {
+  return new WorkbookSheetError(message, {
+    cell: { sheet: grid.name, row: rowNumber, column: columnNumber },
+  });
 }
 
 function cellValue(grid, rowNumber, columnNumber) {
@@ -118,17 +142,16 @@ function isBlank(value) {
 
 function textValue(grid, rowNumber, columnNumber, columnName, { required = false } = {}) {
   const value = cellValue(grid, rowNumber, columnNumber);
-  const cellLocation = location(grid.name, rowNumber, columnName);
 
   if (isBlank(value)) {
     if (required) {
-      throw new WorkbookSheetError(`${cellLocation} is required.`);
+      throw cellError(grid, rowNumber, columnNumber, columnName, "is required.");
     }
     return undefined;
   }
 
   if (value instanceof Date || typeof value === "object") {
-    throw new WorkbookSheetError(`${cellLocation} must contain text.`);
+    throw cellError(grid, rowNumber, columnNumber, columnName, "must contain text.");
   }
 
   return String(value);
@@ -142,25 +165,27 @@ function integerValue(
   { required = false, minimum = 1 } = {},
 ) {
   const value = cellValue(grid, rowNumber, columnNumber);
-  const cellLocation = location(grid.name, rowNumber, columnName);
 
   if (isBlank(value)) {
     if (required) {
-      throw new WorkbookSheetError(`${cellLocation} is required.`);
+      throw cellError(grid, rowNumber, columnNumber, columnName, "is required.");
     }
     return undefined;
   }
 
   const normalizedValue = String(value).trim();
   const number = typeof value === "number" ? value : Number(normalizedValue);
-  if (typeof value !== "number" && !/^\d+$/u.test(normalizedValue)) {
-    throw new WorkbookSheetError(
-      `${cellLocation} must be a whole number of at least ${minimum}.`,
-    );
-  }
-  if (!Number.isInteger(number) || number < minimum) {
-    throw new WorkbookSheetError(
-      `${cellLocation} must be a whole number of at least ${minimum}.`,
+  const wholeNumber =
+    (typeof value === "number" || /^\d+$/u.test(normalizedValue)) &&
+    Number.isInteger(number) &&
+    number >= minimum;
+  if (!wholeNumber) {
+    throw cellError(
+      grid,
+      rowNumber,
+      columnNumber,
+      columnName,
+      `must be a whole number of at least ${minimum}.`,
     );
   }
 
@@ -190,8 +215,12 @@ function responseSpaceValue(grid, rowNumber) {
 
   if (modeLabel === undefined) {
     if (lines !== undefined || pages !== undefined) {
-      throw new WorkbookSheetError(
-        `${location(grid.name, rowNumber, "Response space")} must be set before entering Custom lines or Total response pages.`,
+      throw cellError(
+        grid,
+        rowNumber,
+        8,
+        "Response space",
+        "must be set before entering Custom lines or Total response pages.",
       );
     }
     return undefined;
@@ -200,20 +229,32 @@ function responseSpaceValue(grid, rowNumber) {
   const normalizedLabel = modeLabel.trim();
   const mode = RESPONSE_MODES[normalizedLabel];
   if (!mode) {
-    throw new WorkbookSheetError(
-      `${location(grid.name, rowNumber, "Response space")} must use one of the template dropdown choices.`,
+    throw cellError(
+      grid,
+      rowNumber,
+      8,
+      "Response space",
+      "must use one of the template dropdown choices.",
     );
   }
 
   if (mode === "custom-lines") {
     if (lines === undefined) {
-      throw new WorkbookSheetError(
-        `${location(grid.name, rowNumber, "Custom lines")} is required for Custom lines.`,
+      throw cellError(
+        grid,
+        rowNumber,
+        9,
+        "Custom lines",
+        "is required for Custom lines.",
       );
     }
     if (pages !== undefined) {
-      throw new WorkbookSheetError(
-        `${location(grid.name, rowNumber, "Total response pages")} must be blank for Custom lines.`,
+      throw cellError(
+        grid,
+        rowNumber,
+        10,
+        "Total response pages",
+        "must be blank for Custom lines.",
       );
     }
     return { mode, lines };
@@ -221,21 +262,33 @@ function responseSpaceValue(grid, rowNumber) {
 
   if (mode === "multiple-pages") {
     if (pages === undefined || pages < 2) {
-      throw new WorkbookSheetError(
-        `${location(grid.name, rowNumber, "Total response pages")} must be a whole number of at least 2 for Multiple pages.`,
+      throw cellError(
+        grid,
+        rowNumber,
+        10,
+        "Total response pages",
+        "must be a whole number of at least 2 for Multiple pages.",
       );
     }
     if (lines !== undefined) {
-      throw new WorkbookSheetError(
-        `${location(grid.name, rowNumber, "Custom lines")} must be blank for Multiple pages.`,
+      throw cellError(
+        grid,
+        rowNumber,
+        9,
+        "Custom lines",
+        "must be blank for Multiple pages.",
       );
     }
     return { mode, pages };
   }
 
   if (lines !== undefined || pages !== undefined) {
-    throw new WorkbookSheetError(
-      `${location(grid.name, rowNumber, "Custom lines / Total response pages")} must be blank for ${normalizedLabel}.`,
+    throw cellError(
+      grid,
+      rowNumber,
+      lines === undefined ? 10 : 9,
+      "Custom lines / Total response pages",
+      `must be blank for ${normalizedLabel}.`,
     );
   }
 
@@ -247,6 +300,7 @@ function requireGrid(grids, sheetName) {
   if (!rows) {
     throw new WorkbookSheetError(
       `Required tab "${sheetName}" is missing. Start from the official template and do not rename tabs.`,
+      { cell: { sheet: sheetName } },
     );
   }
 
@@ -256,6 +310,7 @@ function requireGrid(grids, sheetName) {
     if (actual !== expected) {
       throw new WorkbookSheetError(
         `"${sheetName}" column ${index + 1} must be named "${expected}"; found ${JSON.stringify(actual)}.`,
+        { cell: { sheet: sheetName, row: HEADER_ROW, column: index + 1 } },
       );
     }
   });
@@ -308,6 +363,7 @@ function parseWorkbookMetadata(grid) {
   if (rows.length !== 1) {
     throw new WorkbookSheetError(
       `"Workbook" must contain exactly one information row; found ${rows.length}.`,
+      { cell: { sheet: grid.name, row: FIRST_DATA_ROW } },
     );
   }
 
@@ -329,7 +385,9 @@ function parseWorkbookMetadata(grid) {
 function parseLessons(grid) {
   const rows = dataRows(grid, SHEET_HEADERS.Lessons.length);
   if (rows.length === 0) {
-    throw new WorkbookSheetError('"Lessons" must contain at least one lesson row.');
+    throw new WorkbookSheetError('"Lessons" must contain at least one lesson row.', {
+      cell: { sheet: grid.name, row: FIRST_DATA_ROW },
+    });
   }
 
   const lessons = [];
@@ -339,7 +397,10 @@ function parseLessons(grid) {
       required: true,
     });
     if (lessonNumbers.has(lessonNumber)) {
-      throw new WorkbookSheetError(
+      throw rowError(
+        grid,
+        rowNumber,
+        2,
         `"Lessons" row ${rowNumber} duplicates lesson number ${lessonNumber} from row ${lessonNumbers.get(lessonNumber)}.`,
       );
     }
@@ -380,7 +441,10 @@ function addOrderedItem(sectionRows, lessonNumber, order, rowNumber, item, grid)
   const rowsForLesson = sectionRows.get(lessonNumber) ?? [];
   const duplicate = rowsForLesson.find((row) => row.order === order);
   if (duplicate) {
-    throw new WorkbookSheetError(
+    throw rowError(
+      grid,
+      rowNumber,
+      3,
       `"${grid.name}" row ${rowNumber} duplicates order ${order} for lesson ${lessonNumber} from row ${duplicate.rowNumber}.`,
     );
   }
@@ -390,7 +454,10 @@ function addOrderedItem(sectionRows, lessonNumber, order, rowNumber, item, grid)
 
 function assertKnownLesson(grid, rowNumber, lessonNumber, lessonNumbers) {
   if (!lessonNumbers.has(lessonNumber)) {
-    throw new WorkbookSheetError(
+    throw rowError(
+      grid,
+      rowNumber,
+      2,
       `"${grid.name}" row ${rowNumber} refers to lesson ${lessonNumber}, which is not listed on the Lessons tab.`,
     );
   }
@@ -494,17 +561,24 @@ function parseVocabularyGrid(grid, lessonNumbers) {
   return sectionRows;
 }
 
-function assignSection(lessons, sectionRows, sectionKey, sheetName) {
+function assignSection(lessons, sectionRows, sectionKey, sheetName, sources) {
   for (const lesson of lessons) {
     const rows = sectionRows.get(lesson.lessonNumber) ?? [];
     if (rows.length === 0) {
       throw new WorkbookSheetError(
         `Lesson ${lesson.lessonNumber} needs at least one row on the "${sheetName}" tab.`,
+        { cell: { sheet: sheetName } },
       );
     }
-    lesson.sections[sectionKey] = rows
-      .sort((left, right) => left.order - right.order)
-      .map(({ item }) => item);
+
+    const ordered = rows.sort((left, right) => left.order - right.order);
+    lesson.sections[sectionKey] = ordered.map(({ item }) => item);
+    // The lesson holds items in this order from here on, so an index into a
+    // section is the same index into these rows. That is the whole of what lets
+    // a complaint about `/sections/vocabulary/2` be turned back into a cell.
+    sources.get(lesson.lessonNumber).sections[sectionKey] = ordered.map(
+      ({ rowNumber }) => ({ sheet: sheetName, row: rowNumber }),
+    );
   }
 }
 
@@ -514,6 +588,11 @@ function assignSection(lessons, sectionRows, sectionKey, sheetName) {
  * `grids` maps each tab name to its cell matrix. The result carries the
  * workbook's metadata and its lessons in the order the Lessons tab lists them;
  * it has no identifier yet, because nothing in the Sheet decides that.
+ *
+ * `sources` says where each lesson and each of its items was typed. Nothing
+ * about the content needs it — the renderer never sees it — but a rule that
+ * fails later, when the content is no longer rows, can be pointed back at the
+ * cell that broke it.
  */
 export function parseWorkbookGrids(grids) {
   const sheets = Object.fromEntries(
@@ -522,32 +601,64 @@ export function parseWorkbookGrids(grids) {
   const metadata = parseWorkbookMetadata(sheets.Workbook);
   const { lessons, lessonNumbers } = parseLessons(sheets.Lessons);
 
+  const sources = new Map(
+    [...lessonNumbers].map(([lessonNumber, rowNumber]) => [
+      lessonNumber,
+      { lesson: { sheet: "Lessons", row: rowNumber }, sections: {} },
+    ]),
+  );
+
   assignSection(
     lessons,
     parseQuestionGrid(sheets.Comprehension, lessonNumbers),
     "readingComprehension",
     "Comprehension",
+    sources,
   );
   assignSection(
     lessons,
     parseQuestionGrid(sheets.Analysis, lessonNumbers),
     "criticalThinkingAndAnalysis",
     "Analysis",
+    sources,
   );
   assignSection(
     lessons,
     parseWritingGrid(sheets.Writing, lessonNumbers),
     "paragraphWriting",
     "Writing",
+    sources,
   );
   assignSection(
     lessons,
     parseVocabularyGrid(sheets.Vocabulary, lessonNumbers),
     "vocabulary",
     "Vocabulary",
+    sources,
   );
 
-  return { metadata, lessons };
+  return { metadata, lessons, sources };
+}
+
+/**
+ * Which cell a content rule was complaining about.
+ *
+ * `content-rules.mjs` reports the lesson and a path into it, because it never
+ * saw a spreadsheet. This turns one of those paths back into a row: a section
+ * item points at the row it was typed on, and anything else — the lesson cover,
+ * the lesson as a whole — points at the lesson's own row.
+ */
+export function locateContentPath(sources, lessonNumber, path) {
+  const lesson = sources?.get?.(lessonNumber);
+  if (!lesson) {
+    return undefined;
+  }
+
+  const [, sections, sectionKey, index] = String(path ?? "").split("/");
+  if (sections !== "sections") {
+    return lesson.lesson;
+  }
+  return lesson.sections[sectionKey]?.[Number(index)] ?? lesson.lesson;
 }
 
 /** Build the package manifest for parsed content under a chosen ID. */

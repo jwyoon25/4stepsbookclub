@@ -13,6 +13,7 @@ import {
 } from "../workbooks/builder/browser/content-rules.mjs";
 import {
   createWorkbookManifest,
+  locateContentPath,
   parseWorkbookGrids,
   SHEET_HEADERS,
   slugifyBookTitle,
@@ -127,7 +128,7 @@ function workbookGrids({ teacherGuidance = "Look for the concealed decision." } 
  * that these separately extracted pieces still add up to a workbook.
  */
 function previewWorkbook(grids) {
-  const { metadata, lessons } = parseWorkbookGrids(grids);
+  const { metadata, lessons, sources } = parseWorkbookGrids(grids);
   const manifest = normalizeManifest(
     createWorkbookManifest(metadata, lessons, {
       workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
@@ -135,7 +136,12 @@ function previewWorkbook(grids) {
   );
   const normalized = lessons.map((lesson) => {
     const normalizedLesson = normalizeLesson(lesson);
-    assertLessonLayout(normalizedLesson, `lesson ${lesson.lessonNumber}`);
+    try {
+      assertLessonLayout(normalizedLesson, `lesson ${lesson.lessonNumber}`);
+    } catch (error) {
+      error.cell = locateContentPath(sources, lesson.lessonNumber, error.path);
+      throw error;
+    }
     return normalizedLesson;
   });
 
@@ -197,7 +203,51 @@ test("refuses a Sheet with nowhere to put an answer", () => {
     () => previewWorkbook(workbookGrids({ teacherGuidance: "   " })),
     (error) =>
       error instanceof WorkbookSheetError &&
-      error.message === '"Analysis" row 5, Teacher guidance is required.',
+      error.message === '"Analysis" row 5, Teacher guidance is required.' &&
+      // The same cell in numbers, so the Sheet can be made to show it.
+      error.cell.sheet === "Analysis" &&
+      error.cell.row === 5 &&
+      error.cell.column === 7,
+  );
+});
+
+test("names the cell for a problem no single column caused", () => {
+  const grids = workbookGrids();
+  // Two lesson rows claiming to be lesson 1: neither cell is wrong on its own.
+  grids.Lessons[5][1] = 1;
+
+  assert.throws(
+    () => previewWorkbook(grids),
+    (error) =>
+      error instanceof WorkbookSheetError &&
+      error.cell.sheet === "Lessons" &&
+      error.cell.row === 6 &&
+      error.cell.column === 2,
+  );
+});
+
+test("traces a layout failure back to the row it was typed on", () => {
+  const grids = workbookGrids();
+  // Lesson 2's second vocabulary entry, given an excerpt no reference page can
+  // hold. The rule that refuses it counts characters and has never seen a
+  // spreadsheet, so the row has to be recovered from the parse.
+  const [word, korean, definition, excerpt, context] = [
+    "obdurate",
+    "완고한",
+    "Stubbornly refusing to change an opinion.",
+    "He had never once, in all the years she had known him, ".repeat(40),
+    "The argument has reached its third day.",
+  ];
+  grids.Vocabulary.push(["", 2, 2, word, korean, definition, excerpt, context, ""]);
+
+  assert.throws(
+    () => previewWorkbook(grids),
+    (error) => {
+      assert.equal(error.name, "WorkbookContentError");
+      assert.equal(error.path, "/sections/vocabulary/1");
+      assert.deepEqual(error.cell, { sheet: "Vocabulary", row: 7 });
+      return true;
+    },
   );
 });
 

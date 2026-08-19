@@ -37,10 +37,19 @@ const MAX_LESSON_COVER_UNITS = 700;
 const MAX_VOCABULARY_ENTRY_UNITS = 1900;
 const MAX_UNBROKEN_TEXT_UNITS = 80;
 
+/**
+ * Content that cannot be laid out, wherever it came from.
+ *
+ * The message says which lesson and which field, because that is what an author
+ * needs read to them. `path` repeats the field on its own, so a caller that
+ * knows where the content was typed — a Sheet row, a file on disk — can point
+ * at it directly. This file never learns which of those it is.
+ */
 export class WorkbookContentError extends Error {
-  constructor(message, options) {
+  constructor(message, { path, ...options } = {}) {
     super(message, options);
     this.name = "WorkbookContentError";
+    this.path = path;
   }
 }
 
@@ -104,6 +113,7 @@ function assertLayoutBudget(source, location, actual, maximum, guidance) {
   throw new WorkbookContentError(
     `Content is too long for the standardized workbook layout in ${source}:\n` +
       `  ${location}: estimated layout size ${actual} exceeds ${maximum}. ${guidance}`,
+    { path: location },
   );
 }
 
@@ -117,6 +127,7 @@ export function assertWrappableContent(value, source, location = "") {
         `Content cannot wrap safely in ${source}:\n` +
           `  ${location || "/"}: contains an unbroken text segment of ${longest} characters; ` +
           `the maximum is ${MAX_UNBROKEN_TEXT_UNITS}. Add normal word breaks or punctuation.`,
+        { path: location },
       );
     }
     return;
@@ -227,6 +238,7 @@ export function assertTeacherGuidance(lesson, source) {
       throw new WorkbookContentError(
         `Teacher guidance is required when teacher PDFs are requested in ${source}:\n` +
           `  /sections/${sectionName}/${index}/teacherGuidance: add answer guidance or export student PDFs only.`,
+        { path: `/sections/${sectionName}/${index}/teacherGuidance` },
       );
     });
   }

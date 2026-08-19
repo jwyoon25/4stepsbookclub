@@ -224,10 +224,28 @@
         );
       }
 
+      function highlight(message) {
+        serve(
+          "highlighted",
+          function (result) {
+            return result && result.a1
+              ? "Marked " + result.sheet + "!" + result.a1 + " in the Sheet."
+              : "Nothing to mark for this problem.";
+          },
+          function (onSuccess, onFailure) {
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .highlightWorkbookCell(message.cell);
+          },
+        );
+      }
+
       var HANDLERS = {
         "read-sheet": sendSheet,
         "export-start": startExport,
         "export-archive": saveArchive,
+        highlight: highlight,
       };
 
       window.addEventListener("message", function (event) {

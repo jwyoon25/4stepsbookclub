@@ -40,6 +40,7 @@ import {
 } from "/pdf-archive.mjs";
 import {
   createWorkbookManifest,
+  locateContentPath,
   parseWorkbookGrids,
   slugifyBookTitle,
 } from "/sheet-contract.mjs";
@@ -352,6 +353,25 @@ function renderSelections(selections) {
 }
 
 /**
+ * Show the author which cell a failure was about, or that none is.
+ *
+ * The Sheet contract names a cell outright. A content rule names a lesson and a
+ * field, because it never saw a spreadsheet, so the row it was typed on is
+ * looked up from what the contract recorded while parsing. Either way the
+ * dialog does the marking, because only an Apps Script page can write to the
+ * Sheet. Called with nothing, it clears whatever the last failure marked.
+ */
+function markTheCell(cell, message) {
+  if (!state.driveOrigin) {
+    return;
+  }
+  window.opener.postMessage(
+    { type: `${MESSAGE_PREFIX}-highlight`, cell: cell ? { ...cell, message } : null },
+    state.driveOrigin,
+  );
+}
+
+/**
  * Read the workbook the author is looking at.
  *
  * The Sheet arrives as raw cell matrices; everything that turns them into a
@@ -363,10 +383,12 @@ async function refreshFromSheet() {
   elements.refresh.disabled = true;
   elements.refresh.textContent = "Reading the Sheet…";
 
+  // Whatever the last read complained about is no longer what is wrong.
+  let cell;
   try {
     const startedAt = performance.now();
     const { grids, spreadsheetName } = await requestSheetGrids();
-    const { metadata, lessons } = parseWorkbookGrids(grids);
+    const { metadata, lessons, sources } = parseWorkbookGrids(grids);
     const manifest = normalizeManifest(
       createWorkbookManifest(metadata, lessons, {
         workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
@@ -376,10 +398,15 @@ async function refreshFromSheet() {
 
     const normalized = lessons.map((lesson) => {
       const source = `lesson ${lesson.lessonNumber}`;
-      assertWrappableContent(lesson, source);
-      const normalizedLesson = normalizeLesson(lesson);
-      assertLessonLayout(normalizedLesson, source);
-      return normalizedLesson;
+      try {
+        assertWrappableContent(lesson, source);
+        const normalizedLesson = normalizeLesson(lesson);
+        assertLessonLayout(normalizedLesson, source);
+        return normalizedLesson;
+      } catch (error) {
+        cell = locateContentPath(sources, lesson.lessonNumber, error.path);
+        throw error;
+      }
     });
 
     state.sheet = {
@@ -389,6 +416,7 @@ async function refreshFromSheet() {
       targets: listWorkbookTargets(normalized),
     };
     renderSelections(sheetSelections());
+    markTheCell();
     record("Workbook", `${manifest.bookTitle} · ${normalized.length} lessons`);
     record("Sheet read", milliseconds(performance.now() - startedAt));
     log(
@@ -399,8 +427,11 @@ async function refreshFromSheet() {
     return true;
   } catch (error) {
     // Sheet and content errors name the tab, the row, and the column, which is
-    // the whole point of showing them here rather than a generic failure.
+    // the whole point of showing them here rather than a generic failure. The
+    // Sheet is then made to show the same thing, because reading a row number
+    // and finding the row are not the same job.
     log(error.message, "bad");
+    markTheCell(error.cell ?? cell, error.message);
     return false;
   } finally {
     elements.refresh.disabled = state.driveOrigin === null;
