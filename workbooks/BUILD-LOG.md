@@ -17,10 +17,11 @@ Newest first.
 
 ## 2026-08-19 — Phase 1, and designing around a number nobody has measured twice
 
-Phase 1 is built end to end: the three menu items, the Drive export, the cell
-highlighting, and the schema check the browser had been going without. Four
-commits, `58e8afd` through `cb81c2b`. Nothing here has been run in the real
-Sheet.
+Phase 1 is built end to end and the export ran in the real Sheet: the three menu
+items, the Drive export, the cell highlighting, and the schema check the browser
+had been going without. Four PDFs reached
+`4steps PDF Builds/<book>/2026-08-19 05-30-18/` on the first attempt with
+nothing adjusted.
 
 ### What shipped
 
@@ -55,6 +56,33 @@ The compile time is the point: 0.6 seconds against roughly three minutes of
 transfer for the same work, which is why the export is designed around
 `google.script.run` and not around Typst.
 
+### What the first real export measured
+
+Four PDFs, 0.60 MB, one call, from the bound Sheet. Apps Script reports what it
+spends, so the channel is the remainder:
+
+| Stage | Measured | Per what |
+| --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | each file |
+| Build folder | 3.8 s | each export |
+| Channel | 1.41 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | the whole archive |
+
+**The transfer was never the expensive part. Drive was.** The session was spent
+designing around `google.script.run`, and `google.script.run` turns out to cost
+1.41 seconds of the 8.13; six and a third went to writing four files.
+
+That does not make the archives wrong — they removed twenty-five redundant
+folder resolutions and twenty-five calls, which is why a twelve-lesson book now
+projects to 56 seconds instead of 202. It makes them wrong *about what they were
+for*. The remaining 41 seconds is `createFile` called twenty-six times, and no
+transport change reaches it.
+
+One thing the numbers immediately paid for: the build folder took 3.8 seconds
+after compiling had already finished, serially, for no reason. It is now
+requested while the compiler runs.
+
 ### What was learned
 
 - **The archive is a ZIP the browser writes itself.** `CompressionStream` is
@@ -85,11 +113,21 @@ transfer for the same work, which is why the export is designed around
 ### Left open
 
 Where the bundle is hosted is still the only thing Phase 1 has not decided, and
-nothing after Phase 1 can start without it. Two numbers are waiting on the first
-real export: how much one `google.script.run` call actually carries, and which
-half of the gate's 7.78 seconds was the channel rather than Drive. The export
-reports both, and the budget halves and retries rather than failing, so finding
-out costs an export rather than a session.
+nothing after Phase 1 can start without it.
+
+The export that ran carried one lesson. A twelve-lesson book is twenty-six files
+and 4.09 MB of base64, and it is what settles the two things four files could
+not: whether the projection of 56 seconds holds, and how much one
+`google.script.run` call actually carries. 0.66 MB is proven; the budget is 2 MB
+and halves on refusal, so a full book finds the ceiling if there is one without
+failing the export.
+
+If 56 seconds turns out to be worth improving — and for something an author does
+once a book, it may well not be — the two candidates are the advanced Drive
+service in place of `DriveApp.createFile`, and several concurrent
+`google.script.run` calls, since Apps Script runs a user's executions in
+parallel. Both attack `createFile`, which is the only thing left that costs
+anything.
 
 ---
 

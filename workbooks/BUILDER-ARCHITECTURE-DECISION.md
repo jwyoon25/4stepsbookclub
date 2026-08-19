@@ -366,36 +366,63 @@ The response-space defaults, the layout budgets, and the wrapping limit moved to
 what a disk build applies. `lib/content.mjs` keeps the filesystem; the JSON
 schemas are now applied on both sides.
 
-**Every step of Phase 1 is built. None of it has been run in the real Sheet**, so
-the transfer figures below are still the Phase 0 measurement rather than an
-export's own.
+**Every step of Phase 1 is built, and the export has run in the real Sheet**, on
+2026-08-19: four PDFs into
+`4steps PDF Builds/<book>/2026-08-19 05-30-18/`, first attempt, nothing
+adjusted. The three menu items, the archive transfer, the build folder, and the
+cell marking all work against Google. What has not been run is a full
+twelve-lesson book; the projection below is from the four-file run.
 
-### How the export is designed
+### How the export is designed, and what it actually costs
 
 The transfer, not the compiler, is what the export had to be designed around:
 7.78 seconds for one 0.47 MB PDF against 168 milliseconds to compile it. Sending
-a twelve-lesson book's twenty-six files one at a time is about three minutes.
+a twelve-lesson book's twenty-six files one at a time is about three and a half
+minutes.
 
 They travel as ZIP archives. `Utilities.unzip` already splits the hosted
 renderer's archives on the Apps Script side, so the format is proven rather than
 assumed, and workbook PDFs deflate to about three quarters of their size —
-measured across a full twelve-lesson export: 4.08 MB of PDF, 3.07 MB compressed,
-4.09 MB once base64 encoded. At the 2 MB archive budget that book costs two
-calls instead of twenty-six.
+4.08 MB of PDF for a twelve-lesson book, 3.07 MB compressed, 4.09 MB once base64
+encoded. The build folder is created once, before any bytes move, so a run that
+fails partway leaves one timestamped folder holding what arrived.
 
-Three things follow from what is still unknown:
+#### Where the 7.78 seconds went — measured 2026-08-19
 
-- **How much one `google.script.run` call carries has never been established.**
-  0.63 MB of base64 is proven; the budget is a modest step above it rather than
-  the largest archive that might work, because the suspected cost is the number
-  of calls rather than their size. A refused call halves the budget and repacks,
-  so the first export to meet a real limit finds it, logs it, and finishes.
-- **Which half of the 7.78 seconds is the channel is not known either.** Apps
-  Script now returns what it spent decoding, unzipping, and writing, and the
-  window reports the difference. One real export answers it.
-- **The build folder is created once, before any bytes move**, so a run that
-  fails partway leaves one timestamped folder holding what arrived rather than
-  scattering files across two of them.
+The first real export carried four PDFs, 0.60 MB, in one call. Apps Script
+returns what it spends, so the channel is what is left over:
+
+| Stage | Measured | Per what |
+| --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | each file |
+| Build folder | 3.8 s | each export |
+| Channel | 1.41 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | the whole archive |
+
+**The transfer was never the expensive part; Drive was.** Unzipping four PDFs
+costs twenty milliseconds and writing them costs six and a third seconds. This
+overturns the assumption the design was built on — that the number of calls was
+the cost — and it changes what is worth optimizing:
+
+- **Archives were still the right move**, but for a different reason than
+  expected. They removed twenty-five redundant folder resolutions and twenty-five
+  calls' worth of channel, taking a twelve-lesson book from a projected 202
+  seconds to a projected **56**.
+- **Nothing about the transport can improve the remaining 41 seconds**, because
+  it is `createFile` called twenty-six times. Only two things could: the
+  advanced Drive service, which is often faster than `DriveApp`, or several
+  concurrent `google.script.run` calls, since Apps Script will run a user's
+  executions in parallel. Neither is worth doing before a full book has been
+  exported once and the projection confirmed.
+- **The folder is now requested while the compiler runs**, which is worth its
+  whole 3.8 seconds and cost nothing.
+- **How much one call carries is still unestablished.** 0.66 MB of base64 is now
+  proven; the 2 MB budget stays where it is because a refused call halves it and
+  repacks, so a full book's first export finds the ceiling if there is one. The
+  four-file run cannot separate per-call overhead from throughput — both are
+  inside that 1.41 seconds — so a full book is also what settles whether fewer,
+  larger archives are worth anything.
 
 ### What Phase 1 decided
 

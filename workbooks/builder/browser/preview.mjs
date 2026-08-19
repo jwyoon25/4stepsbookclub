@@ -837,6 +837,19 @@ async function exportApprovedPdfs() {
 
   try {
     const startedAt = performance.now();
+    // Drive takes about four seconds to make the folder and the compiler takes
+    // about one to make everything that goes in it, so the two are asked for at
+    // once. Settled rather than left pending, because nothing looks at a
+    // rejection here until the compiling is finished.
+    const folderRequest = askTheDialog(
+      { type: `${MESSAGE_PREFIX}-export-start` },
+      `${MESSAGE_PREFIX}-export-started`,
+      SHEET_TIMEOUT_MILLISECONDS,
+    ).then(
+      (folder) => ({ folder }),
+      (error) => ({ error }),
+    );
+
     const files = await compileEveryTarget((index, total, target) => {
       elements.export.textContent = `Compiling ${index + 1} of ${total}…`;
       log(`Compiling ${target.label}…`);
@@ -851,11 +864,10 @@ async function exportApprovedPdfs() {
     );
 
     elements.export.textContent = "Creating the build folder…";
-    const folder = await askTheDialog(
-      { type: `${MESSAGE_PREFIX}-export-start` },
-      `${MESSAGE_PREFIX}-export-started`,
-      SHEET_TIMEOUT_MILLISECONDS,
-    );
+    const { folder, error: folderError } = await folderRequest;
+    if (folderError) {
+      throw folderError;
+    }
     log(`Writing to ${folder.folderName} in Google Drive.`);
 
     elements.export.textContent = "Sending to Drive…";
@@ -865,6 +877,7 @@ async function exportApprovedPdfs() {
     );
 
     const elapsed = performance.now() - compiledAt;
+    record("Export total", milliseconds(performance.now() - startedAt));
     record("Export transfer", milliseconds(elapsed));
     record("Export PDFs", `${saved.length} files, ${megabytes(totalBytes)}`);
     log(
