@@ -246,6 +246,14 @@ the site is:
 | Root directory | repository root | repository root |
 | `NODE_VERSION` | — | `22` |
 
+The root directory has to stay the repository root, because that is where the
+build script and `package.json` are. One consequence: Cloudflare finds
+`functions/` there as well and deploys the site's Decap OAuth handlers to this
+project too. They are inert here — the bundle uses neither `/auth` nor
+`/callback`, the project has none of the OAuth secrets, and Access covers them —
+but a deploy log mentioning Functions on the builder is expected rather than
+wrong.
+
 `NODE_VERSION` is not optional. The bundle finds the Typst engine inside
 `node_modules` with `import.meta.resolve`, which is stable only from Node 20.6,
 and a build image older than that fails while vendoring rather than saying
