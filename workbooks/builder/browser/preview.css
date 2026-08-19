@@ -284,3 +284,15 @@ dd {
     min-height: 70vh;
   }
 }
+
+/*
+  The window is opened for one of two reasons, and each hides the other's
+  controls. A gate run answers the eight checks against the workbooks in the
+  bundle; an author opened it from the 4steps menu to see their own book. The
+  page defaults to the gate, because opening it directly is the documented way
+  to run one.
+*/
+body[data-mode="author"] .gate-only,
+body:not([data-mode="author"]) .author-only {
+  display: none;
+}

@@ -4,9 +4,25 @@ const FOURSTEPS_XLSX_MIME =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 function onOpen() {
-  const menu = SpreadsheetApp.getUi()
-    .createMenu(FOURSTEPS_MENU_TITLE)
-    .addItem("Create PDFs", "createWorkbookPdfs");
+  const menu = SpreadsheetApp.getUi().createMenu(FOURSTEPS_MENU_TITLE);
+
+  // The builder compiles in the author's browser and previews the real PDF
+  // before anything is filed. Its items appear only while
+  // builder/apps-script/WorkbookBuilder.gs is in the project, so a Sheet that
+  // has not been connected to it shows a menu of what it can actually do
+  // rather than three items that fail when clicked.
+  if (typeof openWorkbookPreview === "function") {
+    menu
+      .addItem("Validate workbook", "validateWorkbook")
+      .addItem("Open preview", "openWorkbookPreview")
+      .addItem("Create all approved PDFs", "createAllApprovedPdfs")
+      .addSeparator();
+  }
+
+  // The hosted renderer stays available: it needs no browser support and no
+  // static host, which is what makes it the recovery path when the builder
+  // cannot run.
+  menu.addItem("Create PDFs with the hosted renderer", "createWorkbookPdfs");
 
   // The browser-compiler gate is a temporary spike. The item appears only while
   // builder/apps-script/Phase0.gs is in the project, so removing that file after

@@ -183,6 +183,7 @@ const PAGE_FILES = Object.freeze([
   "sheet-contract.mjs",
   "content-rules.mjs",
   "build-targets.mjs",
+  "pdf-archive.mjs",
 ]);
 
 // The cross-origin-isolated copy of the preview page. Isolation buys the worker

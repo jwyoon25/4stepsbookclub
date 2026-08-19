@@ -15,7 +15,7 @@
     </script>
     <script type="module" src="/preview.mjs"></script>
   </head>
-  <body>
+  <body data-mode="gate">
     <header>
       <div class="title">
         <h1>Workbook preview</h1>
@@ -33,18 +33,23 @@
         <div class="buttons">
           <button id="compile" type="button" disabled>Compile and preview</button>
           <button id="refresh" type="button" disabled>Refresh from the Sheet</button>
-          <button id="save" type="button" disabled>Save to Google Drive</button>
-          <button id="verify" type="button" disabled>
+          <button id="export" class="author-only" type="button" disabled>
+            Create all approved PDFs
+          </button>
+          <button id="save" class="gate-only" type="button" disabled>
+            Save to Google Drive
+          </button>
+          <button id="verify" class="gate-only" type="button" disabled>
             Audit and compare with native
           </button>
           <a id="download" class="button" hidden download>Download</a>
-          <button id="run" class="quiet" type="button" disabled>
+          <button id="run" class="quiet gate-only" type="button" disabled>
             Run every gate check
           </button>
         </div>
       </section>
 
-      <section class="panel" aria-label="Gate checks">
+      <section class="panel gate-only" aria-label="Gate checks">
         <h2>The eight checks</h2>
         <dl id="gate" class="gate"></dl>
       </section>

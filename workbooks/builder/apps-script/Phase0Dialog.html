@@ -95,6 +95,11 @@
       // dialog replies with its own origin, and from then on both sides address
       // each other explicitly. Everything Drive-facing stays here, because only
       // an Apps Script page can call google.script.run.
+      //
+      // A request gets exactly one reply type, and the preview tells success
+      // from failure by whether that reply carries an `error`. The production
+      // dialog answers the same way; two shapes for one protocol is one shape
+      // too many.
       var MESSAGE_PREFIX = "4steps-preview";
       var previewUrl = document.getElementById("config").dataset.previewUrl;
       var previewOrigin = new URL(previewUrl, window.location.href).origin;
@@ -161,7 +166,7 @@
           .withFailureHandler(function (error) {
             log("Drive refused the file: " + error.message, "bad");
             previewWindow.postMessage(
-              { type: MESSAGE_PREFIX + "-save-failed", error: error.message },
+              { type: MESSAGE_PREFIX + "-saved", error: error.message },
               previewOrigin,
             );
           })
@@ -190,7 +195,7 @@
           .withFailureHandler(function (error) {
             log("Could not read the Sheet: " + error.message, "bad");
             previewWindow.postMessage(
-              { type: MESSAGE_PREFIX + "-sheet-failed", error: error.message },
+              { type: MESSAGE_PREFIX + "-sheet", error: error.message },
               previewOrigin,
             );
           })

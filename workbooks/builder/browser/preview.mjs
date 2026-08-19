@@ -24,6 +24,7 @@ import { createWebWorker } from "/vendor/typst-wasm/worker/browser.js";
 import {
   createTargetBundle,
   listWorkbookTargets,
+  workbookPdfName,
 } from "/build-targets.mjs";
 import {
   assertLessonLayout,
@@ -31,6 +32,12 @@ import {
   normalizeLesson,
   normalizeManifest,
 } from "/content-rules.mjs";
+import {
+  compressPdfEntries,
+  DEFAULT_MAX_ARCHIVE_BYTES,
+  MINIMUM_MAX_ARCHIVE_BYTES,
+  packPdfArchives,
+} from "/pdf-archive.mjs";
 import {
   createWorkbookManifest,
   parseWorkbookGrids,
@@ -43,9 +50,12 @@ import {
   readPdfCreator,
 } from "/workbook-compiler.mjs";
 
-// Reading a Sheet is a round trip through the dialog and Apps Script, which is
-// slower than anything else this window does.
+// Every round trip through the dialog reaches Apps Script, which is slower than
+// anything else this window does. An archive of PDFs is slower still: Drive
+// writes each file it unpacks, and the gate measured that channel at seconds per
+// megabyte rather than milliseconds.
 const SHEET_TIMEOUT_MILLISECONDS = 60000;
+const DRIVE_TIMEOUT_MILLISECONDS = 300000;
 
 const ENGINE_CORE_MODULES = [
   "engine.core.wasm",
@@ -75,6 +85,7 @@ const elements = {
   refresh: document.querySelector("#refresh"),
   run: document.querySelector("#run"),
   compile: document.querySelector("#compile"),
+  export: document.querySelector("#export"),
   save: document.querySelector("#save"),
   verify: document.querySelector("#verify"),
   download: document.querySelector("#download"),
@@ -95,8 +106,14 @@ const state = {
   current: null,
   lastCompiled: null,
   driveOrigin: null,
-  pendingSave: null,
-  pendingSheet: null,
+  // The window serves two audiences. A gate run answers the eight checks
+  // against the workbooks in the bundle; an author opened it from the 4steps
+  // menu to see their own book and export it. Opened directly, with no dialog
+  // to say otherwise, it is the gate — that is the documented runbook.
+  mode: "gate",
+  intent: null,
+  pending: new Map(),
+  archiveBudget: DEFAULT_MAX_ARCHIVE_BYTES,
   measurements: new Map(),
   verdicts: new Map(),
   startedAt: performance.now(),
@@ -379,13 +396,16 @@ async function refreshFromSheet() {
         `${milliseconds(performance.now() - startedAt)}.`,
       "good",
     );
+    return true;
   } catch (error) {
     // Sheet and content errors name the tab, the row, and the column, which is
     // the whole point of showing them here rather than a generic failure.
     log(error.message, "bad");
+    return false;
   } finally {
     elements.refresh.disabled = state.driveOrigin === null;
     elements.refresh.textContent = "Refresh from the Sheet";
+    elements.export.disabled = state.sheet === null;
   }
 }
 
@@ -496,6 +516,7 @@ function setBusy(busy) {
   elements.run.disabled = busy;
   elements.compile.disabled = busy;
   elements.fixture.disabled = busy;
+  elements.export.disabled = busy || state.sheet === null;
   elements.compile.textContent = busy ? "Compiling…" : "Compile and preview";
 }
 
@@ -532,17 +553,20 @@ function connectToDialog() {
       record("Drive run", message.session);
       verdict(1, `opened from the Sheet dialog at ${event.origin}`);
       log(`Connected to the Google Sheet dialog at ${event.origin}.`, "good");
+      applyMode(message.mode ?? "gate", message.intent ?? null);
       // The author opened this window from their workbook, so their workbook is
       // what it should be showing.
-      refreshFromSheet();
-    } else if (message.type === `${MESSAGE_PREFIX}-sheet`) {
-      state.pendingSheet?.resolve(message);
-    } else if (message.type === `${MESSAGE_PREFIX}-sheet-failed`) {
-      state.pendingSheet?.reject(new Error(message.error));
-    } else if (message.type === `${MESSAGE_PREFIX}-saved`) {
-      state.pendingSave?.resolve(message);
-    } else if (message.type === `${MESSAGE_PREFIX}-save-failed`) {
-      state.pendingSave?.reject(new Error(message.error));
+      openWorkbook();
+      return;
+    }
+
+    const pending = state.pending.get(message.type);
+    if (pending) {
+      if (message.error === undefined) {
+        pending.resolve(message);
+      } else {
+        pending.reject(new Error(message.error));
+      }
     }
   });
 
@@ -563,30 +587,46 @@ function connectToDialog() {
   log("Announced this window to the Google Sheet dialog.");
 }
 
-function requestSheetGrids() {
+/**
+ * Ask the Apps Script dialog for something and wait for its answer.
+ *
+ * Everything this window needs from Google — the Sheet's cells, a build folder,
+ * a saved archive — is a request the dialog answers with either a reply or an
+ * `error`. One reply type is one outstanding request, which is true because
+ * each of them is a step the author is waiting on.
+ */
+function askTheDialog(request, replyType, timeoutMilliseconds) {
   if (!state.driveOrigin) {
-    throw new Error(
-      "This window is not connected to a Google Sheet, so there is nothing to read.",
+    return Promise.reject(
+      new Error("This window is not connected to a Google Sheet."),
     );
   }
 
   return new Promise((resolve, reject) => {
     const expired = setTimeout(() => {
-      state.pendingSheet = null;
+      state.pending.delete(replyType);
       reject(new Error("The Google Sheet did not answer in time."));
-    }, SHEET_TIMEOUT_MILLISECONDS);
+    }, timeoutMilliseconds);
     const settle = (settler) => (value) => {
       clearTimeout(expired);
-      state.pendingSheet = null;
+      state.pending.delete(replyType);
       settler(value);
     };
 
-    state.pendingSheet = { resolve: settle(resolve), reject: settle(reject) };
-    window.opener.postMessage(
-      { type: `${MESSAGE_PREFIX}-read-sheet` },
-      state.driveOrigin,
-    );
+    state.pending.set(replyType, {
+      resolve: settle(resolve),
+      reject: settle(reject),
+    });
+    window.opener.postMessage(request, state.driveOrigin);
   });
+}
+
+function requestSheetGrids() {
+  return askTheDialog(
+    { type: `${MESSAGE_PREFIX}-read-sheet` },
+    `${MESSAGE_PREFIX}-sheet`,
+    SHEET_TIMEOUT_MILLISECONDS,
+  );
 }
 
 async function saveToDrive() {
@@ -600,19 +640,17 @@ async function saveToDrive() {
   log(`Sending ${name} (${megabytes(pdf.byteLength)}) to Apps Script…`);
 
   try {
-    const saved = await new Promise((resolve, reject) => {
-      state.pendingSave = { resolve, reject };
-      window.opener.postMessage(
-        {
-          type: `${MESSAGE_PREFIX}-save`,
-          name,
-          fixture: fixture.id,
-          bytes: pdf.byteLength,
-          base64: toBase64(pdf),
-        },
-        state.driveOrigin,
-      );
-    });
+    const saved = await askTheDialog(
+      {
+        type: `${MESSAGE_PREFIX}-save`,
+        name,
+        fixture: fixture.id,
+        bytes: pdf.byteLength,
+        base64: toBase64(pdf),
+      },
+      `${MESSAGE_PREFIX}-saved`,
+      DRIVE_TIMEOUT_MILLISECONDS,
+    );
 
     record("Drive transfer", milliseconds(saved.milliseconds));
     verdict(
@@ -626,9 +664,221 @@ async function saveToDrive() {
     log(`Google Drive rejected the transfer: ${error.message}`, "bad");
     return null;
   } finally {
-    state.pendingSave = null;
     elements.save.disabled = false;
     elements.save.textContent = "Save to Google Drive";
+  }
+}
+
+// --- The export -------------------------------------------------------------
+//
+// Everything a workbook owes: one PDF per lesson and one for the whole book, in
+// both editions. Twenty-six files for a twelve-lesson book, compiled here in
+// well under a second and then carried to Drive, which is the part that takes
+// real time.
+
+/**
+ * Compile every PDF the workbook owes.
+ *
+ * The names are the ones `lib/build.mjs` writes on disk, so a folder built here
+ * and a folder built by the native renderer hold the same files.
+ */
+async function compileEveryTarget(onProgress) {
+  const { manifest, lessons, targets } = state.sheet;
+  const files = [];
+
+  for (const [index, target] of targets.entries()) {
+    onProgress(index, targets.length, target);
+    files.push({
+      name: workbookPdfName(manifest.id, target),
+      bytes: await compileWorkbookPdf(
+        state.compiler,
+        createTargetBundle(manifest, lessons, target),
+      ),
+    });
+  }
+
+  return files;
+}
+
+/**
+ * Send the archives, shrinking them if a host refuses one.
+ *
+ * How much `google.script.run` will carry in a single call is the one thing
+ * about this transfer nobody has established. Rather than guess conservatively
+ * and pay for it on every export, the budget starts at what the gate's measured
+ * figure suggests is safe and halves on refusal — so the first export that
+ * meets a real limit finds it, says so, and finishes anyway.
+ */
+async function sendArchives(files, folderId) {
+  const saved = [];
+  // Compressing is the cheap half and the entries never change, so a retry at a
+  // smaller budget repacks them rather than deflating four megabytes again.
+  let remaining = await compressPdfEntries(files);
+  let driveMilliseconds = 0;
+  let transferMilliseconds = 0;
+
+  while (remaining.length > 0) {
+    const [archive] = packPdfArchives(remaining, {
+      maxArchiveBytes: state.archiveBudget,
+    });
+    const base64 = toBase64(archive.bytes);
+
+    log(
+      `Sending ${archive.names.length} PDFs (${megabytes(archive.bytes.length)} ` +
+        `compressed, ${megabytes(base64.length)} encoded)…`,
+    );
+
+    const startedAt = performance.now();
+    let result;
+    try {
+      result = await askTheDialog(
+        {
+          type: `${MESSAGE_PREFIX}-export-archive`,
+          folderId,
+          bytes: archive.bytes.length,
+          base64,
+        },
+        `${MESSAGE_PREFIX}-export-saved`,
+        DRIVE_TIMEOUT_MILLISECONDS,
+      );
+    } catch (error) {
+      if (
+        archive.names.length === 1 ||
+        state.archiveBudget <= MINIMUM_MAX_ARCHIVE_BYTES
+      ) {
+        throw error;
+      }
+      state.archiveBudget = Math.max(
+        MINIMUM_MAX_ARCHIVE_BYTES,
+        Math.floor(state.archiveBudget / 2),
+      );
+      log(
+        `Google refused ${megabytes(base64.length)} in one call — ${error.message}. ` +
+          `Retrying with archives of ${megabytes(state.archiveBudget)}.`,
+        "warn",
+      );
+      continue;
+    }
+
+    const elapsed = performance.now() - startedAt;
+    driveMilliseconds += result.milliseconds.total;
+    transferMilliseconds += elapsed - result.milliseconds.total;
+    saved.push(...result.files);
+    log(
+      `Saved ${result.files.length} PDFs in ${milliseconds(elapsed)} — ` +
+        `${milliseconds(result.milliseconds.total)} of it in Drive ` +
+        `(unzip ${milliseconds(result.milliseconds.unzip)}, ` +
+        `write ${milliseconds(result.milliseconds.write)}).`,
+      "good",
+    );
+
+    remaining = remaining.slice(archive.names.length);
+  }
+
+  return { saved, driveMilliseconds, transferMilliseconds };
+}
+
+/**
+ * Write every approved PDF to the workbook's build folder in Drive.
+ *
+ * The folder is created first and once, so a run that fails partway leaves one
+ * timestamped folder holding what did arrive rather than scattering files
+ * across two of them.
+ */
+async function exportApprovedPdfs() {
+  if (!state.sheet || !state.compiler) {
+    return;
+  }
+
+  setBusy(true);
+  elements.export.disabled = true;
+  elements.export.textContent = "Exporting…";
+  state.archiveBudget = DEFAULT_MAX_ARCHIVE_BYTES;
+
+  try {
+    const startedAt = performance.now();
+    const files = await compileEveryTarget((index, total, target) => {
+      elements.export.textContent = `Compiling ${index + 1} of ${total}…`;
+      log(`Compiling ${target.label}…`);
+    });
+    const compiledAt = performance.now();
+    const totalBytes = files.reduce((sum, { bytes }) => sum + bytes.byteLength, 0);
+    record("Export compile", milliseconds(compiledAt - startedAt));
+    log(
+      `Compiled ${files.length} PDFs (${megabytes(totalBytes)}) in ` +
+        `${milliseconds(compiledAt - startedAt)}.`,
+      "good",
+    );
+
+    elements.export.textContent = "Creating the build folder…";
+    const folder = await askTheDialog(
+      { type: `${MESSAGE_PREFIX}-export-start` },
+      `${MESSAGE_PREFIX}-export-started`,
+      SHEET_TIMEOUT_MILLISECONDS,
+    );
+    log(`Writing to ${folder.folderName} in Google Drive.`);
+
+    elements.export.textContent = "Sending to Drive…";
+    const { saved, driveMilliseconds, transferMilliseconds } = await sendArchives(
+      files,
+      folder.folderId,
+    );
+
+    const elapsed = performance.now() - compiledAt;
+    record("Export transfer", milliseconds(elapsed));
+    record("Export PDFs", `${saved.length} files, ${megabytes(totalBytes)}`);
+    log(
+      `Exported ${saved.length} PDFs to Google Drive in ${milliseconds(elapsed)}: ` +
+        `${milliseconds(driveMilliseconds)} in Apps Script and Drive, ` +
+        `${milliseconds(transferMilliseconds)} in the channel itself.`,
+      "good",
+    );
+    log(folder.folderUrl, "good");
+  } catch (error) {
+    log(`The export failed: ${error.message}`, "bad");
+  } finally {
+    setBusy(false);
+    elements.export.disabled = false;
+    elements.export.textContent = "Create all approved PDFs";
+  }
+}
+
+// --- What the window was opened for -----------------------------------------
+
+/**
+ * Show only what this window was opened to do.
+ *
+ * The gate's controls answer a question that was settled on 2026-08-19; an
+ * author opening their workbook from the 4steps menu should not be offered
+ * them, or the four fixtures they run against.
+ */
+function applyMode(mode, intent) {
+  state.mode = mode;
+  state.intent = intent;
+  document.body.dataset.mode = mode;
+  if (mode === "gate") {
+    return;
+  }
+  record("Opened for", intent ?? mode);
+}
+
+/** Read the author's workbook, then do whatever the menu item asked for. */
+async function openWorkbook() {
+  const parsed = await refreshFromSheet();
+  if (!parsed) {
+    return;
+  }
+
+  if (state.intent === "validate") {
+    log(
+      `${state.sheet.manifest.bookTitle} is valid: ${state.sheet.lessons.length} ` +
+        `lessons, ${state.sheet.targets.length} PDFs to build.`,
+      "good",
+    );
+  } else if (state.intent === "export") {
+    await exportApprovedPdfs();
+  } else if (state.mode === "author") {
+    await compileSelected();
   }
 }
 
@@ -819,6 +1069,7 @@ elements.fixture.addEventListener("change", clearPreview);
 elements.refresh.addEventListener("click", refreshFromSheet);
 elements.run.addEventListener("click", runEveryCheck);
 elements.compile.addEventListener("click", compileSelected);
+elements.export.addEventListener("click", exportApprovedPdfs);
 elements.save.addEventListener("click", saveToDrive);
 elements.verify.addEventListener("click", verifyCurrentPdf);
 elements.copy.addEventListener("click", copyResults);
