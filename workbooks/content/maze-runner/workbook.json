@@ -1,0 +1,17 @@
+{
+  "$schema": "../../schema/workbook.schema.json",
+  "schemaVersion": 1,
+  "id": "maze-runner",
+  "bookTitle": "The Maze Runner",
+  "author": "James Dashner",
+  "seriesTitle": "4steps Book Club Workbook",
+  "lessonRange": "Lessons 1-5",
+  "coverSubtitle": "Reading, analysis, writing, and vocabulary for Chapters 1-62.",
+  "lessonFiles": [
+    "lessons/lesson-01.json",
+    "lessons/lesson-02.json",
+    "lessons/lesson-03.json",
+    "lessons/lesson-04.json",
+    "lessons/lesson-05.json"
+  ]
+}

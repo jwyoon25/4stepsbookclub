@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --ink: #17342f;
+        --muted: #5f7069;
+        --faint: #69786f;
+        --paper: #f7f3ea;
+        --line: #dfe4dc;
+        --good: #4f7d5b;
+        --bad: #b84431;
+      }
+
+      body {
+        margin: 0;
+        padding: 16px;
+        background: #fff;
+        color: var(--ink);
+        font: 13px/1.5 "Helvetica Neue", Arial, sans-serif;
+      }
+
+      h2 {
+        margin: 0 0 4px;
+        font-size: 14px;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      h3 {
+        margin: 16px 0 6px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      a.open {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: var(--ink);
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .log {
+        margin: 0;
+        padding: 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 11px/1.5 ui-monospace, Menlo, monospace;
+        white-space: pre-wrap;
+      }
+
+      .good {
+        color: var(--good);
+      }
+
+      .bad {
+        color: var(--bad);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="heading">Workbook</h2>
+    <p id="explanation"></p>
+
+    <div
+      id="config"
+      data-preview-url="<?= previewUrl ?>"
+      data-intent="<?= intent ?>"
+    ></div>
+    <a class="open" id="open" target="_blank" rel="opener">Open the workbook</a>
+
+    <h3>Activity</h3>
+    <div class="log" id="log"></div>
+
+    <script>
+      // The preview window is where the workbook actually exists: it holds the
+      // Typst compiler and the content contract, and it is on a different origin
+      // from this dialog, so the two talk over postMessage. Everything
+      // Google-facing stays here, because only an Apps Script page can call
+      // google.script.run.
+      //
+      // Whoever changes the message names has to change them in
+      // builder/browser/preview.mjs at the same time; they are the contract
+      // between the two windows.
+      var MESSAGE_PREFIX = "4steps-preview";
+      var config = document.getElementById("config").dataset;
+      var previewUrl = config.previewUrl;
+      var intent = config.intent;
+      var previewOrigin = new URL(previewUrl, window.location.href).origin;
+      var session = new Date().toISOString().replace(/[:.]/g, "-");
+      var previewWindow = null;
+
+      var JOBS = {
+        validate: {
+          heading: "Validate workbook",
+          explanation:
+            "Opens your workbook and checks every cell. Nothing is built and " +
+            "nothing is saved.",
+        },
+        preview: {
+          heading: "Workbook preview",
+          explanation:
+            "Opens your workbook and compiles the real PDF. Edit the Sheet, " +
+            "then refresh the preview to see the change.",
+        },
+        export: {
+          heading: "Create all approved PDFs",
+          explanation:
+            "Builds every lesson and the complete workbook, in both editions, " +
+            "and files them in Google Drive. Keep this dialog open until it " +
+            "finishes.",
+        },
+      };
+      var job = JOBS[intent] || JOBS.preview;
+
+      document.getElementById("open").href = previewUrl;
+      document.getElementById("heading").textContent = job.heading;
+      document.getElementById("explanation").textContent = job.explanation;
+
+      function log(message, level) {
+        var line = document.createElement("div");
+        if (level) {
+          line.className = level;
+        }
+        line.textContent = new Date().toLocaleTimeString() + "  " + message;
+        var element = document.getElementById("log");
+        element.appendChild(line);
+        element.scrollTop = element.scrollHeight;
+      }
+
+      function reply(type, payload) {
+        payload = payload || {};
+        payload.type = MESSAGE_PREFIX + "-" + type;
+        previewWindow.postMessage(payload, previewOrigin);
+      }
+
+      /**
+       * Answer one request from the preview window.
+       *
+       * Every one of them is a call into Apps Script that either returns
+       * something or fails, and the preview window tells the two apart by
+       * whether the reply carries an `error`.
+       */
+      function serve(replyType, describe, call) {
+        call(
+          function (result) {
+            if (describe) {
+              log(describe(result), "good");
+            }
+            reply(replyType, result);
+          },
+          function (error) {
+            log(error.message, "bad");
+            reply(replyType, { error: error.message });
+          },
+        );
+      }
+
+      function sendSheet(message) {
+        log("Reading the workbook tabs…");
+        serve(
+          "sheet",
+          function (result) {
+            return (
+              "Sent " +
+              Object.keys(result.grids).length +
+              " tabs to the workbook window."
+            );
+          },
+          function (onSuccess, onFailure) {
+            // Which tabs to read is the window's to say: the contract that
+            // names them runs there, not here.
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .readWorkbookGrids(message.tabs);
+          },
+        );
+      }
+
+      function startExport() {
+        log("Creating the build folder in Google Drive…");
+        serve(
+          "export-started",
+          function (result) {
+            return "Writing to " + result.folderName + ".";
+          },
+          function (onSuccess, onFailure) {
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .startWorkbookExport();
+          },
+        );
+      }
+
+      function saveArchive(message) {
+        log("Receiving " + message.bytes + " bytes of PDFs…");
+        serve(
+          "export-saved",
+          function (result) {
+            return "Saved " + result.files.length + " PDFs to Drive.";
+          },
+          function (onSuccess, onFailure) {
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .saveWorkbookArchive({
+                folderId: message.folderId,
+                base64: message.base64,
+              });
+          },
+        );
+      }
+
+      function highlight(message) {
+        serve(
+          "highlighted",
+          function (result) {
+            return result && result.a1
+              ? "Marked " + result.sheet + "!" + result.a1 + " in the Sheet."
+              : "Nothing to mark for this problem.";
+          },
+          function (onSuccess, onFailure) {
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .highlightWorkbookCell(message.cell);
+          },
+        );
+      }
+
+      var HANDLERS = {
+        "read-sheet": sendSheet,
+        "export-start": startExport,
+        "export-archive": saveArchive,
+        highlight: highlight,
+      };
+
+      window.addEventListener("message", function (event) {
+        if (event.origin !== previewOrigin) {
+          return;
+        }
+        var message = event.data;
+        if (!message || typeof message.type !== "string") {
+          return;
+        }
+        var name = message.type.slice(MESSAGE_PREFIX.length + 1);
+
+        if (name === "ready") {
+          previewWindow = event.source;
+          reply("hello", { session: session, mode: "author", intent: intent });
+          log("Workbook window connected.", "good");
+          return;
+        }
+
+        if (previewWindow && HANDLERS[name]) {
+          HANDLERS[name](message);
+        }
+      });
+
+      log("Waiting for the workbook window.");
+    </script>
+  </body>
+</html>

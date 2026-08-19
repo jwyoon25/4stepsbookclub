@@ -7,8 +7,12 @@ The design system is implemented and proven by a specimen. The tutor-facing
 requirements are locked in
 [CONTENT-WORKFLOW-DECISIONS.md](CONTENT-WORKFLOW-DECISIONS.md), their JSON model
 is defined in [schema/](schema/README.md), and the data-driven renderer turns a
-validated content package into student and teacher PDFs. The staff editor is the
-remaining layer.
+validated content package into student and teacher PDFs. The first staff-facing
+authoring MVP is a Google Sheets-ready template with a checked `.xlsx` importer.
+The accepted preview and delivery direction is recorded in
+[BUILDER-ARCHITECTURE-DECISION.md](BUILDER-ARCHITECTURE-DECISION.md): keep Sheets,
+compile with Typst in the author's browser, preview before export, save through
+Apps Script to Drive, and retain the native renderer as a fallback.
 
 ## Prerequisites
 
@@ -35,15 +39,145 @@ From the repository root:
 npm run workbook:specimen        # build the design specimen
 npm run workbook:specimen:watch  # rebuild it on every save
 npm run workbook:validate        # validate the example content package
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
 npm run workbook:render          # render every example PDF variant
+npm run workbook:serve           # run the Sheets PDF service locally
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
+npm run workbook:browser-bundle  # write the browser compiler's static bundle
+npm run workbook:browser-gate    # serve that bundle for the Phase 0 gate
+npm run workbook:browser-verify  # compare the browser compiler with native Typst
+```
+
+## Google Sheets authoring MVP
+
+Use the checked template at
+`outputs/2026-08-19-google-sheets-mvp/4steps-workbook-authoring-template.xlsx`:
+
+1. Upload the `.xlsx` file to Google Drive, open it with Google Sheets, and make
+   a copy for the book.
+2. Edit the workbook and lesson tabs. Add one question, prompt, or vocabulary
+   entry per row. Do not rename tabs or column headings.
+3. In Google Sheets, choose **File → Download → Microsoft Excel (.xlsx)**.
+4. Import the download from the repository root:
+
+   ```bash
+   npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
+   ```
+
+The command creates a validated schema-v1 package under
+`workbooks/content/<generated-book-id>/`. It stops with a tab, row, and field
+message when the spreadsheet contract is invalid. The generated ID is based on
+the book title; use `--id existing-book-id` to assign a stable ID explicitly.
+
+To import into a chosen directory and retain its existing manifest ID:
+
+```bash
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx \
+  --output-dir workbooks/content/existing-book-id
+```
+
+To import, validate, and immediately create all student and teacher PDFs:
+
+```bash
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx --render
+```
+
+The bound Apps Script in `service/apps-script/Code.gs` adds a **4steps → Create
+PDFs** menu to the Sheet. It exports the current workbook, sends it to the same
+checked importer and Typst renderer used locally, and saves every resulting PDF
+to this Drive structure:
+
+```text
+<sheet's parent folder>/4steps PDF Builds/<book title>/<timestamp>/
+```
+
+The menu keeps Google Sheets as the authoring surface while preserving the
+student/teacher editions, standalone lessons, validation, layout rules, and PDF
+audits. It is generation-on-demand rather than a live viewer; a split editor/PDF
+viewer can still be added after real authors have proven the content contract.
+
+### Browser compiler gate
+
+The accepted direction replaces that hosted renderer with Typst compiled in the
+author's browser, previewed before export, and saved to Drive through Apps
+Script. Before any of it is built, one pass/fail gate has to run in the real
+Google environment. It is implemented in [builder/](builder/README.md), which is
+also its runbook.
+
+Everything outside Google is already verified:
+
+```bash
+npm run workbook:browser-verify
+```
+
+That compiles every representative workbook twice — once with the WebAssembly
+compiler the preview page uses, once with the Typst CLI — audits the WebAssembly
+output, and compares the two by every text run, every response rule, and every
+pixel. `npm test` runs a shorter version of the same check.
+
+### One-time renderer deployment
+
+> **Fallback implementation:** The accepted MVP direction is to replace this
+> default hosted dependency with browser-side Typst compilation after the
+> compatibility gate in
+> [BUILDER-ARCHITECTURE-DECISION.md](BUILDER-ARCHITECTURE-DECISION.md). The
+> deployment instructions below document the already-implemented native
+> renderer and remain the reliability fallback.
+
+The menu calls a small token-protected HTTP service because Apps Script cannot
+run Typst. `Dockerfile` packages the importer, renderer, audited PDF build, and
+Typst CLI for Cloud Run. After selecting a Google Cloud project with billing
+enabled, deploy from the repository root:
+
+```bash
+export FOURSTEPS_RENDERER_TOKEN="$(openssl rand -hex 32)"
+gcloud run deploy 4steps-workbook-renderer \
+  --source workbooks \
+  --region asia-northeast3 \
+  --allow-unauthenticated \
+  --concurrency 1 \
+  --memory 1Gi \
+  --timeout 300 \
+  --set-env-vars "RENDERER_TOKEN=${FOURSTEPS_RENDERER_TOKEN}"
+```
+
+The Cloud Run endpoint must accept public network requests because Apps Script
+cannot attach Google Cloud IAM credentials. The application still rejects every
+render request that does not contain the separate 32-byte bearer token. Keep the
+token out of the spreadsheet cells and source repository.
+
+In the bound Apps Script project, open **Project Settings → Script Properties**
+and add:
+
+- `RENDERER_URL`: the deployed Cloud Run service URL, without a trailing slash
+- `RENDERER_TOKEN`: the exact token used for the Cloud Run deployment
+
+Copy `service/apps-script/Code.gs` into the Sheet's bound Apps Script project.
+The optional `appsscript.json` records the minimal explicit scopes. Reload the
+Sheet, choose **4steps → Create PDFs**, and approve the first-run Google Sheets,
+Drive, and external-request permissions. Later clicks validate and render the
+latest sheet contents without a manual `.xlsx` download.
+
+For a local service smoke test, use a token of at least 32 characters:
+
+```bash
+RENDERER_TOKEN=replace-with-at-least-32-characters npm run workbook:serve
+curl http://localhost:8080/healthz
 ```
 
 Validate a production manifest by passing its path after `--`:
 
 ```bash
 npm run workbook:validate -- workbooks/content/the-book-id/workbook.json
+```
+
+Use the same student-only boundary during validation when answer guidance has
+not been authored yet:
+
+```bash
+npm run workbook:validate -- workbooks/content/the-book-id/workbook.json \
+  --editions student
 ```
 
 Render that package with the same manifest entry point:
@@ -59,6 +193,16 @@ directory:
 npm run workbook:render -- workbooks/content/the-book-id/workbook.json \
   --output-dir path/to/output
 ```
+
+When teacher answer guidance is not ready yet, create only the student outputs:
+
+```bash
+npm run workbook:render -- workbooks/content/the-book-id/workbook.json \
+  --editions student
+```
+
+Teacher guidance remains required whenever `--editions teacher` or `--editions
+both` is requested; the student-only path does not invent answer guidance.
 
 For a package with the ID `the-book-id`, the renderer creates:
 
@@ -105,19 +249,31 @@ workbooks/
 ├── README.md
 ├── DESIGN-DECISIONS.md   # settled decisions and deferred questions, with reasoning
 ├── CONTENT-WORKFLOW-DECISIONS.md # locked authoring fields, defaults, and outputs
+├── BUILDER-ARCHITECTURE-DECISION.md # accepted authoring, preview, and rendering plan
+├── BUILD-LOG.md          # dated record of what each session shipped, measured, and learned
 ├── schema/               # versioned JSON Schemas, documentation, and examples
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
 │   └── logo/             # logomark and logotype, derived from the website assets
+├── builder/              # browser and Apps Script code: the Sheet contract, preview, and gate
 ├── content/              # Production book- and lesson-specific curriculum data
 ├── lib/
+│   ├── browser-bundle.mjs   # the static bundle the browser compiler is loaded from
+│   ├── browser-verification.mjs # one workbook, compiled twice and compared
 │   ├── build.mjs         # output planning and Typst build orchestration
 │   ├── content.mjs       # package loading, validation, and default application
-│   └── pdf-audit.mjs     # post-render PDF consistency checks
+│   ├── pdf-audit.mjs     # post-render PDF consistency checks
+│   ├── render-parity.mjs # comparing two renderings of the same workbook
+│   ├── sheet-import.mjs  # the .xlsx adapter over the shared Sheet contract
+│   └── typst-compiler.mjs   # the browser compiler, running under Node
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
+│   ├── build-browser-bundle.mjs   # writes the browser compiler's static bundle
+│   ├── import-sheet.mjs     # command-line spreadsheet importer
 │   ├── render-content.mjs   # command-line PDF renderer
-│   └── validate-content.mjs # command-line content validator
+│   ├── serve-browser-bundle.mjs   # local gate server with the audit endpoint
+│   ├── validate-content.mjs # command-line content validator
+│   └── verify-browser-compiler.mjs # browser-versus-native comparison harness
 ├── src/
 │   ├── main.typ          # Minimal Typst compilation smoke test.
 │   ├── render.typ        # Generic JSON bundle entry point.

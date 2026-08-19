@@ -124,6 +124,23 @@ This is the direct fix for the reference PDF's densest failure, where five field
 forced into A4-width columns produced definitions wrapping at a few words per
 line and rows splitting across page breaks.
 
+### A vocabulary entry is indivisible
+
+`vocab-entry` is `breakable: false`. An entry moves to the next page whole rather
+than leaving its fields behind.
+
+This section previously claimed that "pagination happens between entries" while
+the component was `breakable: true`, so the claim was not enforced anywhere. A
+twelve-word lesson — an ordinary size — split two entries, and two of the four
+vocabulary pages opened with a bare `From book` / `Excerpt context` pair and no
+headword above it. An entry is a dictionary entry: the fields mean nothing
+without the word they define.
+
+Making entries indivisible cost no pages in that lesson, and it cannot cost more
+than one: `MAX_VOCABULARY_ENTRY_UNITS` in `lib/content.mjs` already rejects any
+entry too large for a single reference page, so an entry always has a page it
+fits on.
+
 ### Tutor-authored vocabulary content is never altered
 
 The system may wrap, paginate, and label it. It must not rewrite, shorten,
@@ -169,6 +186,65 @@ is deliberately not locked: it must be reviewed after the final page design is
 approved with the current 7 mm writing rhythm. Content stores the semantic
 choice rather than the derived number, so revising the mapping will not require
 curriculum edits.
+
+### Student panels are filled; teacher panels are outlined
+
+The `Guidance & requirements` panel a student must follow and the `Teacher
+guidance` panel that holds the answer key both sat on a `step-wash` ground. In
+grayscale both measured 243 out of 255 — identical on any black-and-white print
+or photocopy, which is how a teacher guide is normally used. The only difference
+was a 2 pt left bar and the label text.
+
+Teacher-only panels are now outlined on a near-white ground and keep the heavy
+step-coloured bar; student-facing panels stay filled and unbordered. Fill versus
+outline is a structural difference rather than a tonal one, so it survives
+grayscale, a bad photocopier, and a low-toner print — which is what separating
+an answer key from student instructions has to do.
+
+### Step verbs are assigned per section, not by index — provisional
+
+`step-actions` is `("Read", "Think", "Write", "Speak")`: Paragraph Writing carries
+WRITE and Vocabulary carries SPEAK.
+
+The previous list was the brand strip in its own order, zipped against the four
+sections by index. That produced two wrong labels, because the method does not map
+one-to-one onto the workbook: SPEAK is the live discussion and has no workbook
+section, and the site files vocabulary under READ. Paragraph Writing was labelled
+SPEAK, and Vocabulary — a reference section with no response space at all — was
+labelled WRITE.
+
+Giving WRITE to Paragraph Writing is settled and correct. **Vocabulary as SPEAK is
+provisional and Jayden intends to revisit it.** Two things to weigh when he does:
+
+- The site's own READ step is noted "Reading · Vocabulary", and its promise line
+  is the weekly vocabulary test. On that copy, vocabulary belongs to READ, and the
+  workbook now says otherwise. If the live class actually drills vocabulary orally
+  then SPEAK is right and `methodSteps` in `website/src/pages/index.astro` is what
+  needs updating — either way the two should not disagree.
+- The pressure that caused the original error is still here: four tabs want four
+  distinct verbs, and the method only supplies three that the workbook covers.
+  The alternative considered was to drop the verb from Vocabulary and label it as
+  a reference section, which resolves the mismatch instead of relocating it.
+
+Step numbers stay in book order, so the printed sequence is now
+READ · THINK · WRITE · SPEAK rather than the brand strip's
+READ · THINK · SPEAK · WRITE. Numbers on a section a student reads front to back
+have to ascend; the verb order gives way to that.
+
+### Vocabulary has not been settled as prep or review
+
+Independent of the label, the system says three different things about what the
+vocabulary section is for:
+
+| Where | What it says |
+| --- | --- |
+| `src/specimen.typ` | "Read these before you begin Chapter 9" — pre-reading prep |
+| `system/renderer.typ` (ships) | "Return to these words and the moments in which they appear" — post-reading review |
+| `how-to-page` | "Return to important words…" — post-reading review |
+
+The section is rendered last, which fits review and contradicts the specimen.
+Settling this decides where the section belongs in the lesson and which verb it
+takes, so it should be settled before the verb question is revisited.
 
 ### Grayscale legibility is load-bearing
 
@@ -223,6 +299,15 @@ They are a section finder when flipping and a progress indicator when reading,
 and they cost nothing to print. They do not bleed off the edge: a home printer
 cannot print to the edge, and a tab clipped by an unprintable margin looks broken
 rather than deliberate.
+
+**All four share an outer edge at `tab-right` (202 mm), and the active tab extends
+inward.** The active tab used to be the wider one measured *outward* from a shared
+left edge, which put its outer edge 4 mm from the sheet — inside the unprintable
+band of a common home laser or inkjet (roughly 4.2–5 mm). The one marker a student
+needs, the current section, was the first thing their printer clipped, while the
+three inactive tabs at 8 mm printed fine. Extending inward keeps every tab 8 mm
+clear and gives the stack the flush outer edge that makes it read as index tabs
+rather than four loose swatches.
 
 ### Every section begins on a fresh page
 
@@ -293,11 +378,20 @@ the answer lines.
 
 | Token | Value | Role |
 | --- | --- | --- |
-| `ink` | `#17342f` | The brand's black; a deep forest green |
-| `muted` | `#5f7069` | Secondary type and furniture |
+| `ink` | `#17342f` | The brand's black; a deep forest green — 13.4:1 on white |
+| `muted` | `#5f7069` | Secondary type and furniture — 5.2:1 |
+| `faint` | `#69786f` | Small caps labels, field labels, page numbers — 4.7:1 |
 | `paper` | `#f7f3ea` | Warm neutral for restrained callout panels |
-| `coral-deep` | `#b84431` | The margin rule |
+| `coral-deep` | `#b84431` | The margin rule — 5.4:1 |
 | `ruled` | `#c6d0c8` | Handwriting guides; dark enough for a home laser |
+
+**Every colour used as type clears 4.5:1 on white.** `faint` was `#8a978f` at
+3.04:1, which failed that bar while carrying the *smallest* type in the book —
+6.5 pt vocabulary field labels, 7.5 pt section labels, and the footer. The type
+scale was inverted against legibility: the smaller the text, the weaker its
+contrast. `faint` and `muted` now sit close in value; they stay distinguishable
+because `faint` is only ever used in tracked caps at 6.5–8 pt, which is already a
+different register from `muted` running text.
 
 Section colours follow the approved design in method order: green `#a9cdb0`,
 coral `#f0b6a4`, teal `#96cdc9`, and purple `#bfb2dc`, for Reading

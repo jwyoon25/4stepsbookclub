@@ -1,0 +1,195 @@
+{
+  "$schema": "../../../schema/lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 4,
+  "title": "The Code in the Maps",
+  "readingRange": "Chapters 37-48",
+  "framingNote": "The Gladers lose the routines that once protected them and begin turning the Maze's patterns into a plan.",
+  "studentInstructions": "Answer comprehension questions in complete sentences and support analysis answers with text details. For writing, choose one prompt and write a well-developed paragraph with a clear topic sentence, evidence, and explanation.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "What happens when the Doors of the Maze stop closing at night, and how does this change life in the Glade?"
+      },
+      {
+        "prompt": "How do the Grievers begin attacking the Gladers, and what pattern do the Gladers notice about whom the Grievers take?"
+      },
+      {
+        "prompt": "What happens to the Maps, and why does this seem like a serious problem at first?"
+      },
+      {
+        "prompt": "What important discovery do Thomas, Minho, and the others make when they compare the Maps from different days?"
+      },
+      {
+        "prompt": "Why does Thomas decide to get stung by a Griever, and what does he hope to learn through the Changing?"
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "The Gladers used to believe that the Maze walls closing at night protected them. What does it mean symbolically when the Doors stop closing?"
+      },
+      {
+        "prompt": "The Grievers begin taking one Glader each night instead of killing everyone at once. Why is this method especially terrifying, and what does it reveal about the Creators’ control over the boys?"
+      },
+      {
+        "prompt": "The burning of the Maps seems like a disaster, but it also forces the Gladers to think differently. How does this moment show the difference between losing hope and adapting under pressure?"
+      },
+      {
+        "prompt": "The hidden code in the Maps suggests that the Maze was never random. How does this discovery change the meaning of the Maze?"
+      },
+      {
+        "prompt": "Thomas chooses to get stung even though he knows it will cause extreme pain. What does this decision reveal about his courage and his sense of responsibility?"
+      },
+      {
+        "prompt": "Through the Changing, Thomas begins to recover memories that connect him to the Creators and the Maze. Why might this make him feel guilty even if he cannot fully remember his past choices?"
+      },
+      {
+        "prompt": "Teresa and Thomas are able to communicate telepathically and seem to share a mysterious connection to the experiment. How does their relationship complicate the Gladers’ trust in them?"
+      },
+      {
+        "prompt": "In these chapters, the Gladers move from simply surviving inside the Glade to actively planning escape. What causes this shift?"
+      },
+      {
+        "prompt": "By the end of Lesson 4, does fear divide the Gladers or push them toward action? Explain your reasoning using specific moments from the text."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Choose ONE of the following prompts:\n1. In Chapters 37-48, the Glade changes from a place of routine survival into a place of immediate danger. How does Dashner show that comfort and safety can disappear when people are trapped inside a controlled system?\n2. Thomas decides to sacrifice his own comfort and safety by getting stung in order to recover memories. What do these chapters suggest about courage, sacrifice, and leadership?\n3. The discovery of the code proves that the Maze has a hidden design and purpose. How does this change the Gladers’ understanding of their situation and their hope for escape?",
+        "responseGuidance": [
+          "Write one well-developed paragraph with a clear topic sentence, evidence, explanation, and specific moments from the book."
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "discernible",
+        "koreanMeaning": "알아볼 수 있는, 분명히 감지되는",
+        "definition": "able to be noticed, recognized, or clearly seen.",
+        "bookExcerpt": "“Though there had been no discernible change in the light since the sun and blue sky hadn’t appeared that morning, it still felt like a darkness spread over the Glade.”",
+        "excerptContext": "The Doors have failed to close, and the Gladers are hurriedly preparing for danger. Although the light has not noticeably changed, the frightening situation makes the Glade seem darker.",
+        "chapterReference": "Chapter 37"
+      },
+      {
+        "term": "catalyst",
+        "koreanMeaning": "촉매, 변화를 촉진하는 계기",
+        "definition": "something that causes or speeds up an important change or action.",
+        "bookExcerpt": "“Thomas had an overwhelming feeling that all of these changes were a spur, a catalyst for the endgame.”",
+        "excerptContext": "Thomas is explaining to Newt that the recent changes may finally force the Gladers to solve the Maze. He believes these events are pushing them toward the final stage of their struggle.",
+        "chapterReference": "Chapter 37"
+      },
+      {
+        "term": "remorseful",
+        "koreanMeaning": "뉘우치는, 후회하는",
+        "definition": "feeling sorry and guilty about something wrong you have done.",
+        "bookExcerpt": "“But their leader didn’t look in the least bit reprimanded or remorseful.”",
+        "excerptContext": "Newt challenges Alby for acting as though the Gladers should simply wait for the Grievers instead of taking action. Thomas notices that Alby does not initially appear sorry or affected by Newt’s criticism.",
+        "chapterReference": "Chapter 38"
+      },
+      {
+        "term": "suffocating",
+        "koreanMeaning": "숨 막히는, 질식할 듯한",
+        "definition": "so oppressive or overwhelming that it feels hard to breathe.",
+        "bookExcerpt": "“The anticipation of what might happen was overpowering, a suffocating blanket of misery and fear that began to take on a life of its own.”",
+        "excerptContext": "The Gladers have crowded into the Homestead and prepared for a possible Griever attack. As they wait in the dark, their fear becomes almost unbearable.",
+        "chapterReference": "Chapter 38"
+      },
+      {
+        "term": "lunacy",
+        "koreanMeaning": "광기, 제정신이 아닌 상태",
+        "definition": "a state of wild, irrational madness.",
+        "bookExcerpt": "“Gally’s eyes raged with lunacy; his clothes were torn and filthy.”",
+        "excerptContext": "Gally suddenly appears after having been missing. He looks wild and unstable as he warns the Gladers that the Grievers will kill them one by one.",
+        "chapterReference": "Chapter 39"
+      },
+      {
+        "term": "figment",
+        "koreanMeaning": "상상의 산물, 실제가 아닌 것",
+        "definition": "something created by the imagination that is not actually real.",
+        "bookExcerpt": "“It was as if they all believed as Thomas did - that Gally was only a figment of their imagination.”",
+        "excerptContext": "Gally’s unexpected return leaves everyone stunned and silent. His appearance is so surprising that Thomas can hardly believe Gally is really standing there.",
+        "chapterReference": "Chapter 39"
+      },
+      {
+        "term": "sabotage",
+        "koreanMeaning": "고의적인 파괴, 방해 행위",
+        "definition": "deliberate damage or interference meant to stop something from working or succeeding.",
+        "bookExcerpt": "“He stood outside the window of the Slammer, having left Newt and Minho when they went to investigate the sabotage of the Map Room.”",
+        "excerptContext": "Someone has deliberately burned the Map Room and destroyed its stored Maps. Newt and Minho investigate the damage while Thomas goes to speak with Teresa.",
+        "chapterReference": "Chapter 40"
+      },
+      {
+        "term": "distraught",
+        "koreanMeaning": "몹시 괴로워하는, 심란한",
+        "definition": "extremely upset, worried, or distressed.",
+        "bookExcerpt": "“Minho was standing behind him, looking distraught and dirty, and spotted Thomas first.”",
+        "excerptContext": "Thomas arrives at the burned Map Room and finds the Gladers gathered around an injured Alby. Minho is visibly distressed by the fire and everything that has happened.",
+        "chapterReference": "Chapter 41"
+      },
+      {
+        "term": "gingerly",
+        "koreanMeaning": "조심스럽게, 신중하게",
+        "definition": "with great care and caution, especially to avoid causing pain or damage.",
+        "bookExcerpt": "“Newt was cleaning it with a wet rag, gingerly, asking questions in a whisper too low to hear.”",
+        "excerptContext": "Alby has been found with a large wound on his forehead near the burned Map Room. Newt carefully cleans the injury while trying to find out what happened.",
+        "chapterReference": "Chapter 41"
+      },
+      {
+        "term": "feverishly",
+        "koreanMeaning": "열성적으로, 다급하게",
+        "definition": "with intense speed and energy, especially because something is urgent.",
+        "bookExcerpt": "“Soon he’d completed five maps, then five more. The others kept the same pace, working feverishly.”",
+        "excerptContext": "Thomas, Teresa, Newt, and Minho are tracing the Maze Maps onto wax paper so they can compare them. They work as quickly and intensely as possible because they believe the Maps may contain an important clue.",
+        "chapterReference": "Chapter 42"
+      },
+      {
+        "term": "visualize",
+        "koreanMeaning": "마음속에 그리다, 시각화하다",
+        "definition": "to form a clear picture or image in your mind.",
+        "bookExcerpt": "“Just … come … help … me, he tried to say back, thinking each word separately, trying to visualize the message, send it.”",
+        "excerptContext": "Teresa has spoken to Thomas telepathically while the others are working on the Maps. Thomas tries to answer her by concentrating on each word and mentally forming the message he wants to send.",
+        "chapterReference": "Chapter 42"
+      },
+      {
+        "term": "decipher",
+        "koreanMeaning": "해독하다, 의미를 풀어내다",
+        "definition": "to work out the meaning of something difficult, hidden, or written in code.",
+        "bookExcerpt": "“‘If you’re going to decipher a hidden code from a complex set of different mazes, I’m pretty sure you need a girl’s brain running the show.’”",
+        "excerptContext": "Minho wants Thomas to return to exploring the Maze while Newt continues working on the code. Teresa agrees to stay behind and help, joking that she should be the one to solve the hidden message.",
+        "chapterReference": "Chapter 43"
+      },
+      {
+        "term": "intrigue",
+        "koreanMeaning": "호기심, 흥미",
+        "definition": "a strong feeling of curiosity or interest, especially about something mysterious.",
+        "bookExcerpt": "“Thomas felt a million thoughts go through his head in that moment. An itch to learn the code, embarrassment at what Newt thought of him and Teresa, the intrigue of what they might find out in the Maze - and fear.”",
+        "excerptContext": "Thomas is about to leave Teresa and the code-breaking work to explore the Maze with Minho. He feels several emotions at once, including curiosity about what they may discover outside.",
+        "chapterReference": "Chapter 43"
+      },
+      {
+        "term": "impenetrable",
+        "koreanMeaning": "뚫고 들어갈 수 없는, 관통할 수 없는",
+        "definition": "impossible or extremely difficult to pass through or enter.",
+        "bookExcerpt": "“The ivy was especially thick there; it made the world seem green and lush, hiding the hard, impenetrable stone.”",
+        "excerptContext": "Thomas and Minho stop at a dead end while exploring the Maze. Thick ivy covers the wall, but underneath it is solid stone that they cannot pass through.",
+        "chapterReference": "Chapter 44"
+      },
+      {
+        "term": "sheepishly",
+        "koreanMeaning": "멋쩍게, 쑥스럽게",
+        "definition": "in an embarrassed or awkward way because you feel foolish.",
+        "bookExcerpt": "“Smiling sheepishly at Minho, who’d turned to look without slowing, Thomas got back up and caught up to him.”",
+        "excerptContext": "While Thomas is running through the Maze, Teresa jokingly suggests through their telepathic connection that they may once have been lovers. Thomas is so surprised that he trips, then gets up looking embarrassed in front of Minho.",
+        "chapterReference": "Chapter 44"
+      },
+      {
+        "term": "aimlessly",
+        "koreanMeaning": "목적 없이, 정처 없이",
+        "definition": "without a clear purpose, plan, or direction.",
+        "bookExcerpt": "“And after aimlessly wandering the Glade to hear the other Runners’ stories, he snapped out of his funk.”",
+        "excerptContext": "The Runners have returned without finding a way out, and the Gladers are discouraged. Thomas wanders around without a clear direction before refocusing on the Maze code and contacting Teresa.",
+        "chapterReference": "Chapter 45"
+      }
+    ]
+  }
+}

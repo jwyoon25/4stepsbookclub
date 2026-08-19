@@ -1,0 +1,227 @@
+{
+  "$schema": "../../../schema/lesson.schema.json",
+  "schemaVersion": 1,
+  "lessonNumber": 3,
+  "title": "Teresa and the Ending",
+  "readingRange": "Chapters 25-36",
+  "framingNote": "Thomas becomes a Runner as Teresa's arrival and the changing Glade make his identity harder to understand.",
+  "studentInstructions": "Answer comprehension questions in complete sentences and support analysis answers with text details. For writing, choose one prompt and write a well-developed paragraph with a clear topic sentence, evidence, and explanation.",
+  "sections": {
+    "readingComprehension": [
+      {
+        "prompt": "What does Thomas learn during his first official days training as a Runner with Minho?"
+      },
+      {
+        "prompt": "What does Thomas discover about the Grievers and the Cliff while exploring the Maze?"
+      },
+      {
+        "prompt": "How does Alby react to Thomas after going through the Changing, and why does this make Thomas feel even more confused about his past?"
+      },
+      {
+        "prompt": "What happens when Teresa wakes up, and what special connection does she seem to have with Thomas?"
+      },
+      {
+        "prompt": "What changes begin happening in the Glade after Teresa’s message, and how do these changes affect the Gladers’ sense of safety?"
+      }
+    ],
+    "criticalThinkingAndAnalysis": [
+      {
+        "prompt": "Thomas finally becomes a Runner, but this does not immediately give him all the answers he wants. What does this suggest about the difference between action and understanding?"
+      },
+      {
+        "prompt": "The Runners are brave, but they also depend on careful observation, mapping, and patterns. How do these chapters show that intelligence is just as important as courage?"
+      },
+      {
+        "prompt": "Thomas notices that the Grievers seem to disappear near the Cliff. Why is this discovery important, and how does it change the way Thomas thinks about the Maze?"
+      },
+      {
+        "prompt": "Alby’s memories from the Changing make him afraid of Thomas. Why does this create conflict between Thomas’s own view of himself and the way others see him?"
+      },
+      {
+        "prompt": "Teresa’s arrival and awakening make Thomas’s identity even more mysterious. How does their connection suggest that Thomas’s past may be connected to the creation or purpose of the Maze?"
+      },
+      {
+        "prompt": "The phrase “the Ending” creates fear because it suggests that the Gladers’ world is changing permanently. Why is this idea more frightening than an ordinary danger or attack?"
+      },
+      {
+        "prompt": "The Gladers have survived by depending on routine, but these chapters show that their routine can suddenly disappear. What does this suggest about the danger of becoming too comfortable in an unsafe system?"
+      },
+      {
+        "prompt": "The Maze begins to seem less like a random prison and more like a designed test. What details in these chapters support this idea?"
+      },
+      {
+        "prompt": "By the end of Lesson 3, does knowledge seem to make Thomas safer or more burdened? Explain your reasoning using specific moments from the text."
+      }
+    ],
+    "paragraphWriting": [
+      {
+        "prompt": "Choose ONE of the following prompts:\n1. In Chapters 25-36, Thomas gains more knowledge about the Maze, the Grievers, Teresa, and his own mysterious past. How does Dashner show that knowledge can be both powerful and frightening?\n2. The Gladers once believed that following rules and routines would keep them alive, but these chapters begin to challenge that belief. What do these chapters suggest about the limits of order and routine?\n3. Thomas wants to understand who he is, but the more he learns, the more others begin to fear or distrust him. How do these chapters explore the relationship between identity, memory, and suspicion?",
+        "responseGuidance": [
+          "Write one well-developed paragraph with a clear topic sentence, evidence, explanation, and specific moments from the book."
+        ]
+      }
+    ],
+    "vocabulary": [
+      {
+        "term": "clamoring",
+        "koreanMeaning": "큰 소리로 강하게 요구하는, 아우성치며 요구하는",
+        "definition": "loudly and insistently demanding or calling for something.",
+        "bookExcerpt": "“Some Keepers seemed to actually agree with Minho’s recommendation - like Frypan, who clapped to drown out Gally, clamoring to take a vote.”",
+        "excerptContext": "Minho has just recommended that Thomas become Keeper of the Runners. The Council erupts into disagreement, and Frypan loudly pushes for an immediate vote.",
+        "chapterReference": "Chapter 25"
+      },
+      {
+        "term": "hypocrisy",
+        "koreanMeaning": "위선, 위선적인 태도",
+        "definition": "the act of criticizing someone for behavior that you yourself are guilty of.",
+        "bookExcerpt": "“That’s called hypocrisy, you shuck-faced piece of -”",
+        "excerptContext": "Minho points out that Gally is criticizing Thomas for breaking a Maze rule even though Gally himself broke that same rule before.",
+        "chapterReference": "Chapter 25"
+      },
+      {
+        "term": "gamut",
+        "koreanMeaning": "전 범위, 모든 종류",
+        "definition": "the full range or variety of something.",
+        "bookExcerpt": "“He’d been through the whole gamut of emotions in the short time since he’d arrived at the Glade.”",
+        "excerptContext": "After Gally threatens to kill him, Thomas reflects on the many different emotions he has experienced since arriving in the Glade.",
+        "chapterReference": "Chapter 26"
+      },
+      {
+        "term": "incredulous",
+        "koreanMeaning": "믿기 어려워하는, 믿지 못하겠다는 듯한",
+        "definition": "unable or unwilling to believe something; showing disbelief.",
+        "bookExcerpt": "“Winston, did you see what just happened?” Frypan asked, looking incredulous.",
+        "excerptContext": "Winston suggests that Gally’s memories from the Changing might make his suspicions about Thomas worth considering. Frypan reacts with disbelief because Gally has just behaved violently and irrationally.",
+        "chapterReference": "Chapter 26"
+      },
+      {
+        "term": "solemn",
+        "koreanMeaning": "엄숙한, 심각한",
+        "definition": "serious and not cheerful, especially because something important or troubling is happening.",
+        "bookExcerpt": "“Newt, all grim and solemn, was waiting for Thomas at the top of the stairwell.”",
+        "excerptContext": "Thomas and Newt are going to see Alby, who has recently gone through the Changing and specifically asked to speak with Thomas.",
+        "chapterReference": "Chapter 27"
+      },
+      {
+        "term": "ordeal",
+        "koreanMeaning": "시련, 고통스러운 경험",
+        "definition": "a very difficult, painful, or frightening experience.",
+        "bookExcerpt": "“The memory made him queasy; he hoped Alby was completely healed from the ordeal so he didn’t have to witness something like that again - the sickly skin, the veins, the thrashing.”",
+        "excerptContext": "As Thomas approaches Alby’s room, he remembers the horrifying effects of the Changing that he previously saw in Ben.",
+        "chapterReference": "Chapter 27"
+      },
+      {
+        "term": "entwined",
+        "koreanMeaning": "얽혀 있는, 깊이 관련된",
+        "definition": "closely involved or connected with something.",
+        "bookExcerpt": "“No matter what he did, he was becoming more and more entwined in the dealings of the Glade.”",
+        "excerptContext": "Thomas realizes that although he has been in the Glade only a short time, he is becoming deeply involved in its problems and decisions.",
+        "chapterReference": "Chapter 28"
+      },
+      {
+        "term": "delve",
+        "koreanMeaning": "깊이 파고들다, 철저히 탐구하다",
+        "definition": "to examine or search deeply into something.",
+        "bookExcerpt": "“Delve inside that brain of yours, and seek it out.”",
+        "excerptContext": "Newt tells Thomas to search his mind carefully for any memories of the Glade or his past that might help explain what is happening.",
+        "chapterReference": "Chapter 28"
+      },
+      {
+        "term": "falter",
+        "koreanMeaning": "주춤하다, 망설이다",
+        "definition": "to hesitate, lose confidence, or become less steady while doing something.",
+        "bookExcerpt": "“Not once did he falter on his return, turning left and right and running down long corridors in reverse of the way he had come.”",
+        "excerptContext": "Thomas has run deep into the Maze while trying to escape Teresa’s voice in his mind. On his way back, he realizes that he remembers the route perfectly without hesitating.",
+        "chapterReference": "Chapter 29"
+      },
+      {
+        "term": "inept",
+        "koreanMeaning": "서투른, 무능한",
+        "definition": "lacking skill or ability; incompetent.",
+        "bookExcerpt": "“He’d doubted it until now, wondered how the Runners could be so inept.”",
+        "excerptContext": "After experiencing the enormous size and complexity of the Maze himself, Thomas finally understands why the Runners have struggled to solve it.",
+        "chapterReference": "Chapter 29"
+      },
+      {
+        "term": "obscure",
+        "koreanMeaning": "눈에 잘 띄지 않는, 외진",
+        "definition": "not easily seen or noticed; hidden or out of the way.",
+        "bookExcerpt": "“The Slammer stood in an obscure place between the Homestead and the north Glade wall, hidden behind thorny, ragged bushes that looked like they hadn’t been trimmed in ages.”",
+        "excerptContext": "Newt takes Thomas to the Slammer for his one-day punishment. The small jail is hidden behind overgrown bushes in an out-of-the-way part of the Glade.",
+        "chapterReference": "Chapter 30"
+      },
+      {
+        "term": "fathom",
+        "koreanMeaning": "이해하다, 헤아리다",
+        "definition": "to understand something difficult or mysterious.",
+        "bookExcerpt": "“But he just couldn’t fathom how such a structure could have been built.”",
+        "excerptContext": "Thomas thinks about the enormous size of the Maze and cannot understand how anyone could have constructed something so massive.",
+        "chapterReference": "Chapter 31"
+      },
+      {
+        "term": "precision",
+        "koreanMeaning": "정밀함, 정확성",
+        "definition": "the quality of being exact and accurate.",
+        "bookExcerpt": "“Though the sun and the shadows had seemed plenty to let him know roughly what time it was up to that point, being a Runner probably required more precision.”",
+        "excerptContext": "Minho gives Thomas a watch while preparing him for Runner training. Thomas realizes that Runners need to know the time much more accurately than he did before.",
+        "chapterReference": "Chapter 32"
+      },
+      {
+        "term": "haphazardly",
+        "koreanMeaning": "되는대로, 무질서하게",
+        "definition": "in a random or disorganized way, without a clear plan or order.",
+        "bookExcerpt": "“Knives of all shapes and sizes were stacked haphazardly all the way to the top.”",
+        "excerptContext": "Minho takes Thomas into a room containing Runner supplies and weapons. Thomas notices that many different knives have been piled into a trunk without careful organization.",
+        "chapterReference": "Chapter 32"
+      },
+      {
+        "term": "relishing",
+        "koreanMeaning": "만끽하는, 즐기는",
+        "definition": "enjoying something greatly or with special pleasure.",
+        "bookExcerpt": "“He guzzled his water, relishing the wet coolness as it washed down his dry throat.”",
+        "excerptContext": "Thomas is on his first training run through the Maze with Minho. After running several miles, he eagerly enjoys the cool water during their break.",
+        "chapterReference": "Chapter 33"
+      },
+      {
+        "term": "fabricated",
+        "koreanMeaning": "인공적으로 만들어진, 가짜로 만들어진",
+        "definition": "made or created artificially rather than occurring naturally.",
+        "bookExcerpt": "“Their sky had to have been - and still was - fabricated. Artificial.”",
+        "excerptContext": "Thomas wakes to discover that the sun has disappeared and the sky has turned completely gray. He concludes that the sky above the Glade must have been artificially created.",
+        "chapterReference": "Chapter 34"
+      },
+      {
+        "term": "deliberation",
+        "koreanMeaning": "숙고, 신중한 생각",
+        "definition": "careful thought before making a decision.",
+        "bookExcerpt": "“After a lot of deliberation, he decided to keep his mouth shut and went running with Minho for his second day of training, below a bleak and colorless sky.”",
+        "excerptContext": "Thomas thinks carefully about whether to tell anyone about Teresa’s strange voice in his head. He decides to keep it secret because he fears the others will think he has gone crazy.",
+        "chapterReference": "Chapter 34"
+      },
+      {
+        "term": "rebuke",
+        "koreanMeaning": "질책, 꾸지람",
+        "definition": "a sharp expression of criticism or disapproval.",
+        "bookExcerpt": "“Minho actually recoiled at the harsh rebuke, but his face seemed more confused to Thomas than hurt or angry.”",
+        "excerptContext": "Minho and Thomas return with important information, but Alby impatiently interrupts Minho and sharply demands that he explain what they found.",
+        "chapterReference": "Chapter 35"
+      },
+      {
+        "term": "commotion",
+        "koreanMeaning": "소동, 소란",
+        "definition": "a noisy state of confusion, excitement, or disturbance.",
+        "bookExcerpt": "“But a commotion outside the Homestead shifted their attention away from the conversation.”",
+        "excerptContext": "Thomas, Minho, Newt, and Alby are discussing their discovery about the Grievers when a disturbance outside interrupts them. Chuck soon announces that the girl has awakened.",
+        "chapterReference": "Chapter 35"
+      },
+      {
+        "term": "seclusion",
+        "koreanMeaning": "사람들과 떨어져 있는 상태, 외딴 곳",
+        "definition": "the state or place of being private and away from other people.",
+        "bookExcerpt": "“He skirted the edge of the Glade, then, breaking into a run, he headed for his place of seclusion behind the Deadhead forest.”",
+        "excerptContext": "After Teresa wakes up, Thomas avoids seeing her because he is disturbed by their strange mental connection. He slips away to his private hiding place behind the forest.",
+        "chapterReference": "Chapter 36"
+      }
+    ]
+  }
+}

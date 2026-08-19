@@ -21,7 +21,7 @@
 #let ink-soft = rgb("#24483f")
 #let ink-body = rgb("#263a34")
 #let muted = rgb("#5f7069")
-#let faint = rgb("#8a978f") // small labels and quiet furniture
+#let faint = rgb("#69786f") // small labels and quiet furniture; 4.65:1 on white
 
 #let paper = rgb("#f7f3ea") // warm neutral for restrained callouts
 #let paper-deep = rgb("#eee7da")
@@ -33,10 +33,15 @@
 
 // --- Section colours --------------------------------------------------------
 //
-// The four section colours are the brand's method palette, in method order.
-// The sections keep their working names — Comprehension, Analysis, Writing,
-// Vocabulary — because that is what is actually on the page; the palette is
-// what ties them to READ · THINK · SPEAK · WRITE.
+// The four section colours are the brand's method palette. The sections keep
+// their working names — Comprehension, Analysis, Writing, Vocabulary — because
+// that is what is actually on the page; the palette is what ties them to the
+// READ · THINK · SPEAK · WRITE method.
+//
+// `step-actions` assigns a verb per section, in book order, so the verb printed
+// beside a section is the verb for that section — not the verb that happens to
+// share its index in the brand's strip. Paragraph Writing is WRITE. Vocabulary
+// is SPEAK. Provisional: see "Step verbs" in DESIGN-DECISIONS.md.
 //
 // These are pastels. They are fills, never text: every one of them fails
 // contrast as type on white. Each has a `-deep` partner for the rare place a
@@ -46,14 +51,18 @@
 #let step-deep = (rgb("#4f7d5b"), rgb("#a9503a"), rgb("#3a7570"), rgb("#6d5c99"))
 #let step-wash = (rgb("#f0f5ef"), rgb("#fdf0ec"), rgb("#eff8f7"), rgb("#f3f0f8"))
 #let step-pale = (rgb("#e4ede3"), rgb("#f7ddd5"), rgb("#dcf0ed"), rgb("#e8e2f1"))
-#let step-actions = ("Read", "Think", "Speak", "Write")
+#let step-actions = ("Read", "Think", "Write", "Speak")
 
 // --- Rules ------------------------------------------------------------------
 //
-// Two rule weights carry the notebook motif, and they mean different things:
-// solid rules are for writing on, dashed rules are for fields to be filled in.
-// The distinction is the mark's own — it alternates solid and dashed — reused
-// here as a signal rather than as texture.
+// Three rules carry the notebook motif, separated by weight and colour rather
+// than by dash pattern:
+//   stroke-ruled     the handwriting guides a student writes on
+//   stroke-hairline  the quiet border of a callout panel
+//   stroke-margin    the rust spine
+// Every rule in the system is solid. An earlier draft of this file described a
+// solid/dashed grammar for "write here" versus "fill this in"; no dashed stroke
+// was ever built, so the grammar is not claimed here.
 
 #let ruled = rgb("#c6d0c8") // handwriting guides; dark enough for a home laser
 #let stroke-ruled = 0.2mm + ruled
@@ -124,8 +133,19 @@
 //
 // They do not bleed. A home printer cannot print to the edge, and a tab clipped
 // by an unprintable margin looks broken rather than deliberate.
+//
+// All four share an outer edge at `tab-right`, and the active tab extends
+// *inward* rather than outward. Two reasons, and the first is not cosmetic:
+//
+//   - A common home laser or inkjet cannot print within about 4.2-5 mm of the
+//     sheet edge. An outward-extending active tab put the current section — the
+//     one marker that has to survive — inside that band, so the "you are here"
+//     signal was the first thing a home printer clipped. `tab-right` keeps
+//     every tab 8 mm clear of the edge.
+//   - A stack of index tabs reads as a stack because its outer edge is flush.
+//     Ragged outer edges read as four unrelated swatches.
 
-#let tab-x = 191mm
+#let tab-right = 202mm // 8mm of clearance; safe on a home printer
 #let tab-width = 11mm
 #let tab-width-active = 15mm
 #let tab-height = 8.5mm

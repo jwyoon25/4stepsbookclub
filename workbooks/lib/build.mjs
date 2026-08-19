@@ -31,11 +31,34 @@ function twoDigitLessonNumber(number) {
   return String(number).padStart(2, "0");
 }
 
-export function createBuildTargets(workbook, outputDirectory = defaultOutputDirectory) {
-  const targets = [];
-  const editions = ["student", "teacher"];
+function normalizeEditions(editions) {
+  if (!Array.isArray(editions) || editions.length === 0) {
+    throw new WorkbookBuildError(
+      "At least one workbook edition must be requested: student or teacher.",
+    );
+  }
 
-  for (const edition of editions) {
+  const normalized = [
+    ...new Set(editions.map((edition) => String(edition).toLowerCase())),
+  ];
+  if (normalized.some((edition) => !["student", "teacher"].includes(edition))) {
+    throw new WorkbookBuildError(
+      `Unknown workbook edition. Choose student or teacher; received ${editions.join(", ")}.`,
+    );
+  }
+
+  return ["student", "teacher"].filter((edition) => normalized.includes(edition));
+}
+
+export function createBuildTargets(
+  workbook,
+  outputDirectory = defaultOutputDirectory,
+  editions = ["student", "teacher"],
+) {
+  const targets = [];
+  const requestedEditions = normalizeEditions(editions);
+
+  for (const edition of requestedEditions) {
     targets.push({
       scope: "workbook",
       edition,
@@ -79,6 +102,68 @@ function typstRootPath(filePath) {
   return `/${pathFromRoot.split(sep).join("/")}`;
 }
 
+/**
+ * Run the native Typst CLI over one normalized build bundle.
+ *
+ * This is the only place the repository invokes Typst, so the browser-compiler
+ * comparison in `scripts/verify-browser-compiler.mjs` measures itself against
+ * the same command the production build runs, down to the root and font path.
+ *
+ * `ppi` switches the output to page rasters, in which case `outputPath` has to
+ * contain Typst's `{p}` page placeholder.
+ */
+export async function compileBundleWithNativeTypst(
+  bundlePath,
+  outputPath,
+  { ppi } = {},
+) {
+  const argumentsForTypst = [
+    "compile",
+    "--root",
+    workbooksRoot,
+    "--font-path",
+    fontPath,
+    "--input",
+    `data=${typstRootPath(bundlePath)}`,
+    ...(ppi ? ["--format", "png", "--ppi", String(ppi)] : []),
+    renderSource,
+    outputPath,
+  ];
+
+  let compileResult;
+  try {
+    compileResult = await execFileAsync("typst", argumentsForTypst, {
+      cwd: repositoryRoot,
+      maxBuffer: 10 * 1024 * 1024,
+    });
+  } catch (cause) {
+    if (cause?.code === "ENOENT") {
+      throw new WorkbookBuildError(
+        "Typst CLI is not installed or is not available on PATH.",
+        { cause },
+      );
+    }
+
+    const diagnostics = cause?.stderr?.trim();
+    throw new WorkbookBuildError(
+      `Typst failed while building ${outputPath}${
+        diagnostics ? `:\n${diagnostics}` : "."
+      }`,
+      { cause },
+    );
+  }
+
+  const successfulDiagnostics = [compileResult.stdout, compileResult.stderr]
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  if (containsTypstWarning(successfulDiagnostics)) {
+    throw new WorkbookBuildError(
+      `Typst reported warnings while building ${outputPath}:\n${successfulDiagnostics}`,
+    );
+  }
+}
+
 async function compileTarget(workbook, target, temporaryDirectory) {
   const bundlePath = join(
     temporaryDirectory,
@@ -100,51 +185,11 @@ async function compileTarget(workbook, target, temporaryDirectory) {
     `.${basename(target.outputPath, ".pdf")}.building-${process.pid}.pdf`,
   );
 
-  const argumentsForTypst = [
-    "compile",
-    "--root",
-    workbooksRoot,
-    "--font-path",
-    fontPath,
-    "--input",
-    `data=${typstRootPath(bundlePath)}`,
-    renderSource,
-    stagedOutputPath,
-  ];
-
-  let compileResult;
   try {
-    compileResult = await execFileAsync("typst", argumentsForTypst, {
-      cwd: repositoryRoot,
-      maxBuffer: 10 * 1024 * 1024,
-    });
+    await compileBundleWithNativeTypst(bundlePath, stagedOutputPath);
   } catch (cause) {
     await rm(stagedOutputPath, { force: true });
-    if (cause?.code === "ENOENT") {
-      throw new WorkbookBuildError(
-        "Typst CLI is not installed or is not available on PATH.",
-        { cause },
-      );
-    }
-
-    const diagnostics = cause?.stderr?.trim();
-    throw new WorkbookBuildError(
-      `Typst failed while building ${target.outputPath}${
-        diagnostics ? `:\n${diagnostics}` : "."
-      }`,
-      { cause },
-    );
-  }
-
-  const successfulDiagnostics = [compileResult.stdout, compileResult.stderr]
-    .filter(Boolean)
-    .join("\n")
-    .trim();
-  if (containsTypstWarning(successfulDiagnostics)) {
-    await rm(stagedOutputPath, { force: true });
-    throw new WorkbookBuildError(
-      `Typst reported warnings while building ${target.outputPath}:\n${successfulDiagnostics}`,
-    );
+    throw cause;
   }
 
   try {
@@ -164,11 +209,21 @@ async function compileTarget(workbook, target, temporaryDirectory) {
 
 export async function buildWorkbookPdfs(
   manifestPath,
-  { outputDirectory = defaultOutputDirectory } = {},
+  {
+    outputDirectory = defaultOutputDirectory,
+    editions = ["student", "teacher"],
+  } = {},
 ) {
   const absoluteOutputDirectory = resolve(outputDirectory);
-  const workbook = await loadWorkbookPackage(manifestPath);
-  const targets = createBuildTargets(workbook, absoluteOutputDirectory);
+  const requestedEditions = normalizeEditions(editions);
+  const workbook = await loadWorkbookPackage(manifestPath, {
+    requireTeacherGuidance: requestedEditions.includes("teacher"),
+  });
+  const targets = createBuildTargets(
+    workbook,
+    absoluteOutputDirectory,
+    requestedEditions,
+  );
 
   await mkdir(absoluteOutputDirectory, { recursive: true });
   await mkdir(temporaryBuildParent, { recursive: true });
