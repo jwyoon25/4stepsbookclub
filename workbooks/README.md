@@ -254,7 +254,7 @@ workbooks/
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
 │   └── logo/             # logomark and logotype, derived from the website assets
-├── builder/              # Phase 0 browser-compiler gate: preview page and Apps Script
+├── builder/              # browser and Apps Script code: the Sheet contract, preview, and gate
 ├── content/              # Production book- and lesson-specific curriculum data
 ├── lib/
 │   ├── browser-bundle.mjs   # the static bundle the browser compiler is loaded from
@@ -263,7 +263,7 @@ workbooks/
 │   ├── content.mjs       # package loading, validation, and default application
 │   ├── pdf-audit.mjs     # post-render PDF consistency checks
 │   ├── render-parity.mjs # comparing two renderings of the same workbook
-│   ├── sheet-import.mjs  # Google Sheets .xlsx contract and schema-v1 conversion
+│   ├── sheet-import.mjs  # the .xlsx adapter over the shared Sheet contract
 │   └── typst-compiler.mjs   # the browser compiler, running under Node
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
