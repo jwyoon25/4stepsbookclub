@@ -177,6 +177,12 @@ const PAGE_FILES = Object.freeze([
   "preview.mjs",
   "preview.css",
   "workbook-compiler.mjs",
+  // The shared contract the preview runs over live Sheet values. These are the
+  // same modules Node imports, copied rather than rewritten, which is what keeps
+  // a browser preview and a disk build describing one workbook.
+  "sheet-contract.mjs",
+  "content-rules.mjs",
+  "build-targets.mjs",
 ]);
 
 // The cross-origin-isolated copy of the preview page. Isolation buys the worker

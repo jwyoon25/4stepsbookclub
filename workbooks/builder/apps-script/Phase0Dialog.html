@@ -172,6 +172,31 @@
           });
       }
 
+      function sendSheet() {
+        log("Reading the workbook tabs…");
+        google.script.run
+          .withSuccessHandler(function (result) {
+            var tabs = Object.keys(result.grids).length;
+            log("Sent " + tabs + " tabs to the preview window.", "good");
+            previewWindow.postMessage(
+              {
+                type: MESSAGE_PREFIX + "-sheet",
+                spreadsheetName: result.spreadsheetName,
+                grids: result.grids,
+              },
+              previewOrigin,
+            );
+          })
+          .withFailureHandler(function (error) {
+            log("Could not read the Sheet: " + error.message, "bad");
+            previewWindow.postMessage(
+              { type: MESSAGE_PREFIX + "-sheet-failed", error: error.message },
+              previewOrigin,
+            );
+          })
+          .readWorkbookGrids();
+      }
+
       window.addEventListener("message", function (event) {
         if (event.origin !== previewOrigin) {
           return;
@@ -190,6 +215,8 @@
           log("Preview window connected.", "good");
         } else if (message.type === MESSAGE_PREFIX + "-save" && previewWindow) {
           saveToDrive(message);
+        } else if (message.type === MESSAGE_PREFIX + "-read-sheet" && previewWindow) {
+          sendSheet();
         }
       });
 

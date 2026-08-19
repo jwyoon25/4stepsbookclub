@@ -22,11 +22,30 @@ import {
 import { createWebWorker } from "/vendor/typst-wasm/worker/browser.js";
 
 import {
+  createTargetBundle,
+  listWorkbookTargets,
+} from "/build-targets.mjs";
+import {
+  assertLessonLayout,
+  assertWrappableContent,
+  normalizeLesson,
+  normalizeManifest,
+} from "/content-rules.mjs";
+import {
+  createWorkbookManifest,
+  parseWorkbookGrids,
+  slugifyBookTitle,
+} from "/sheet-contract.mjs";
+import {
   compileWorkbookPdf,
   loadWorkbookProject,
   PROJECT_SOURCE_FILES,
   readPdfCreator,
 } from "/workbook-compiler.mjs";
+
+// Reading a Sheet is a round trip through the dialog and Apps Script, which is
+// slower than anything else this window does.
+const SHEET_TIMEOUT_MILLISECONDS = 60000;
 
 const ENGINE_CORE_MODULES = [
   "engine.core.wasm",
@@ -53,6 +72,7 @@ const elements = {
   environment: document.querySelector("#environment"),
   build: document.querySelector("#build"),
   fixture: document.querySelector("#fixture"),
+  refresh: document.querySelector("#refresh"),
   run: document.querySelector("#run"),
   compile: document.querySelector("#compile"),
   save: document.querySelector("#save"),
@@ -69,11 +89,14 @@ const state = {
   compiler: null,
   backend: "unknown",
   fixtures: [],
+  sheet: null,
+  selections: [],
   buildInfo: null,
   current: null,
   lastCompiled: null,
   driveOrigin: null,
   pendingSave: null,
+  pendingSheet: null,
   measurements: new Map(),
   verdicts: new Map(),
   startedAt: performance.now(),
@@ -276,14 +299,94 @@ async function loadFixtures() {
   elements.build.textContent =
     `${buildInfo.bookTitle} · typst-wasm ${buildInfo.typstWasmVersion}` +
     (buildInfo.nativeTypstVersion ? ` · native ${buildInfo.nativeTypstVersion}` : "");
+  renderSelections(fixtureSelections());
+}
+
+// --- What can be previewed --------------------------------------------------
+//
+// Two sources, never mixed: the workbooks checked into the bundle, which the
+// gate is judged on and which work with no Sheet at all, and the live Sheet the
+// dialog reads. Switching between them replaces the list rather than adding to
+// it, so what is selected is never ambiguous about where it came from.
+
+function fixtureSelections() {
+  return state.fixtures.map((fixture) => ({ ...fixture, source: "bundle" }));
+}
+
+function sheetSelections() {
+  return state.sheet.targets.map((target) => ({
+    ...target,
+    source: "sheet",
+    lessonCount: target.lessonNumbers.length,
+  }));
+}
+
+function renderSelections(selections) {
+  state.selections = selections;
   elements.fixture.replaceChildren(
-    ...fixtures.map((fixture) => {
+    ...selections.map((selection) => {
       const option = document.createElement("option");
-      option.value = fixture.id;
-      option.textContent = fixture.label;
+      option.value = selection.id;
+      option.textContent = selection.label;
       return option;
     }),
   );
+  clearPreview();
+}
+
+/**
+ * Read the workbook the author is looking at.
+ *
+ * The Sheet arrives as raw cell matrices; everything that turns them into a
+ * workbook — the tab and column contract, the response-space defaults, the
+ * layout budgets — is the same code the disk build runs, so a preview cannot
+ * quietly accept content a real build would refuse.
+ */
+async function refreshFromSheet() {
+  elements.refresh.disabled = true;
+  elements.refresh.textContent = "Reading the Sheet…";
+
+  try {
+    const startedAt = performance.now();
+    const { grids, spreadsheetName } = await requestSheetGrids();
+    const { metadata, lessons } = parseWorkbookGrids(grids);
+    const manifest = normalizeManifest(
+      createWorkbookManifest(metadata, lessons, {
+        workbookId: slugifyBookTitle(metadata.bookTitle) || "workbook",
+      }),
+    );
+    assertWrappableContent(manifest, "the Workbook tab");
+
+    const normalized = lessons.map((lesson) => {
+      const source = `lesson ${lesson.lessonNumber}`;
+      assertWrappableContent(lesson, source);
+      const normalizedLesson = normalizeLesson(lesson);
+      assertLessonLayout(normalizedLesson, source);
+      return normalizedLesson;
+    });
+
+    state.sheet = {
+      name: spreadsheetName,
+      manifest,
+      lessons: normalized,
+      targets: listWorkbookTargets(normalized),
+    };
+    renderSelections(sheetSelections());
+    record("Workbook", `${manifest.bookTitle} · ${normalized.length} lessons`);
+    record("Sheet read", milliseconds(performance.now() - startedAt));
+    log(
+      `Read ${normalized.length} lessons from "${spreadsheetName}" in ` +
+        `${milliseconds(performance.now() - startedAt)}.`,
+      "good",
+    );
+  } catch (error) {
+    // Sheet and content errors name the tab, the row, and the column, which is
+    // the whole point of showing them here rather than a generic failure.
+    log(error.message, "bad");
+  } finally {
+    elements.refresh.disabled = state.driveOrigin === null;
+    elements.refresh.textContent = "Refresh from the Sheet";
+  }
 }
 
 // --- Compiling --------------------------------------------------------------
@@ -296,10 +399,22 @@ function gateItemFor(fixture) {
   return fixture.edition === "student" ? 3 : 4;
 }
 
-async function compileFixture(fixture) {
-  const bundle = await (
-    await fetchOrThrow(`/fixtures/${fixture.id}.json`, `workbook ${fixture.id}`)
-  ).json();
+async function resolveBundle(selection) {
+  if (selection.source !== "sheet") {
+    return (
+      await fetchOrThrow(`/fixtures/${selection.id}.json`, `workbook ${selection.id}`)
+    ).json();
+  }
+
+  // No teacher-guidance check here: the Sheet contract requires that cell on the
+  // Comprehension and Analysis tabs, so content that parsed at all already has
+  // it. The check in `content-rules.mjs` is for packages authored on disk.
+  return createTargetBundle(state.sheet.manifest, state.sheet.lessons, selection);
+}
+
+async function compileFixture(selection) {
+  const fixture = selection;
+  const bundle = await resolveBundle(selection);
 
   log(`Compiling ${fixture.label}…`);
   const startedAt = performance.now();
@@ -318,24 +433,24 @@ async function compileFixture(fixture) {
   record("PDF size", megabytes(pdf.byteLength));
   record("Typst engine", readPdfCreator(pdf));
 
-  show(fixture, pdf);
+  show(fixture, pdf, bundle);
   log(
     `Compiled ${fixture.label} in ${milliseconds(duration)} with zero ` +
       `diagnostics (${megabytes(pdf.byteLength)}).`,
     "good",
   );
-  return { pdf, duration };
+  return { pdf, duration, bundle };
 }
 
 async function compileSelected() {
-  const fixture = state.fixtures.find(({ id }) => id === elements.fixture.value);
-  if (!fixture || !state.compiler) {
+  const selection = state.selections.find(({ id }) => id === elements.fixture.value);
+  if (!selection || !state.compiler) {
     return;
   }
 
   setBusy(true);
   try {
-    await compileFixture(fixture);
+    await compileFixture(selection);
   } catch (error) {
     log(error.message, "bad");
   } finally {
@@ -343,12 +458,14 @@ async function compileSelected() {
   }
 }
 
-function show(fixture, pdf) {
+function show(fixture, pdf, bundle) {
   clearPreview();
 
-  const name = `${state.buildInfo.workbookId}-${fixture.id}-browser.pdf`;
+  const workbookId =
+    fixture.source === "sheet" ? state.sheet.manifest.id : state.buildInfo.workbookId;
+  const name = `${workbookId}-${fixture.id}-browser.pdf`;
   const url = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
-  state.current = { fixture, pdf, url, name };
+  state.current = { fixture, pdf, bundle, url, name };
 
   elements.viewer.src = url;
   elements.download.href = url;
@@ -410,10 +527,18 @@ function connectToDialog() {
     if (message.type === `${MESSAGE_PREFIX}-hello`) {
       state.driveOrigin = event.origin;
       elements.save.disabled = state.current === null;
+      elements.refresh.disabled = false;
       record("Drive channel", `connected to ${event.origin}`);
       record("Drive run", message.session);
       verdict(1, `opened from the Sheet dialog at ${event.origin}`);
       log(`Connected to the Google Sheet dialog at ${event.origin}.`, "good");
+      // The author opened this window from their workbook, so their workbook is
+      // what it should be showing.
+      refreshFromSheet();
+    } else if (message.type === `${MESSAGE_PREFIX}-sheet`) {
+      state.pendingSheet?.resolve(message);
+    } else if (message.type === `${MESSAGE_PREFIX}-sheet-failed`) {
+      state.pendingSheet?.reject(new Error(message.error));
     } else if (message.type === `${MESSAGE_PREFIX}-saved`) {
       state.pendingSave?.resolve(message);
     } else if (message.type === `${MESSAGE_PREFIX}-save-failed`) {
@@ -436,6 +561,32 @@ function connectToDialog() {
   // then talks to. Announcing readiness carries nothing but a version string.
   window.opener.postMessage({ type: `${MESSAGE_PREFIX}-ready`, version: 1 }, "*");
   log("Announced this window to the Google Sheet dialog.");
+}
+
+function requestSheetGrids() {
+  if (!state.driveOrigin) {
+    throw new Error(
+      "This window is not connected to a Google Sheet, so there is nothing to read.",
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    const expired = setTimeout(() => {
+      state.pendingSheet = null;
+      reject(new Error("The Google Sheet did not answer in time."));
+    }, SHEET_TIMEOUT_MILLISECONDS);
+    const settle = (settler) => (value) => {
+      clearTimeout(expired);
+      state.pendingSheet = null;
+      settler(value);
+    };
+
+    state.pendingSheet = { resolve: settle(resolve), reject: settle(reject) };
+    window.opener.postMessage(
+      { type: `${MESSAGE_PREFIX}-read-sheet` },
+      state.driveOrigin,
+    );
+  });
 }
 
 async function saveToDrive() {
@@ -490,11 +641,15 @@ async function saveToDrive() {
  * live outside it. Sending the finished bytes back keeps the thing being judged
  * the same thing the browser produced.
  */
-async function verifyPdf(fixture, pdf) {
+async function verifyPdf(fixture, pdf, bundle) {
+  // A checked workbook is named; a Sheet's workbook has to be sent, because the
+  // server has never seen it.
+  const workbook =
+    fixture.source === "sheet" ? { bundle } : { fixture: fixture.id };
   const response = await fetch("/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fixture: fixture.id, pdfBase64: toBase64(pdf) }),
+    body: JSON.stringify({ ...workbook, pdfBase64: toBase64(pdf) }),
   });
   if (response.status === 404) {
     throw new Error(
@@ -541,7 +696,7 @@ async function verifyCurrentPdf() {
   elements.verify.textContent = "Verifying…";
   try {
     log("Auditing the browser-generated PDF and comparing it with native Typst…");
-    await verifyPdf(state.current.fixture, state.current.pdf);
+    await verifyPdf(state.current.fixture, state.current.pdf, state.current.bundle);
   } catch (error) {
     log(error.message, "bad");
   } finally {
@@ -565,10 +720,13 @@ async function runEveryCheck() {
   let largest = null;
 
   try {
-    for (const fixture of state.fixtures) {
+    // The gate is judged on the workbooks checked into the bundle, whatever the
+    // window happens to be showing.
+    renderSelections(fixtureSelections());
+    for (const fixture of state.selections) {
       const item = gateItemFor(fixture);
       try {
-        const { pdf, duration } = await compileFixture(fixture);
+        const { pdf, duration, bundle } = await compileFixture(fixture);
         verdict(
           item,
           `${fixture.edition}: ${megabytes(pdf.byteLength)} in ${milliseconds(duration)}`,
@@ -577,7 +735,7 @@ async function runEveryCheck() {
           largest = { fixture, pdf };
         }
 
-        const result = await verifyPdf(fixture, pdf);
+        const result = await verifyPdf(fixture, pdf, bundle);
         const compared = result.parity.compared;
         const passed = result.audit.passed && (!compared || result.parity.identical);
         if (passed) {
@@ -598,9 +756,9 @@ async function runEveryCheck() {
     }
 
     log(
-      `${clean} of ${state.fixtures.length} workbooks compiled cleanly, audited, ` +
+      `${clean} of ${state.selections.length} workbooks compiled cleanly, audited, ` +
         "and matched the native renderer.",
-      clean === state.fixtures.length ? "good" : "bad",
+      clean === state.selections.length ? "good" : "bad",
     );
 
     // The largest PDF is the one the Drive transfer has to survive, and it is
@@ -658,6 +816,7 @@ async function copyResults() {
 // --- Start ------------------------------------------------------------------
 
 elements.fixture.addEventListener("change", clearPreview);
+elements.refresh.addEventListener("click", refreshFromSheet);
 elements.run.addEventListener("click", runEveryCheck);
 elements.compile.addEventListener("click", compileSelected);
 elements.save.addEventListener("click", saveToDrive);

@@ -1,27 +1,36 @@
-# Phase 0: the browser-compiler gate
+# The workbook builder's browser side
 
-The workbook builder's accepted direction is to keep Google Sheets as the
-authoring surface, compile the workbook with Typst **in the author's browser**,
-preview the real PDF, and save approved PDFs to Drive through Apps Script.
+Google Sheets is the authoring surface, Typst compiles the workbook **in the
+author's browser**, the real PDF is previewed before export, and approved PDFs
+reach Drive through Apps Script.
 [`../BUILDER-ARCHITECTURE-DECISION.md`](../BUILDER-ARCHITECTURE-DECISION.md)
-records why, and makes one demand before any of it is built: prove the compiler
-and the Drive round trip work in the real Google environment.
+records why, and demanded one thing before any of it was built: proof that the
+compiler and the Drive round trip work inside Google. They do — the Phase 0 gate
+passed on 2026-08-19, and the runbook below still reproduces it.
 
-This directory is that proof, and nothing more. It is a spike: when the gate has
-been run and recorded, it either becomes the foundation of Phase 1 or it is
-deleted.
+What is here now is that gate plus the beginning of the real builder: the
+content contract the preview runs, and the Sheet adapter that feeds it.
 
 ```text
 builder/
-├── browser/
+├── browser/                   # runs in the preview window; imports nothing but itself
+│   ├── sheet-contract.mjs     # which tabs exist, and how a row becomes schema-v1 content
+│   ├── content-rules.mjs      # response-space defaults and the layout budgets
+│   ├── build-targets.mjs      # what can be previewed or exported, and the bundle for it
 │   ├── workbook-compiler.mjs  # which files make a compilable project, and how to load them
 │   ├── preview.html           # the preview window
-│   ├── preview.mjs            # environment probe, compile, display, Drive hand-off
+│   ├── preview.mjs            # environment probe, Sheet read, compile, display, Drive
 │   └── preview.css
 └── apps-script/
+    ├── SheetGrids.gs          # reads every tab as a grid of cells
     ├── Phase0.gs              # the menu item, the launcher, and the Drive write
     └── Phase0Dialog.html      # the dialog the preview window answers to
 ```
+
+The four `browser/` modules are the content contract. Node imports the same
+files — the `.xlsx` importer, the disk loader, and the verification harness all
+go through them — so a preview and a real build cannot describe the workbook
+differently.
 
 ## What is already proven, without Google
 
@@ -91,8 +100,8 @@ whether a browser without JSPI could compile at all.
 
 In the workbook's bound Apps Script project:
 
-1. Add `Phase0.gs` and `Phase0Dialog.html` as new files, keeping those exact
-   names. `Phase0Dialog.html` is loaded by name.
+1. Add `SheetGrids.gs`, `Phase0.gs`, and `Phase0Dialog.html` as new files,
+   keeping those exact names. `Phase0Dialog.html` is loaded by name.
 2. Replace `Code.gs` with this repository's copy, which adds the menu item.
 3. Optionally set a `PREVIEW_URL` script property. The default is
    `http://localhost:8787/preview.html`.
@@ -134,6 +143,28 @@ under Phase 0 results, together with the dialog's environment probe.
 The gate is pass/fail. If every check passes, change the record's status and
 start Phase 1. If any fails, the record's fallback order says what to try next,
 in order.
+
+## Previewing the live Sheet
+
+A preview window opened from the dialog reads the workbook the author is
+actually editing. The dialog asks Apps Script for every tab as a grid of cells
+and forwards them; the window parses them with the same contract the `.xlsx`
+importer uses, applies the same defaults and layout budgets a disk build
+applies, and offers one target per lesson and edition plus the complete
+workbook. **Refresh from the Sheet** reads it again.
+
+Validation failures name the tab, the row, and the column — `"Lessons" row 5,
+Chapter or page range must contain text.` — and appear in the window's log
+rather than as a generic failure.
+
+Two things this deliberately does not do yet:
+
+- **It does not validate against the JSON schemas.** The contract enforces the
+  same required fields cell by cell, and the layout budgets refuse content that
+  cannot fit, but the schemas' length and count limits are not checked in the
+  browser. The `.xlsx` importer and the disk renderer still check them.
+- **It does not export.** Saving to Drive is still the gate's single-file
+  transfer, not the workbook's real build-folder convention.
 
 ## Known constraints
 

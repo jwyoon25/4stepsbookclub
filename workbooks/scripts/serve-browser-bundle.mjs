@@ -202,10 +202,7 @@ async function auditBrowserPdf(pdfPath, fixture) {
 async function compareWithNativeTypst(pdfPath, fixture, temporaryDirectory) {
   const bundlePath = join(temporaryDirectory, `${fixture.id}.json`);
   const nativePath = join(temporaryDirectory, `${fixture.id}-native.pdf`);
-  await writeFile(
-    bundlePath,
-    await readFile(join(bundleDirectory, `fixtures/${fixture.id}.json`)),
-  );
+  await writeFile(bundlePath, `${JSON.stringify(fixture.bundle, null, 2)}\n`);
 
   try {
     await compileBundleWithNativeTypst(bundlePath, nativePath);
@@ -220,6 +217,44 @@ async function compareWithNativeTypst(pdfPath, fixture, temporaryDirectory) {
   return { compared: true, ...parity };
 }
 
+/**
+ * Identify the workbook a request is asking about.
+ *
+ * A checked workbook is named and read from the bundle. A workbook compiled
+ * from a live Sheet has never been here before, so the browser sends the bundle
+ * it compiled, and that is what gets compiled natively for the comparison.
+ */
+async function resolveVerificationSubject(payload) {
+  if (payload.bundle) {
+    const { build, lessons } = payload.bundle;
+    if (!build?.scope || !build?.edition || !Array.isArray(lessons)) {
+      throw new WorkbookBuildError("The request carried an unrecognizable workbook.");
+    }
+    return {
+      id: `${build.scope}-${build.edition}-sheet`,
+      scope: build.scope,
+      edition: build.edition,
+      lessonCount: lessons.length,
+      bundle: payload.bundle,
+    };
+  }
+
+  const fixtures = JSON.parse(
+    await readFile(join(bundleDirectory, "fixtures/index.json"), "utf8"),
+  );
+  const fixture = fixtures.find(({ id }) => id === payload.fixture);
+  if (!fixture) {
+    throw new WorkbookBuildError(`Unknown workbook: ${payload.fixture}`);
+  }
+
+  return {
+    ...fixture,
+    bundle: JSON.parse(
+      await readFile(join(bundleDirectory, `fixtures/${fixture.id}.json`), "utf8"),
+    ),
+  };
+}
+
 async function verify(request, response) {
   let payload;
   try {
@@ -229,12 +264,11 @@ async function verify(request, response) {
     return;
   }
 
-  const fixtures = JSON.parse(
-    await readFile(join(bundleDirectory, "fixtures/index.json"), "utf8"),
-  );
-  const fixture = fixtures.find(({ id }) => id === payload.fixture);
-  if (!fixture) {
-    sendJson(response, 400, { error: `Unknown workbook: ${payload.fixture}` });
+  let fixture;
+  try {
+    fixture = await resolveVerificationSubject(payload);
+  } catch (error) {
+    sendJson(response, 400, { error: error.message });
     return;
   }
   if (typeof payload.pdfBase64 !== "string" || payload.pdfBase64.length === 0) {
