@@ -14,6 +14,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 
+import { createBuildBundle } from "../builder/browser/build-targets.mjs";
 import { PROJECT_FILES } from "../builder/browser/workbook-compiler.mjs";
 import { loadWorkbookPackage } from "./content.mjs";
 
@@ -123,12 +124,7 @@ export async function createFixtureBundles(
       scope,
       edition,
       lessonCount: lessons.length,
-      bundle: {
-        schemaVersion: 1,
-        build: { scope, edition },
-        manifest,
-        lessons,
-      },
+      bundle: createBuildBundle(manifest, lessons, { scope, edition }),
     })),
   );
 }
