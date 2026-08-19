@@ -1,7 +1,6 @@
 # Workbook Builder Architecture Decision
 
-- **Status:** Accepted direction; compatibility gate built and verified outside
-  Google, unrun inside it
+- **Status:** Accepted and validated; Phase 0 passed on 2026-08-19
 - **Decision date:** 2026-08-19
 - **Scope:** Staff authoring, preview, PDF generation, and Drive delivery
 
@@ -173,15 +172,42 @@ Three findings the plan above did not anticipate:
   first load. `engine.core.wasm` is 21.7 MiB, under Cloudflare Pages' 25 MiB
   per-file limit, but not by much.
 
-### What only the bound Sheet can answer
+### Phase 0 gate run — 2026-08-19
 
-Items 1, 2, 6, and 8 are environmental, and items 3 to 5 have been proven in a
-browser engine but not in a browser. Specifically: whether an Apps Script dialog
-may open the preview window and keep an opener relationship with it, whether
-`google.script.run` carries a 484 KB PDF as base64 in one call, what the founder's
-laptop measures over a real network, and what the Apps Script iframe itself
-offers. The dialog reports its own capabilities so the last question is answered
-whichever way the gate goes.
+Run from the bound Sheet on the founder's laptop, Chrome 151 on macOS, against
+the example book served from the local gate server. **All eight checks passed.**
+
+| # | Check | Result |
+| --- | --- | --- |
+| 1 | Open the preview window from the Sheet menu | passed; the dialog and the window kept an opener relationship |
+| 2 | Load the compiler, templates, fonts, and logos | passed; 21.67 MB on the JSPI backend |
+| 3 | A standalone student lesson compiles and displays | passed; 0.13 MB in 137 ms |
+| 4 | Its teacher edition compiles and displays | passed; 0.13 MB in 26 ms |
+| 5 | A representative complete workbook compiles | passed; 0.47 MB in 168 ms student, 96 ms teacher |
+| 6 | The largest PDF reaches Drive through Apps Script | passed; 0.47 MB saved in 7.78 s |
+| 7 | Zero diagnostics, audits pass, parity with native | passed; all four workbooks audited and identical to the native renderer |
+| 8 | A usable cold start and refresh | passed; 164 ms cold, 21 ms to refresh |
+
+The browser reported `jspi`, no cross-origin isolation, and no shared memory —
+exactly the combination the transport was designed around. The compiler was
+Typst 0.15.0 throughout, and the parity comparison was made against the 0.15.1
+CLI on the same machine.
+
+Three things this settles that the analysis above could only predict:
+
+- **An Apps Script dialog may open a window and keep talking to it.** The
+  sandboxed iframe permits the popup, the opener survives, and the two windows
+  exchanged the workbook and the finished PDF across origins without help.
+- **`google.script.run` carries a complete workbook.** 0.47 MB of PDF, base64
+  encoded, in a single call. It is also the slowest step in the whole system by
+  two orders of magnitude: 7.78 seconds, against 168 milliseconds to compile the
+  same document. Phase 1's "create all approved PDFs" writes 26 files for a
+  twelve-lesson book, so that is roughly three minutes of transfer, and it is
+  the number to design around rather than the compile time.
+- **The cold start is not the problem the size suggested.** 164 milliseconds
+  here, 374 on the first ever load. Both are localhost figures and both exclude
+  the download that a hosted bundle would pay once; what they establish is that
+  nothing in the compiler's own startup is slow.
 
 ## Implementation phases
 
@@ -322,12 +348,19 @@ conditions into availability errors rather than automatic PDF-compute charges.
 
 ## Next authorized implementation step
 
-The Phase 0 spike is built and its non-Google half is measured above. What
-remains is to run it in the actual bound Sheet, following
-[`builder/README.md`](builder/README.md), and to paste the preview window's
-results table and the dialog's environment probe into a **Phase 0 gate run**
-section here.
+Phase 0 has passed, so Phase 1 is authorized. Its first three steps are the real
+work and they are all on the content side, because the compiler side is already
+built and proven: extract the row-to-schema logic out of the `.xlsx` reader into
+a browser-safe pure module, keep a Node adapter over it for the existing
+command-line and HTTP paths, and add an Apps Script adapter that hands the
+preview raw Sheet matrices in place of the four checked fixtures.
 
-If all eight checks pass, change the status to **Accepted and validated** and
-proceed to Phase 1. If any fails, record which one and work down the fallback
-order above; nothing in Phase 1 should be built before then.
+Two decisions the gate leaves open and Phase 1 has to make:
+
+- **Where the bundle is hosted.** The gate ran from `localhost`. The generated
+  `_headers` file is ready for Cloudflare Pages, and the measured cold start
+  excludes the one-time download a hosted bundle pays.
+- **How the approved PDFs reach Drive.** One 0.47 MB file took 7.78 seconds
+  through `google.script.run`. Twenty-six of them is about three minutes, which
+  is tolerable for an export but not for anything an author waits on
+  repeatedly.
