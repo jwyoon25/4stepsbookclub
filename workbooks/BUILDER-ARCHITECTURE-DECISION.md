@@ -392,12 +392,20 @@ fails partway leaves one timestamped folder holding what arrived.
 The export happens once a book. **Reading the Sheet happens after every edit**,
 and it is slower. Three reads of a *one-lesson* workbook, measured from inside:
 
-| | Read 1 | Read 2 | Read 3 |
-| --- | --- | --- | --- |
-| `SpreadsheetApp.flush()` | 4 ms | 5 ms | 3 ms |
-| `getDataRange().getValues()`, 7 tabs | 4.01 s | 2.81 s | 3.68 s |
-| Channel | 1.38 s | 1.32 s | 1.05 s |
-| Whole read | 5.39 s | 4.13 s | 4.74 s |
+Seven reads of a *one-lesson* workbook, measured from inside — three before the
+window began naming the tabs it wants, four after:
+
+| | 7 tabs, n=3 | 6 tabs, n=4 |
+| --- | --- | --- |
+| `SpreadsheetApp.flush()` | 4 ms | 3 ms |
+| `getDataRange().getValues()` | 3.50 s | 2.88 s |
+| — per tab | 0.50 s | 0.48 s |
+| Channel | 1.25 s | 1.07 s |
+| Whole read | 4.75 s | **3.96 s** |
+
+Half a second a tab holds across all seven reads, and the one skipped tab
+returned 0.80 seconds against 0.50 predicted. Individual reads spread 86%, so
+nothing here means anything from one sample.
 
 Two things fall out of this, and both were being guessed at before:
 
@@ -414,12 +422,20 @@ Two things fall out of this, and both were being guessed at before:
   of pure overhead, and a *smaller* archive budget would have cost several
   seconds for nothing. The 2 MB budget stays.
 
-What is left of the refresh is roughly 3 seconds of `getValues` and 1.25 seconds
-of channel. The one remaining candidate is the Sheets advanced service, whose
-`batchGet` fetches every range in a single call — but it returns cell values
-without their types, which would lose the check that catches a chapter range
-Google turned into a date. That is a correctness cost for about 2.5 seconds, and
-it should not be paid without deciding it deliberately.
+What is left of the refresh is 2.9 seconds of `getValues` and 1.1 of channel.
+The one remaining candidate is the Sheets advanced service, and the first look
+at it was wrong. `Values.batchGet` does fetch every range in one call and does
+return values without their types, which would lose the check that catches a
+chapter range Google turned into a date. But `Spreadsheets.get` with
+`includeGridData` returns `effectiveFormat.numberFormat.type` alongside each
+value, which names a DATE cell outright — the same fact `instanceof Date` is
+standing in for today, carried explicitly.
+
+So the trade is not speed against correctness. It is **one API call, about 1.6
+seconds a refresh instead of 4.0**, against a service the Sheet owner has to
+enable, a heavier response to parse, and a date check re-expressed against a
+different signal. That last part is the risk worth naming: it cannot be tested
+from this repository, only in a bound Sheet.
 
 #### Where the 7.78 seconds went — measured 2026-08-19
 

@@ -115,7 +115,16 @@ The Sheet has seven tabs; the contract defines six. An eighth of every refresh
 was spent fetching a tutor's notes in order to throw them away. The window now
 names the tabs it wants, and the names travel from the contract rather than
 being written down again in Apps Script — the adapter still knows nothing about
-what a workbook is, which is the only reason it was safe to change.
+what a workbook is, which is the only reason it was safe to change. Four reads
+afterwards put the whole refresh at 3.96 seconds against 4.75, and half a second
+a tab held across all seven.
+
+The obvious next step was dismissed too fast. `Values.batchGet` would fetch every
+range in one call and would lose the type information that catches a chapter
+range Google turned into a date — but `Spreadsheets.get` with `includeGridData`
+returns `numberFormat.type` beside each value, which names a DATE cell outright.
+The choice is a service the Sheet owner enables and a heavier response to parse,
+not speed against correctness, and it was recorded as the latter for a day.
 
 **And `google.script.run` costs about 1.25 seconds a call, almost regardless of
 payload.** That is the number the whole export was designed without. It vindicates
