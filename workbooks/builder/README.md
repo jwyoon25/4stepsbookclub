@@ -243,6 +243,18 @@ the site is:
 | --- | --- | --- |
 | Build command | `npm run build` | `npm run workbook:browser-bundle` |
 | Output directory | `website/dist` | `workbooks/output/browser-bundle` |
+| Root directory | repository root | repository root |
+| `NODE_VERSION` | — | `22` |
+
+`NODE_VERSION` is not optional. The bundle finds the Typst engine inside
+`node_modules` with `import.meta.resolve`, which is stable only from Node 20.6,
+and a build image older than that fails while vendoring rather than saying
+anything about Node. It is set per project, so it cannot disturb the site.
+
+Give the project a name of its own — `4steps-workbook-builder` rather than
+anything close to the site's. Cloudflare appends a random suffix to a
+`pages.dev` name already in use, which is both unrecognisable and a sign that
+two projects are about to be confusable in the dashboard.
 
 Nothing else is needed. There is no deploy script and no `wrangler` dependency,
 because the build runs in Cloudflare's own CI on every push, and it needs no
