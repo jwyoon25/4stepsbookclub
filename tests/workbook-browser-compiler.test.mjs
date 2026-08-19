@@ -8,7 +8,11 @@ import {
   compileWorkbookPdf,
   WorkbookCompilerError,
 } from "../workbooks/builder/browser/workbook-compiler.mjs";
-import { createFixtureBundles } from "../workbooks/lib/browser-bundle.mjs";
+import {
+  assertHostableFiles,
+  BrowserBundleError,
+  createFixtureBundles,
+} from "../workbooks/lib/browser-bundle.mjs";
 import {
   verifyWorkbookFixture,
   withVerificationDirectory,
@@ -95,5 +99,32 @@ test("refuses a bundle the renderer cannot compile", async () => {
     (error) =>
       error instanceof WorkbookCompilerError &&
       /Typst failed while compiling the workbook/.test(error.message),
+  );
+});
+
+test("refuses a bundle a static host would not serve", () => {
+  const megabytes = (count) => ({ bytes: count * 1024 * 1024 });
+
+  // The engine is 21.7 MiB against Cloudflare Pages' 25, and nothing here
+  // decides how large it is — it arrives with a `typst-wasm` release. So the
+  // limit has to be caught when the bundle is built rather than when it is
+  // deployed, and the message has to name the file that grew.
+  assert.throws(
+    () =>
+      assertHostableFiles([
+        { path: "preview.mjs", ...megabytes(0.04) },
+        { path: "vendor/typst-wasm/engine/engine.core.wasm", ...megabytes(26) },
+      ]),
+    (error) =>
+      error instanceof BrowserBundleError &&
+      error.message.includes("engine.core.wasm") &&
+      error.message.includes("26.00 MiB"),
+  );
+
+  assert.doesNotThrow(() =>
+    assertHostableFiles([
+      { path: "vendor/typst-wasm/engine/engine.core.wasm", ...megabytes(21.74) },
+      { path: "project/assets/fonts/GowunBatang-Regular.ttf", ...megabytes(8.04) },
+    ]),
   );
 });

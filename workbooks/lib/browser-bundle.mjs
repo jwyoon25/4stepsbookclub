@@ -34,6 +34,12 @@ const defaultBundleDirectory = resolve(workbooksRoot, "output/browser-bundle");
 const schemaDirectory = resolve(workbooksRoot, "schema");
 const SCHEMA_VALIDATORS_PATH = "schema-validators.mjs";
 
+// Cloudflare Pages refuses any single file above 25 MiB, and `engine.core.wasm`
+// is 21.7 of them. That is headroom a compiler release could spend without
+// anyone noticing until a deploy failed, so the bundle refuses to be built
+// rather than refusing to be published.
+const MAXIMUM_HOSTED_FILE_BYTES = 25 * 1024 * 1024;
+
 // A representative complete workbook is a full book, not the smoke-test lesson:
 // CONTENT-WORKFLOW-DECISIONS.md describes a lesson range such as `Lessons 1–12`,
 // and the largest PDF the Drive transfer has to carry is that book's student
@@ -332,6 +338,31 @@ async function writeInto(bundleDirectory, bundlePath, contents) {
 }
 
 /**
+ * Refuse a bundle a static host would reject.
+ *
+ * The engine is the only file anywhere near the limit, and nothing in this
+ * repository decides how large it is: it arrives with a `typst-wasm` release.
+ * Failing here names the file and the version that grew; failing at deploy time
+ * names neither.
+ */
+export function assertHostableFiles(files) {
+  const tooLarge = files.filter(({ bytes }) => bytes > MAXIMUM_HOSTED_FILE_BYTES);
+  if (tooLarge.length === 0) {
+    return;
+  }
+
+  throw new BrowserBundleError(
+    `A static host will not serve files this large:\n${tooLarge
+      .map(
+        ({ path, bytes }) =>
+          `  ${path}: ${(bytes / 1024 / 1024).toFixed(2)} MiB exceeds the ` +
+          `${MAXIMUM_HOSTED_FILE_BYTES / 1024 / 1024} MiB limit`,
+      )
+      .join("\n")}`,
+  );
+}
+
+/**
  * Write the deployable static bundle.
  *
  * The result is self-contained: served from the root of any static host, or
@@ -448,6 +479,8 @@ export async function writeBrowserBundle({
     ),
   );
   files.push(await writeInto(bundleDirectory, "_headers", headersFile()));
+
+  assertHostableFiles(files);
 
   return { bundleDirectory, buildInfo, fixtures, files };
 }
