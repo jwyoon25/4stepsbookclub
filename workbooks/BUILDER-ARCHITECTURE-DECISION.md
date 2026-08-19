@@ -356,28 +356,66 @@ conditions into availability errors rather than automatic PDF-compute charges.
 | 2. A Node adapter over it for the command line and service | done — `lib/sheet-import.mjs` is now only the `.xlsx` half |
 | 3. An Apps Script adapter supplying raw Sheet matrices | done — `builder/apps-script/SheetGrids.gs` |
 | 4. A browser compiler adapter loading sources, data, fonts, images | done in Phase 0 |
-| 5. **Validate workbook**, **Open preview**, **Create all approved PDFs** menu items | not started |
-| 6. Exact Sheet locations for validation and compilation errors | messages name tab, row, and column; the preview logs them, nothing highlights cells |
-| 7. Save PDFs to the timestamped Drive folder convention | not started; the gate writes single files to a gate folder |
-| 8. The native renderer behind a clearly identified fallback path | unchanged and still tested |
+| 5. **Validate workbook**, **Open preview**, **Create all approved PDFs** menu items | done — `builder/apps-script/WorkbookBuilder.gs` |
+| 6. Exact Sheet locations for validation and compilation errors | done — the named cell is filled, noted, and scrolled to |
+| 7. Save PDFs to the timestamped Drive folder convention | done — `builder/apps-script/WorkbookExport.gs`, through `Code.gs`'s own `createBuildFolder_` |
+| 8. The native renderer behind a clearly identified fallback path | unchanged, still tested, and now named as such in the menu |
 
 The response-space defaults, the layout budgets, and the wrapping limit moved to
 `builder/browser/content-rules.mjs` alongside the contract, so a preview applies
-what a disk build applies. `lib/content.mjs` keeps the filesystem and the JSON
-schemas.
+what a disk build applies. `lib/content.mjs` keeps the filesystem; the JSON
+schemas are now applied on both sides.
+
+**Every step of Phase 1 is built. None of it has been run in the real Sheet**, so
+the transfer figures below are still the Phase 0 measurement rather than an
+export's own.
+
+### How the export is designed
+
+The transfer, not the compiler, is what the export had to be designed around:
+7.78 seconds for one 0.47 MB PDF against 168 milliseconds to compile it. Sending
+a twelve-lesson book's twenty-six files one at a time is about three minutes.
+
+They travel as ZIP archives. `Utilities.unzip` already splits the hosted
+renderer's archives on the Apps Script side, so the format is proven rather than
+assumed, and workbook PDFs deflate to about three quarters of their size —
+measured across a full twelve-lesson export: 4.08 MB of PDF, 3.07 MB compressed,
+4.09 MB once base64 encoded. At the 2 MB archive budget that book costs two
+calls instead of twenty-six.
+
+Three things follow from what is still unknown:
+
+- **How much one `google.script.run` call carries has never been established.**
+  0.63 MB of base64 is proven; the budget is a modest step above it rather than
+  the largest archive that might work, because the suspected cost is the number
+  of calls rather than their size. A refused call halves the budget and repacks,
+  so the first export to meet a real limit finds it, logs it, and finishes.
+- **Which half of the 7.78 seconds is the channel is not known either.** Apps
+  Script now returns what it spent decoding, unzipping, and writing, and the
+  window reports the difference. One real export answers it.
+- **The build folder is created once, before any bytes move**, so a run that
+  fails partway leaves one timestamped folder holding what arrived rather than
+  scattering files across two of them.
+
+### What Phase 1 decided
+
+- **The browser validates against the JSON schemas.** Ajv generates its
+  validating code ahead of time, so `workbook:browser-bundle` writes a
+  `schema-validators.mjs` with no library behind it and the schemas stay the only
+  description of the rules. This was optional while Node did every export; it
+  stopped being optional when the browser became the export path. The generated
+  code needs one CommonJS helper, a UTF-16-aware string length, which the module
+  carries its own copy of; the build fails rather than shipping a page that needs
+  anything else.
+- **Approval is not a Sheet value.** "Create all approved PDFs" builds everything
+  the workbook owes, and approval is the author's judgement made at the preview.
+  `CONTENT-WORKFLOW-DECISIONS.md` leaves approval mechanics unsettled, and the
+  `Status` column stays a note between the people working on the book. Row-level
+  status remains a Phase 2 question for the pilot to answer.
 
 ### What Phase 1 still has to decide
 
-- **Whether the browser validates against the JSON schemas.** It does not today.
-  The Sheet contract requires the same fields cell by cell and the layout budgets
-  refuse content that cannot fit, but the schemas' length and count limits go
-  unchecked in the browser, and the browser is on its way to becoming the export
-  path. Either compile the validators into the bundle or keep an export route
-  that passes through Node.
 - **Where the bundle is hosted.** The gate ran from `localhost`. The generated
   `_headers` file is ready for Cloudflare Pages, and the measured cold start
-  excludes the one-time download a hosted bundle pays.
-- **How the approved PDFs reach Drive.** One 0.47 MB file took 7.78 seconds
-  through `google.script.run`. Twenty-six of them is about three minutes, which
-  is tolerable for an export but not for anything an author waits on
-  repeatedly.
+  excludes the one-time download a hosted bundle pays. Nothing else in Phase 1
+  is blocked on it, and nothing after Phase 1 can start without it.

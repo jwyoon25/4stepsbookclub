@@ -15,6 +15,84 @@ Newest first.
 
 ---
 
+## 2026-08-19 — Phase 1, and designing around a number nobody has measured twice
+
+Phase 1 is built end to end: the three menu items, the Drive export, the cell
+highlighting, and the schema check the browser had been going without. Four
+commits, `58e8afd` through `cb81c2b`. Nothing here has been run in the real
+Sheet.
+
+### What shipped
+
+The transport first, because it decided the rest. Finished PDFs travel to Drive
+as ZIP archives (`58e8afd`); the 4steps menu grew **Validate workbook**, **Open
+preview**, and **Create all approved PDFs**, all three opening the same window
+with a different job to do (`8ec0676`); the cell a validation message names is
+filled, noted, and scrolled to (`f394752`); and the JSON schemas now run in the
+browser as generated code (`cb81c2b`).
+
+The export writes to the folder the hosted renderer has always written to, by
+calling `Code.gs`'s own `createBuildFolder_` rather than describing the
+convention a second time, and names its files the way `lib/build.mjs` names them
+on disk. A test asserts the two lists of file names are equal, because they are
+defined in different files and would otherwise drift silently.
+
+### What was measured
+
+A full twelve-lesson export, compiled locally with the same WebAssembly compiler
+the preview runs:
+
+| | |
+| --- | --- |
+| PDFs a twelve-lesson book owes | 26 |
+| Compiling all of them | 0.6 s |
+| Raw | 4.08 MB |
+| Deflated | 3.07 MB — 75.2% |
+| Base64, as sent | 4.09 MB |
+| Calls at the 2 MB archive budget | 2, against 26 |
+
+The compile time is the point: 0.6 seconds against roughly three minutes of
+transfer for the same work, which is why the export is designed around
+`google.script.run` and not around Typst.
+
+### What was learned
+
+- **The archive is a ZIP the browser writes itself.** `CompressionStream` is
+  deflate in both Chrome and Node, so `builder/browser/pdf-archive.mjs` keeps
+  that directory's rule of importing nothing, and the same writer is what the
+  test checks. Two independent readers — JSZip and `unzip -t` — confirm the
+  output, which matters because the reader that counts is Apps Script's and
+  cannot be tested from here.
+- **Ajv will compile itself away.** Its standalone codegen turns the two schemas
+  into a 98 KB ES module needing exactly one helper, a UTF-16-aware string
+  length, published as CommonJS. Inlining fifteen lines beat adding a bundler,
+  and the build now refuses any *other* `require` rather than shipping a page
+  that fails when someone opens it.
+- **A test written for one rule found that another had overtaken it.** The
+  layout budget was being checked with an over-long vocabulary excerpt; adding
+  the schemas meant the schema caught it first, at a more precise path. Both
+  rules now have a case that only they can fail, which took reading the schema
+  to construct — every field inside its own limit, and the sum over the page's.
+- **Two dialogs, one protocol.** The Phase 0 dialog reported failures as their
+  own message types; the production one carries an `error` on the reply. Making
+  the gate's copy agree was four lines and left one shape instead of two, and
+  the eight checks and their fixtures are untouched.
+- **The Chrome-only constraint held up under a second look.** Nothing in this
+  session's work is a reason to revisit cross-origin isolation: the export needs
+  the dialog for every call it makes, so isolation would cost more now than it
+  did during the gate.
+
+### Left open
+
+Where the bundle is hosted is still the only thing Phase 1 has not decided, and
+nothing after Phase 1 can start without it. Two numbers are waiting on the first
+real export: how much one `google.script.run` call actually carries, and which
+half of the gate's 7.78 seconds was the channel rather than Drive. The export
+reports both, and the budget halves and retries rather than failing, so finding
+out costs an export rather than a session.
+
+---
+
 ## 2026-08-19 — The browser compiler, and the content layer under it
 
 Phase 0 of the builder architecture passed, and Phase 1 got half built. Fourteen

@@ -8,29 +8,36 @@ records why, and demanded one thing before any of it was built: proof that the
 compiler and the Drive round trip work inside Google. They do — the Phase 0 gate
 passed on 2026-08-19, and the runbook below still reproduces it.
 
-What is here now is that gate plus the beginning of the real builder: the
-content contract the preview runs, and the Sheet adapter that feeds it.
+What is here now is that gate plus the builder itself: three menu items, the
+content contract they run, and the Drive export they finish with.
 
 ```text
 builder/
 ├── browser/                   # runs in the preview window; imports nothing but itself
 │   ├── sheet-contract.mjs     # which tabs exist, and how a row becomes schema-v1 content
-│   ├── content-rules.mjs      # response-space defaults and the layout budgets
+│   ├── content-rules.mjs      # response-space defaults, layout budgets, schema failures
 │   ├── build-targets.mjs      # what can be previewed or exported, and the bundle for it
 │   ├── workbook-compiler.mjs  # which files make a compilable project, and how to load them
-│   ├── preview.html           # the preview window
-│   ├── preview.mjs            # environment probe, Sheet read, compile, display, Drive
+│   ├── pdf-archive.mjs        # how finished PDFs are packed for the trip to Drive
+│   ├── preview.html           # the workbook window
+│   ├── preview.mjs            # environment probe, Sheet read, compile, display, export
 │   └── preview.css
 └── apps-script/
-    ├── SheetGrids.gs          # reads every tab as a grid of cells
-    ├── Phase0.gs              # the menu item, the launcher, and the Drive write
-    └── Phase0Dialog.html      # the dialog the preview window answers to
+    ├── SheetGrids.gs                # reads every tab as a grid of cells
+    ├── SheetHighlights.gs           # marks the cell a validation message names
+    ├── WorkbookBuilder.gs           # the three menu items and the window they open
+    ├── WorkbookBuilderDialog.html   # the dialog the window answers to
+    ├── WorkbookExport.gs            # unpacks archives into the Drive build folder
+    ├── Phase0.gs                    # the gate's own menu item and Drive write
+    └── Phase0Dialog.html            # the gate's dialog
 ```
 
-The four `browser/` modules are the content contract. Node imports the same
+The five `browser/` modules are the content contract. Node imports the same
 files — the `.xlsx` importer, the disk loader, and the verification harness all
 go through them — so a preview and a real build cannot describe the workbook
-differently.
+differently. A sixth module, `schema-validators.mjs`, is generated into the
+bundle from `workbooks/schema/*.json` when it is built; see
+[Validation](#validation) below.
 
 ## What is already proven, without Google
 
@@ -100,11 +107,16 @@ whether a browser without JSPI could compile at all.
 
 In the workbook's bound Apps Script project:
 
-1. Add `SheetGrids.gs`, `Phase0.gs`, and `Phase0Dialog.html` as new files,
-   keeping those exact names. `Phase0Dialog.html` is loaded by name.
-2. Replace `Code.gs` with this repository's copy, which adds the menu item.
+1. Add every `apps-script/` file above as a new file, keeping those exact names.
+   The two `.html` files are loaded by name, and `Code.gs` looks for the others
+   by function name.
+2. Replace `Code.gs` with this repository's copy, which adds the menu items.
 3. Optionally set a `PREVIEW_URL` script property. The default is
    `http://localhost:8787/preview.html`.
+
+`Phase0.gs` and `Phase0Dialog.html` are only needed to reproduce the gate.
+Everything else is the builder, and `WorkbookExport.gs` calls `Code.gs`'s own
+`createBuildFolder_` rather than describing the Drive convention twice.
 
 If **Extensions → Apps Script** lands on a Google Drive page saying the file
 cannot be opened, the editor opened under a different signed-in Google account
@@ -151,27 +163,75 @@ The gate is pass/fail. If every check passes, change the record's status and
 start Phase 1. If any fails, the record's fallback order says what to try next,
 in order.
 
-## Previewing the live Sheet
+## The three menu items
 
-A preview window opened from the dialog reads the workbook the author is
-actually editing. The dialog asks Apps Script for every tab as a grid of cells
-and forwards them; the window parses them with the same contract the `.xlsx`
-importer uses, applies the same defaults and layout budgets a disk build
-applies, and offers one target per lesson and edition plus the complete
-workbook. **Refresh from the Sheet** reads it again.
+The 4steps menu offers **Validate workbook**, **Open preview**, and **Create all
+approved PDFs**. All three open the same window with a different job to do,
+because the workbook only exists in one place: the author's browser, where the
+compiler and the content contract both run. Apps Script hands over the cells and
+receives what comes back.
 
-Validation failures name the tab, the row, and the column — `"Lessons" row 5,
-Chapter or page range must contain text.` — and appear in the window's log
-rather than as a generic failure.
+The dialog has to stay open. It is the window's only route to Google, and
+closing it strands an export halfway.
 
-Two things this deliberately does not do yet:
+A window opened this way reads the workbook the author is actually editing. The
+dialog asks Apps Script for every tab as a grid of cells and forwards them; the
+window parses them with the same contract the `.xlsx` importer uses and offers
+one target per lesson and edition plus the complete workbook. **Refresh from the
+Sheet** reads it again.
 
-- **It does not validate against the JSON schemas.** The contract enforces the
-  same required fields cell by cell, and the layout budgets refuse content that
-  cannot fit, but the schemas' length and count limits are not checked in the
-  browser. The `.xlsx` importer and the disk renderer still check them.
-- **It does not export.** Saving to Drive is still the gate's single-file
-  transfer, not the workbook's real build-folder convention.
+"Approved" is the author's judgement, made by looking at the preview before
+choosing the third item. Nothing in the Sheet records it. Approval mechanics are
+explicitly unsettled in
+[`../CONTENT-WORKFLOW-DECISIONS.md`](../CONTENT-WORKFLOW-DECISIONS.md), and the
+`Status` column on every tab is a note between the people working on the book,
+not an input to anything.
+
+### Validation
+
+Four sets of rules run, in the order a disk build runs them:
+
+| Rule | Where it lives | What it catches |
+| --- | --- | --- |
+| The Sheet contract | `sheet-contract.mjs` | missing tabs, renamed columns, a required cell left blank, a chapter range Google turned into a date |
+| The JSON schemas | `workbooks/schema/*.json` | a prompt too long, a seventh guidance line, anything the content model forbids |
+| The wrapping limit | `content-rules.mjs` | an unbroken run of characters no column can break |
+| The layout budgets | `content-rules.mjs` | content that fits the schema and still cannot fit the page |
+
+Every failure names a tab, a row, and a column — `"Lessons" row 5, Chapter or
+page range must contain text.` — and the Sheet is then made to show it: the cell
+is filled, the message becomes its note, and the Sheet scrolls to it. The mark
+is undone when the workbook next parses, and it is remembered rather than
+searched for, so an author's own colouring is left alone.
+
+The schemas run in the browser as generated code. Ajv is a Node library, but it
+compiles validators ahead of time, so `npm run workbook:browser-bundle` writes
+`schema-validators.mjs` into the bundle and nothing loads a validation library
+at runtime. Edit the schemas; never that file.
+
+### The export
+
+**Create all approved PDFs** compiles everything the workbook owes — one PDF per
+lesson and one for the whole book, in both editions — and writes them to
+`<the Sheet's folder>/4steps PDF Builds/<book title>/<timestamp>/`, which is
+where the hosted renderer has always written. The file names are the ones
+`lib/build.mjs` writes on disk, so a folder built either way holds the same
+files.
+
+The transfer is the whole of the design. The Phase 0 gate measured 7.78 seconds
+for one 0.47 MB PDF through `google.script.run` against 168 milliseconds to
+compile it, so twenty-six files sent one at a time is about three minutes. They
+travel as ZIP archives instead — two calls for a twelve-lesson book, and a
+quarter fewer bytes, because workbook PDFs deflate to about three quarters of
+their size. `Utilities.unzip` splits them on the Apps Script side, exactly as it
+already splits the hosted renderer's archives.
+
+Two things follow from not yet knowing how much one call will carry. The archive
+budget starts at 2 MB and halves if a call is refused, so the first export to
+meet a real limit finds it, says so in the log, and finishes anyway. And Apps
+Script returns what it spent decoding, unzipping, and writing, so the log
+separates the time Drive costs from the time the channel costs. Both numbers
+belong in [`../BUILD-LOG.md`](../BUILD-LOG.md) after the first real export.
 
 ## Known constraints
 
@@ -196,12 +256,22 @@ Two things this deliberately does not do yet:
   and lockfile noise. Worth an upstream issue, and worth remembering before
   concluding that the compiler itself is heavy.
 
-## Removing the spike
+## Retiring the gate
 
-Delete this directory, the `browser-bundle` entries from `.gitignore`, the three
-`workbook:browser-*` scripts, `lib/browser-bundle.mjs`,
-`lib/browser-verification.mjs`, `lib/typst-compiler.mjs`,
-`lib/render-parity.mjs`, `scripts/build-browser-bundle.mjs`,
-`scripts/serve-browser-bundle.mjs`, `scripts/verify-browser-compiler.mjs`,
-`tests/workbook-browser-compiler.test.mjs`, the `typst-wasm` dependency, and the
-Phase 0 branch in `Code.gs`'s `onOpen`. Nothing else depends on any of it.
+Phase 0 passed on 2026-08-19 and this directory is no longer a spike: the
+`browser/` modules are the content contract, and `lib/sheet-import.mjs` and
+`lib/content.mjs` import them. The gate is still reproducible, and when keeping
+it stops being worth it, what goes is `apps-script/Phase0.gs`,
+`apps-script/Phase0Dialog.html`, the Phase 0 branch in `Code.gs`'s `onOpen`, and
+the gate's own controls in `preview.mjs` — the eight checks, `Run every gate
+check`, and `Audit and compare with native`, all of which the page already hides
+from an author.
+
+That last removal is also the moment to fold `Phase0Dialog.html` into
+`WorkbookBuilderDialog.html`. The two speak one message protocol on purpose but
+implement the postMessage handshake twice, which is a duplication the gate is
+currently paying for.
+
+Nothing else here is removable. `workbook:browser-verify` is what proves the two
+Typst versions still agree, and `workbook:browser-bundle` is what generates the
+schema validators the export runs.
