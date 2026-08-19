@@ -9,6 +9,10 @@ requirements are locked in
 is defined in [schema/](schema/README.md), and the data-driven renderer turns a
 validated content package into student and teacher PDFs. The first staff-facing
 authoring MVP is a Google Sheets-ready template with a checked `.xlsx` importer.
+The accepted preview and delivery direction is recorded in
+[BUILDER-ARCHITECTURE-DECISION.md](BUILDER-ARCHITECTURE-DECISION.md): keep Sheets,
+compile with Typst in the author's browser, preview before export, save through
+Apps Script to Drive, and retain the native renderer as a fallback.
 
 ## Prerequisites
 
@@ -91,6 +95,13 @@ audits. It is generation-on-demand rather than a live viewer; a split editor/PDF
 viewer can still be added after real authors have proven the content contract.
 
 ### One-time renderer deployment
+
+> **Fallback implementation:** The accepted MVP direction is to replace this
+> default hosted dependency with browser-side Typst compilation after the
+> compatibility gate in
+> [BUILDER-ARCHITECTURE-DECISION.md](BUILDER-ARCHITECTURE-DECISION.md). The
+> deployment instructions below document the already-implemented native
+> renderer and remain the reliability fallback.
 
 The menu calls a small token-protected HTTP service because Apps Script cannot
 run Typst. `Dockerfile` packages the importer, renderer, audited PDF build, and
@@ -198,6 +209,7 @@ workbooks/
 ├── README.md
 ├── DESIGN-DECISIONS.md   # settled decisions and deferred questions, with reasoning
 ├── CONTENT-WORKFLOW-DECISIONS.md # locked authoring fields, defaults, and outputs
+├── BUILDER-ARCHITECTURE-DECISION.md # accepted authoring, preview, and rendering plan
 ├── schema/               # versioned JSON Schemas, documentation, and examples
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
