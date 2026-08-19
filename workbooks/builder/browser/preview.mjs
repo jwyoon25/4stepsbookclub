@@ -604,9 +604,13 @@ async function runEveryCheck() {
     );
 
     // The largest PDF is the one the Drive transfer has to survive, and it is
-    // the one left on screen at the end of the run.
+    // the one left on screen at the end of the run. Compiling it twice more is
+    // what answers the second half of check 8: the first pass makes it current
+    // again, and the second is the refresh an author waits through after
+    // editing a cell.
     if (largest) {
-      show(largest.fixture, largest.pdf);
+      await compileFixture(largest.fixture);
+      await compileFixture(largest.fixture);
       if (state.driveOrigin) {
         await saveToDrive();
       } else {
