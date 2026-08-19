@@ -7,8 +7,8 @@ The design system is implemented and proven by a specimen. The tutor-facing
 requirements are locked in
 [CONTENT-WORKFLOW-DECISIONS.md](CONTENT-WORKFLOW-DECISIONS.md), their JSON model
 is defined in [schema/](schema/README.md), and the data-driven renderer turns a
-validated content package into student and teacher PDFs. The staff editor is the
-remaining layer.
+validated content package into student and teacher PDFs. The first staff-facing
+authoring MVP is a Google Sheets-ready template with a checked `.xlsx` importer.
 
 ## Prerequisites
 
@@ -35,10 +35,50 @@ From the repository root:
 npm run workbook:specimen        # build the design specimen
 npm run workbook:specimen:watch  # rebuild it on every save
 npm run workbook:validate        # validate the example content package
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
 npm run workbook:render          # render every example PDF variant
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
 ```
+
+## Google Sheets authoring MVP
+
+Use the checked template at
+`outputs/2026-08-19-google-sheets-mvp/4steps-workbook-authoring-template.xlsx`:
+
+1. Upload the `.xlsx` file to Google Drive, open it with Google Sheets, and make
+   a copy for the book.
+2. Edit the workbook and lesson tabs. Add one question, prompt, or vocabulary
+   entry per row. Do not rename tabs or column headings.
+3. In Google Sheets, choose **File → Download → Microsoft Excel (.xlsx)**.
+4. Import the download from the repository root:
+
+   ```bash
+   npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
+   ```
+
+The command creates a validated schema-v1 package under
+`workbooks/content/<generated-book-id>/`. It stops with a tab, row, and field
+message when the spreadsheet contract is invalid. The generated ID is based on
+the book title; use `--id existing-book-id` to assign a stable ID explicitly.
+
+To import into a chosen directory and retain its existing manifest ID:
+
+```bash
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx \
+  --output-dir workbooks/content/existing-book-id
+```
+
+To import, validate, and immediately create all student and teacher PDFs:
+
+```bash
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx --render
+```
+
+This MVP intentionally keeps Google Sheets as the editor and the repository as
+the controlled generation boundary. PDF preview is therefore a download-and-run
+step, not a live viewer inside the sheet. A split editor/PDF viewer can be added
+after the authoring contract is proven with real workbook makers.
 
 Validate a production manifest by passing its path after `--`:
 
@@ -113,9 +153,11 @@ workbooks/
 ├── lib/
 │   ├── build.mjs         # output planning and Typst build orchestration
 │   ├── content.mjs       # package loading, validation, and default application
-│   └── pdf-audit.mjs     # post-render PDF consistency checks
+│   ├── pdf-audit.mjs     # post-render PDF consistency checks
+│   └── sheet-import.mjs  # Google Sheets .xlsx contract and schema-v1 conversion
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
+│   ├── import-sheet.mjs     # command-line spreadsheet importer
 │   ├── render-content.mjs   # command-line PDF renderer
 │   └── validate-content.mjs # command-line content validator
 ├── src/

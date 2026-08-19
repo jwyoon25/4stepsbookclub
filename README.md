@@ -76,13 +76,14 @@ the site automatically. Changes usually appear within a few minutes. The
 ## Workbook system
 
 The workbook design system is implemented in Typst and proven by a nine-page
-specimen. A versioned JSON content model, package validator, and data-driven PDF
-renderer are implemented; the staff editor is the remaining layer.
+specimen. A versioned JSON content model, package validator, data-driven PDF
+renderer, and Google Sheets authoring MVP are implemented.
 
 ```bash
 npm run workbook:specimen        # build the design specimen
 npm run workbook:specimen:watch
 npm run workbook:validate        # validate the example content package
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
 npm run workbook:render          # render all example student/teacher PDFs
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
