@@ -13,28 +13,45 @@
  */
 
 /**
- * Read every tab of the active spreadsheet as a grid of cell values.
+ * Read the workbook's tabs as grids of cell values.
  *
- * Returns `{ spreadsheetName, grids, tabs, cells, milliseconds }`, where `grids`
- * maps a tab name to its rows. Extra tabs — drafts, notes, scratch work — are
- * included and ignored by the contract, so a tutor can keep whatever else they
- * need in the file.
+ * `wanted` is the list of tab names to read, and it comes from the browser
+ * because the browser is where the contract lives. Naming them here instead
+ * would be a second copy of something that already exists, free to drift; this
+ * way the script still knows nothing about what a workbook is. Called with
+ * nothing, it reads every tab, which is what the Phase 0 dialog does.
  *
- * The timings come back with the cells because this is the wait an author hits
- * most: it happens on every refresh, and it has measured between three and
- * eleven seconds for a one-lesson workbook. Which part of that is the script
- * and which is the trip to the browser is not something to infer from the
- * outside, so it is reported from the inside.
+ * Reading only what is asked for is worth about half a second per tab skipped.
+ * A tutor's drafts, notes, and scratch work stay in the file and go unread
+ * rather than being fetched and thrown away, and a tab that should be there and
+ * is not simply does not appear, which is the failure the contract already
+ * reports by name.
+ *
+ * Returns `{ spreadsheetName, grids, tabs, cells, milliseconds }`. The timings
+ * come with the cells because this is the wait an author hits most: it happens
+ * after every edit, and it has measured between three and eleven seconds for a
+ * one-lesson workbook. Which part is the script and which is the trip to the
+ * browser is not something to infer from outside, so it is reported from
+ * inside.
  */
-function readWorkbookGrids() {
+function readWorkbookGrids(wanted) {
   const startedAt = new Date().getTime();
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   SpreadsheetApp.flush();
   const flushedAt = new Date().getTime();
 
+  const sheets =
+    wanted && wanted.length > 0
+      ? wanted
+          .map(function (name) {
+            return spreadsheet.getSheetByName(name);
+          })
+          .filter(Boolean)
+      : spreadsheet.getSheets();
+
   const grids = {};
   let cells = 0;
-  spreadsheet.getSheets().forEach(function (sheet) {
+  sheets.forEach(function (sheet) {
     const rows = sheet
       .getDataRange()
       .getValues()

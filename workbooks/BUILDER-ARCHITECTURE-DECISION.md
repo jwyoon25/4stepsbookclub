@@ -387,24 +387,39 @@ assumed, and workbook PDFs deflate to about three quarters of their size —
 encoded. The build folder is created once, before any bytes move, so a run that
 fails partway leaves one timestamped folder holding what arrived.
 
-#### The wait an author actually pays
+#### The wait an author actually pays, and what a call costs
 
 The export happens once a book. **Reading the Sheet happens after every edit**,
-and it is slower: 5.3, 5.4, and 10.6 seconds for the first read of a session on
-a *one-lesson* workbook, and 3.5 seconds for a second read in an already-open
-window. Some of that is a cold Apps Script container, and 3.5 seconds is what
-remains when it is warm.
+and it is slower. Three reads of a *one-lesson* workbook, measured from inside:
 
-It cannot be the channel — the same channel carries 0.66 MB of base64 in 1.5
-seconds, and a one-lesson workbook's cells are a fraction of that. So it is the
-script: `SpreadsheetApp.flush()` and one `getDataRange().getValues()` for every
-tab in the file. `readWorkbookGrids` now reports what it spends, the way the
-export does, because the next thing to optimize should be chosen from a
-measurement rather than from that inference.
+| | Read 1 | Read 2 | Read 3 |
+| --- | --- | --- | --- |
+| `SpreadsheetApp.flush()` | 4 ms | 5 ms | 3 ms |
+| `getDataRange().getValues()`, 7 tabs | 4.01 s | 2.81 s | 3.68 s |
+| Channel | 1.38 s | 1.32 s | 1.05 s |
+| Whole read | 5.39 s | 4.13 s | 4.74 s |
 
-Two candidates, neither worth doing before the split is known: reading only the
-six tabs the contract needs rather than every tab in the file, and the Sheets
-advanced service, whose `batchGet` fetches every range in one call.
+Two things fall out of this, and both were being guessed at before:
+
+- **`getValues` costs about half a second a tab, whatever is in it.** Flushing
+  is free and the data is tiny; the cost is one round trip per tab. The Sheet
+  had seven tabs and the contract defines six, so an eighth of every refresh was
+  fetching a tutor's notes in order to discard them. The window now names the
+  tabs it wants — the names come from the contract, which runs there, so the
+  script still knows nothing about what a workbook is.
+- **`google.script.run` costs about 1.25 seconds a call and barely notices the
+  payload.** The same channel carried 0.66 MB of base64 in ~1.5 seconds. That is
+  the number the archive design needed and never had: the cost really is the
+  call count, so batching twenty-six files into two calls saves about 30 seconds
+  of pure overhead, and a *smaller* archive budget would have cost several
+  seconds for nothing. The 2 MB budget stays.
+
+What is left of the refresh is roughly 3 seconds of `getValues` and 1.25 seconds
+of channel. The one remaining candidate is the Sheets advanced service, whose
+`batchGet` fetches every range in a single call — but it returns cell values
+without their types, which would lose the check that catches a chapter range
+Google turned into a date. That is a correctness cost for about 2.5 seconds, and
+it should not be paid without deciding it deliberately.
 
 #### Where the 7.78 seconds went — measured 2026-08-19
 

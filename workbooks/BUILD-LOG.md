@@ -100,12 +100,29 @@ it is slower: 5.3, 5.4, and 10.6 seconds for a session's first read of a
 Some of the first figure is a cold Apps Script container; 3.5 seconds is what is
 left when it is warm.
 
-That cannot be the channel, which carries 0.66 MB of base64 in 1.5 seconds. But
-having just been caught inferring, `readWorkbookGrids` was given the same
+Having just been caught inferring, `readWorkbookGrids` was given the same
 treatment as the export: it reports flush, read, and tab count, and the window
-prints script against channel. The two candidates — reading only the six tabs
-the contract needs instead of every tab in the file, and the Sheets advanced
-service's `batchGet` — both wait on that number.
+prints script against channel. Three reads then said it outright.
+
+| | Read 1 | Read 2 | Read 3 |
+| --- | --- | --- | --- |
+| `SpreadsheetApp.flush()` | 4 ms | 5 ms | 3 ms |
+| `getValues()`, 7 tabs | 4.01 s | 2.81 s | 3.68 s |
+| Channel | 1.38 s | 1.32 s | 1.05 s |
+
+**`getValues` costs about half a second a tab and the data in it is irrelevant.**
+The Sheet has seven tabs; the contract defines six. An eighth of every refresh
+was spent fetching a tutor's notes in order to throw them away. The window now
+names the tabs it wants, and the names travel from the contract rather than
+being written down again in Apps Script — the adapter still knows nothing about
+what a workbook is, which is the only reason it was safe to change.
+
+**And `google.script.run` costs about 1.25 seconds a call, almost regardless of
+payload.** That is the number the whole export was designed without. It vindicates
+the archives — twenty-six calls to two saves about 30 seconds of pure overhead —
+and it retires the idea, entertained twice this session, of lowering the archive
+budget to stay inside proven payload sizes. That would have bought nothing and
+cost seconds.
 
 ### What was learned
 

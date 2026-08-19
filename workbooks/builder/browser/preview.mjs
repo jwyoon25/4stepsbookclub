@@ -47,6 +47,7 @@ import {
   createWorkbookManifest,
   locateContentPath,
   parseWorkbookGrids,
+  SHEET_NAMES,
   slugifyBookTitle,
 } from "/sheet-contract.mjs";
 import {
@@ -673,7 +674,9 @@ function askTheDialog(request, replyType, timeoutMilliseconds) {
 
 function requestSheetGrids() {
   return askTheDialog(
-    { type: `${MESSAGE_PREFIX}-read-sheet` },
+    // Every tab read costs about half a second, so the six the contract defines
+    // are named rather than letting Apps Script fetch a tutor's notes as well.
+    { type: `${MESSAGE_PREFIX}-read-sheet`, tabs: [...SHEET_NAMES] },
     `${MESSAGE_PREFIX}-sheet`,
     SHEET_TIMEOUT_MILLISECONDS,
   );

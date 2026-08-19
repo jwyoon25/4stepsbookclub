@@ -169,7 +169,7 @@
         );
       }
 
-      function sendSheet() {
+      function sendSheet(message) {
         log("Reading the workbook tabs…");
         serve(
           "sheet",
@@ -181,10 +181,12 @@
             );
           },
           function (onSuccess, onFailure) {
+            // Which tabs to read is the window's to say: the contract that
+            // names them runs there, not here.
             google.script.run
               .withSuccessHandler(onSuccess)
               .withFailureHandler(onFailure)
-              .readWorkbookGrids();
+              .readWorkbookGrids(message.tabs);
           },
         );
       }
