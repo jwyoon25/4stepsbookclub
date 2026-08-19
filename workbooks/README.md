@@ -44,6 +44,9 @@ npm run workbook:render          # render every example PDF variant
 npm run workbook:serve           # run the Sheets PDF service locally
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
+npm run workbook:browser-bundle  # write the browser compiler's static bundle
+npm run workbook:browser-gate    # serve that bundle for the Phase 0 gate
+npm run workbook:browser-verify  # compare the browser compiler with native Typst
 ```
 
 ## Google Sheets authoring MVP
@@ -93,6 +96,25 @@ The menu keeps Google Sheets as the authoring surface while preserving the
 student/teacher editions, standalone lessons, validation, layout rules, and PDF
 audits. It is generation-on-demand rather than a live viewer; a split editor/PDF
 viewer can still be added after real authors have proven the content contract.
+
+### Browser compiler gate
+
+The accepted direction replaces that hosted renderer with Typst compiled in the
+author's browser, previewed before export, and saved to Drive through Apps
+Script. Before any of it is built, one pass/fail gate has to run in the real
+Google environment. It is implemented in [builder/](builder/README.md), which is
+also its runbook.
+
+Everything outside Google is already verified:
+
+```bash
+npm run workbook:browser-verify
+```
+
+That compiles every representative workbook twice — once with the WebAssembly
+compiler the preview page uses, once with the Typst CLI — audits the WebAssembly
+output, and compares the two by every text run, every response rule, and every
+pixel. `npm test` runs a shorter version of the same check.
 
 ### One-time renderer deployment
 
@@ -232,17 +254,25 @@ workbooks/
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
 │   └── logo/             # logomark and logotype, derived from the website assets
+├── builder/              # Phase 0 browser-compiler gate: preview page and Apps Script
 ├── content/              # Production book- and lesson-specific curriculum data
 ├── lib/
+│   ├── browser-bundle.mjs   # the static bundle the browser compiler is loaded from
+│   ├── browser-verification.mjs # one workbook, compiled twice and compared
 │   ├── build.mjs         # output planning and Typst build orchestration
 │   ├── content.mjs       # package loading, validation, and default application
 │   ├── pdf-audit.mjs     # post-render PDF consistency checks
-│   └── sheet-import.mjs  # Google Sheets .xlsx contract and schema-v1 conversion
+│   ├── render-parity.mjs # comparing two renderings of the same workbook
+│   ├── sheet-import.mjs  # Google Sheets .xlsx contract and schema-v1 conversion
+│   └── typst-compiler.mjs   # the browser compiler, running under Node
 ├── output/               # Generated files; PDFs are ignored by Git.
 ├── scripts/
+│   ├── build-browser-bundle.mjs   # writes the browser compiler's static bundle
 │   ├── import-sheet.mjs     # command-line spreadsheet importer
 │   ├── render-content.mjs   # command-line PDF renderer
-│   └── validate-content.mjs # command-line content validator
+│   ├── serve-browser-bundle.mjs   # local gate server with the audit endpoint
+│   ├── validate-content.mjs # command-line content validator
+│   └── verify-browser-compiler.mjs # browser-versus-native comparison harness
 ├── src/
 │   ├── main.typ          # Minimal Typst compilation smoke test.
 │   ├── render.typ        # Generic JSON bundle entry point.

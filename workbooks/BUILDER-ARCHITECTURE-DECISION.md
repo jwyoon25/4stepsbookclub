@@ -1,6 +1,7 @@
 # Workbook Builder Architecture Decision
 
-- **Status:** Accepted direction; browser compatibility gate pending
+- **Status:** Accepted direction; compatibility gate built and verified outside
+  Google, unrun inside it
 - **Decision date:** 2026-08-19
 - **Scope:** Staff authoring, preview, PDF generation, and Drive delivery
 
@@ -124,6 +125,63 @@ prove all of the following:
 
 This gate is pass/fail. Do not build the full preview interface until the
 compiler and Drive round trip succeed in the real environment.
+
+### The gate is built
+
+[`builder/README.md`](builder/README.md) is its runbook. Three commands carry
+it: `workbook:browser-bundle` writes the compiler, templates, fonts, logos, and
+representative content as static files; `workbook:browser-gate` serves them with
+the headers a static host would send and audits whatever the browser produces;
+`workbook:browser-verify` compares the browser compiler with the native one
+without involving Google at all. `builder/apps-script/` holds the Sheet menu
+item, the launcher dialog, and the Drive write.
+
+### What the gate has already established
+
+Measured on the example book, 2026-08-19, macOS, Node 24.16, typst-wasm 1.0.0
+against the Typst 0.15.1 CLI:
+
+| Result | Measurement |
+| --- | --- |
+| Workbooks compiled both ways | 4 — lesson and 12-lesson workbook, each edition |
+| Pages | 162 |
+| Typst diagnostics | none |
+| Existing PDF audit | passed on every browser-compiled PDF |
+| Text and rule parity | identical; worst positional difference 0.000 pt |
+| Rasterized parity | identical; 324,641,520 channels, no differing pixel |
+| Compile time, warm compiler | 130–160 ms per workbook; 6–21 ms to recompile |
+| Compiler start | 56–65 ms, then 36–44 ms to load templates, fonts, and logos |
+| Largest PDF | 484 KB for the 86-page complete workbook |
+| Bundle a browser downloads once | 43.91 MB, 13.67 MB compressed |
+
+Three findings the plan above did not anticipate:
+
+- **The two Typst versions differ and the output does not.** typst-wasm 1.0.0
+  embeds Typst 0.15.0 while the CLI here is 0.15.1, and every page still matches
+  to the pixel. That is luck worth keeping under a test rather than a guarantee:
+  `workbook:browser-verify` exists to be run whenever either version moves.
+- **Cross-origin isolation and the Drive channel are mutually exclusive.** The
+  worker backend needs isolation; an isolated page loses `window.opener`, which
+  is the preview window's only route back to the Apps Script dialog. So the
+  Drive round trip runs on JSPI, which is Chrome and Edge 137+, and the bundle
+  also serves an isolated copy of the same page to establish whether a browser
+  without JSPI could compile at all. The MVP being Chrome-first is now a
+  consequence of the Drive channel, not of the compiler.
+- **The fonts cost as much as the compiler.** The four brand faces are 21.23 MB
+  raw and 5.22 MB compressed, against 22.10 MB and 8.04 MB for the engine, and
+  Gowun Batang is three quarters of the font weight. Both are cached after the
+  first load. `engine.core.wasm` is 21.7 MiB, under Cloudflare Pages' 25 MiB
+  per-file limit, but not by much.
+
+### What only the bound Sheet can answer
+
+Items 1, 2, 6, and 8 are environmental, and items 3 to 5 have been proven in a
+browser engine but not in a browser. Specifically: whether an Apps Script dialog
+may open the preview window and keep an opener relationship with it, whether
+`google.script.run` carries a 484 KB PDF as base64 in one call, what the founder's
+laptop measures over a real network, and what the Apps Script iframe itself
+offers. The dialog reports its own capabilities so the last question is answered
+whichever way the gate goes.
 
 ## Implementation phases
 
@@ -264,6 +322,12 @@ conditions into availability errors rather than automatic PDF-compute charges.
 
 ## Next authorized implementation step
 
-Build only the Phase 0 compatibility spike. If it passes, record the measured
-browser, compilation, preview, Drive-transfer, and audit results in this file,
-change the status to **Accepted and validated**, and proceed to Phase 1.
+The Phase 0 spike is built and its non-Google half is measured above. What
+remains is to run it in the actual bound Sheet, following
+[`builder/README.md`](builder/README.md), and to paste the preview window's
+results table and the dialog's environment probe into a **Phase 0 gate run**
+section here.
+
+If all eight checks pass, change the status to **Accepted and validated** and
+proceed to Phase 1. If any fails, record which one and work down the fallback
+order above; nothing in Phase 1 should be built before then.
