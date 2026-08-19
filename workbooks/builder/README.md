@@ -106,6 +106,13 @@ In the workbook's bound Apps Script project:
 3. Optionally set a `PREVIEW_URL` script property. The default is
    `http://localhost:8787/preview.html`.
 
+If **Extensions → Apps Script** lands on a Google Drive page saying the file
+cannot be opened, the editor opened under a different signed-in Google account
+than the one that owns the Sheet. Match the account index in the Sheet's own URL
+— `docs.google.com/spreadsheets/u/1/d/…` needs `script.google.com/u/1/home` — or
+use a window where the owning account is the only one signed in. Apps Script has
+never handled multiple accounts well.
+
 No new OAuth scopes: the Sheet UI and Drive scopes the renderer automation
 already requests are enough, and the browser — not the script — fetches the
 compiler.
@@ -182,6 +189,12 @@ Two things this deliberately does not do yet:
 - **The cold start is dominated by the fonts and the engine**, not by the
   workbook. Both are cached after the first load, and the bundle's cache headers
   say so.
+- **`typst-wasm` declares a build plugin as a runtime dependency.**
+  `tsdown-plugin-worker` is in its `dependencies`, so installing it pulls a
+  bundler toolchain into the lockfile that nothing at runtime imports. It is a
+  devDependency here and the browser never sees it, so the cost is install time
+  and lockfile noise. Worth an upstream issue, and worth remembering before
+  concluding that the compiler itself is heavy.
 
 ## Removing the spike
 
