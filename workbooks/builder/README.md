@@ -111,8 +111,16 @@ In the workbook's bound Apps Script project:
    The two `.html` files are loaded by name, and `Code.gs` looks for the others
    by function name.
 2. Replace `Code.gs` with this repository's copy, which adds the menu items.
-3. Optionally set a `PREVIEW_URL` script property. The default is
-   `http://localhost:8787/preview.html`.
+3. Keep the master workbook view-only, then use **File → Make a copy** for each
+   book. The copied workbook carries the bound Apps Script and becomes that
+   book's source of truth.
+4. Reload the copy and choose **4steps → Set up this workbook**. Google may
+   show a one-time permission prompt for the copied script; approve it once,
+   then use the other 4steps menu items normally.
+5. Production copies use the hosted preview by default:
+   `https://4steps-workbook-builder.pages.dev/preview`. Set a `PREVIEW_URL`
+   script property only when intentionally overriding it for local development
+   or another deployment.
 
 `Phase0.gs` and `Phase0Dialog.html` are only needed to reproduce the gate.
 Everything else is the builder, and `WorkbookExport.gs` calls `Code.gs`'s own
@@ -278,31 +286,24 @@ paths are root-absolute — `/vendor/…`, `/build-targets.mjs`, `/isolated/…`
 the bundle has to be the root of its own hostname. It cannot be a folder inside
 the public site.
 
-### Signing in
+### Access and visibility
 
-The bundle carries the whole Typst design system, the brand logo set, and an
-example book, so it sits behind **Cloudflare Access** rather than on the open
-web. Access is free for a small team and authenticates against Google, which is
-the account the author is already signed in to.
+The builder is currently served publicly from Cloudflare Pages. The host serves
+the static compiler and preview UI; it does not read the Google Sheet by itself.
+Live workbook data still moves through the authorized Apps Script bridge, and
+the Google Sheet's own permissions control who can author or export it.
 
-**Sign in once in an ordinary tab before using the Sheet menu.** Access answers
-an unauthenticated request with a redirect to its own login, and the preview
-window is opened by the Apps Script dialog, which the window has to keep talking
-to — a login page that sets `Cross-Origin-Opener-Policy` on the way past would
-sever that channel for good, and the preview would report "no opener" and refuse
-to save. Arriving with the cookie already set means no redirect happens at all.
-The cookie lasts as long as the Access session policy says, so this is once a
-day or once a month, not once a sitting.
-
-If the preview ever does report no opener immediately after signing in, that is
-this failure and not a bug in the page.
+If Cloudflare Access is enabled later, authors should sign in once in an
+ordinary tab before using the Sheet menu so the Apps Script dialog can open the
+preview without an authentication redirect.
 
 ### Pointing the Sheet at it
 
-Set a `PREVIEW_URL` script property in the bound Apps Script project to
-`https://<the hostname>/preview.html`. That is the only place the address
-appears; nothing in this repository hardcodes a hostname, and the default stays
-the local gate server so the runbook above keeps working.
+Production copies default to
+`https://4steps-workbook-builder.pages.dev/preview`. Set a `PREVIEW_URL` script
+property only when intentionally overriding that address for local development
+or another deployment. The local gate remains available by setting it to
+`http://localhost:8787/preview.html`.
 
 One thing to weigh before the first deploy: if the hostname is `admin.<domain>`,
 the public site already serves the Decap CMS at `<domain>/admin/`. They are

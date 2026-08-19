@@ -503,17 +503,15 @@ the cost — and it changes what is worth optimizing:
   deploy script, no `wrangler` dependency, and no Typst CLI in CI. It cannot be a
   folder inside the public site: the bundle's paths are root-absolute, so it has
   to be the root of its own hostname.
-- **It sits behind Cloudflare Access**, because it carries the whole Typst design
-  system, the brand logo set, and an example book. The cost is one constraint
-  worth knowing: an author has to sign in once in an ordinary tab before using
-  the Sheet menu. Access answers an unauthenticated request with a redirect, and
-  a login page that set `Cross-Origin-Opener-Policy` on the way past would sever
-  the channel to the dialog permanently — the same way cross-origin isolation
-  does, for the same reason. Arriving with the cookie already set avoids the
-  redirect entirely.
+- **The builder is currently public rather than behind Cloudflare Access.** The
+  host serves static compiler and preview assets; live Sheet data still travels
+  through the authorized Apps Script bridge. Access remains an optional future
+  privacy layer, with the known opener/redirect constraint documented in the
+  runbook.
 
 Nothing in the repository hardcodes a hostname. It appears once, in the
-`PREVIEW_URL` script property, and the default remains the local gate server.
+`PREVIEW_URL` script property. Production copies default to the hosted Pages
+bundle; the property remains available as an explicit local-gate override.
 
 ### What Phase 1 still has to decide
 

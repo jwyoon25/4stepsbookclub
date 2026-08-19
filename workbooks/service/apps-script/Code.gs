@@ -10,9 +10,11 @@ function onOpen() {
   // before anything is filed. Its items appear only while
   // builder/apps-script/WorkbookBuilder.gs is in the project, so a Sheet that
   // has not been connected to it shows a menu of what it can actually do
-  // rather than three items that fail when clicked.
+  // rather than builder items that fail when clicked.
   if (typeof openWorkbookPreview === "function") {
     menu
+      .addItem("Set up this workbook", "setupWorkbook")
+      .addSeparator()
       .addItem("Validate workbook", "validateWorkbook")
       .addItem("Open preview", "openWorkbookPreview")
       .addItem("Create all approved PDFs", "createAllApprovedPdfs")
