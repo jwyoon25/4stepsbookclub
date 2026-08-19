@@ -43,6 +43,19 @@ export function listWorkbookTargets(lessons) {
   ];
 }
 
+/**
+ * What one target's PDF is called.
+ *
+ * `lib/build.mjs` names the files the native renderer writes to disk, and the
+ * Drive export writes the same set from the browser. An author comparing a
+ * folder built one way with a folder built the other has to be looking at the
+ * same file names, so the target ids above are the only thing that decides
+ * them.
+ */
+export function workbookPdfName(workbookId, target) {
+  return `${workbookId}-${target.id}.pdf`;
+}
+
 /** Assemble the normalized bundle the Typst renderer compiles. */
 export function createBuildBundle(manifest, lessons, { scope, edition }) {
   return {
