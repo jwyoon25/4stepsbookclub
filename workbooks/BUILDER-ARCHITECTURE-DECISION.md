@@ -7,7 +7,9 @@
 This record captures the agreed direction for the first workbook-builder MVP.
 It complements the founder-confirmed requirements in
 [`CONTENT-WORKFLOW-DECISIONS.md`](CONTENT-WORKFLOW-DECISIONS.md); it does not
-change those requirements or the schema-v1 content model.
+change those requirements or the schema-v1 content model. What is currently true
+is here; how it got here, session by session, is in
+[`BUILD-LOG.md`](BUILD-LOG.md).
 
 ## Decision
 

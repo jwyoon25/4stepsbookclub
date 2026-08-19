@@ -250,6 +250,7 @@ workbooks/
 ├── DESIGN-DECISIONS.md   # settled decisions and deferred questions, with reasoning
 ├── CONTENT-WORKFLOW-DECISIONS.md # locked authoring fields, defaults, and outputs
 ├── BUILDER-ARCHITECTURE-DECISION.md # accepted authoring, preview, and rendering plan
+├── BUILD-LOG.md          # dated record of what each session shipped, measured, and learned
 ├── schema/               # versioned JSON Schemas, documentation, and examples
 ├── assets/
 │   ├── fonts/            # Gowun Batang + IBM Plex Sans KR, vendored (OFL)
