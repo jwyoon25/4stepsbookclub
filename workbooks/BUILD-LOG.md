@@ -162,8 +162,13 @@ cost seconds.
 
 ### Left open
 
-Where the bundle is hosted is still the only thing Phase 1 has not decided, and
-nothing after Phase 1 can start without it.
+Where the bundle is hosted is settled: a second Cloudflare Pages project over
+this repository, built the same way the site is, behind Cloudflare Access. It
+needs no deploy script and no `wrangler`, because the build already runs in
+Cloudflare's CI on every push and wants no Typst CLI. What it does need is a
+branch to build from, and this work is not on `main`.
+
+**Phase 1 is complete.** What is left is not decisions.
 
 The export that ran carried one lesson. A twelve-lesson book is twenty-six files
 and 4.09 MB of base64, and it is what settles the two things four files could

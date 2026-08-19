@@ -233,6 +233,63 @@ Script returns what it spent decoding, unzipping, and writing, so the log
 separates the time Drive costs from the time the channel costs. Both numbers
 belong in [`../BUILD-LOG.md`](../BUILD-LOG.md) after the first real export.
 
+## Hosting the bundle
+
+The bundle is static files and Cloudflare Pages already serves this repository,
+so it is a **second Pages project over the same repository**, built the same way
+the site is:
+
+| | Website | Builder |
+| --- | --- | --- |
+| Build command | `npm run build` | `npm run workbook:browser-bundle` |
+| Output directory | `website/dist` | `workbooks/output/browser-bundle` |
+
+Nothing else is needed. There is no deploy script and no `wrangler` dependency,
+because the build runs in Cloudflare's own CI on every push, and it needs no
+Typst CLI — the bundle omits the native version from `build-info.json` when
+Typst is absent and is otherwise identical. `_headers` is generated with it, so
+the isolated page keeps its cross-origin isolation and the compiler and fonts
+keep their immutable cache rules.
+
+Two things it will not survive. Every file has to stay under Cloudflare's 25 MiB
+limit, which `engine.core.wasm` is 3.26 MiB away from; the bundle build refuses
+rather than letting a `typst-wasm` release discover it at deploy time. And the
+paths are root-absolute — `/vendor/…`, `/build-targets.mjs`, `/isolated/…` — so
+the bundle has to be the root of its own hostname. It cannot be a folder inside
+the public site.
+
+### Signing in
+
+The bundle carries the whole Typst design system, the brand logo set, and an
+example book, so it sits behind **Cloudflare Access** rather than on the open
+web. Access is free for a small team and authenticates against Google, which is
+the account the author is already signed in to.
+
+**Sign in once in an ordinary tab before using the Sheet menu.** Access answers
+an unauthenticated request with a redirect to its own login, and the preview
+window is opened by the Apps Script dialog, which the window has to keep talking
+to — a login page that sets `Cross-Origin-Opener-Policy` on the way past would
+sever that channel for good, and the preview would report "no opener" and refuse
+to save. Arriving with the cookie already set means no redirect happens at all.
+The cookie lasts as long as the Access session policy says, so this is once a
+day or once a month, not once a sitting.
+
+If the preview ever does report no opener immediately after signing in, that is
+this failure and not a bug in the page.
+
+### Pointing the Sheet at it
+
+Set a `PREVIEW_URL` script property in the bound Apps Script project to
+`https://<the hostname>/preview.html`. That is the only place the address
+appears; nothing in this repository hardcodes a hostname, and the default stays
+the local gate server so the runbook above keeps working.
+
+Two things to decide before the first deploy. The Pages project needs a branch
+to build from, and this work is on `workbook-production-audit` rather than
+`main`. And if the hostname is `admin.<domain>`, be aware the public site
+already serves the Decap CMS at `<domain>/admin/`; they are different tools with
+one name between them.
+
 ## Known constraints
 
 - **The Drive round trip needs JSPI**, which means Chrome or Edge 137 or newer.

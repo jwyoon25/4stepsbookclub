@@ -497,10 +497,26 @@ the cost — and it changes what is worth optimizing:
   `CONTENT-WORKFLOW-DECISIONS.md` leaves approval mechanics unsettled, and the
   `Status` column stays a note between the people working on the book. Row-level
   status remains a Phase 2 question for the pilot to answer.
+- **The bundle is a second Cloudflare Pages project over this repository**, built
+  by `npm run workbook:browser-bundle` into `workbooks/output/browser-bundle`,
+  the way the site is built by `npm run build` into `website/dist`. It needs no
+  deploy script, no `wrangler` dependency, and no Typst CLI in CI. It cannot be a
+  folder inside the public site: the bundle's paths are root-absolute, so it has
+  to be the root of its own hostname.
+- **It sits behind Cloudflare Access**, because it carries the whole Typst design
+  system, the brand logo set, and an example book. The cost is one constraint
+  worth knowing: an author has to sign in once in an ordinary tab before using
+  the Sheet menu. Access answers an unauthenticated request with a redirect, and
+  a login page that set `Cross-Origin-Opener-Policy` on the way past would sever
+  the channel to the dialog permanently — the same way cross-origin isolation
+  does, for the same reason. Arriving with the cookie already set avoids the
+  redirect entirely.
+
+Nothing in the repository hardcodes a hostname. It appears once, in the
+`PREVIEW_URL` script property, and the default remains the local gate server.
 
 ### What Phase 1 still has to decide
 
-- **Where the bundle is hosted.** The gate ran from `localhost`. The generated
-  `_headers` file is ready for Cloudflare Pages, and the measured cold start
-  excludes the one-time download a hosted bundle pays. Nothing else in Phase 1
-  is blocked on it, and nothing after Phase 1 can start without it.
+Nothing. **Phase 1 is complete**, subject to two things that are not decisions:
+a full twelve-lesson book has not been exported, and the Pages project has to
+build from a branch — this work is on `workbook-production-audit`, not `main`.
