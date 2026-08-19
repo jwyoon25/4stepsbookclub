@@ -392,7 +392,8 @@ async function refreshFromSheet() {
   let cell;
   try {
     const startedAt = performance.now();
-    const { grids, spreadsheetName } = await requestSheetGrids();
+    const sheet = await requestSheetGrids();
+    const { grids, spreadsheetName } = sheet;
     const { metadata, lessons, sources } = parseWorkbookGrids(grids);
     // The same order a disk build applies: the schema first, because it decides
     // what the later rules are even allowed to assume about the content.
@@ -425,11 +426,21 @@ async function refreshFromSheet() {
     };
     renderSelections(sheetSelections());
     markTheCell();
+    // The most frequent wait in the builder: an author pays it after every
+    // edit. Apps Script says what it spent, so the rest is the trip itself.
+    const elapsed = performance.now() - startedAt;
     record("Workbook", `${manifest.bookTitle} · ${normalized.length} lessons`);
-    record("Sheet read", milliseconds(performance.now() - startedAt));
+    record("Sheet read", milliseconds(elapsed));
     log(
       `Read ${normalized.length} lessons from "${spreadsheetName}" in ` +
-        `${milliseconds(performance.now() - startedAt)}.`,
+        `${milliseconds(elapsed)}` +
+        (sheet.milliseconds
+          ? ` — ${milliseconds(sheet.milliseconds.total)} in Apps Script ` +
+            `(flush ${milliseconds(sheet.milliseconds.flush)}, ` +
+            `${sheet.tabs} tabs ${milliseconds(sheet.milliseconds.read)}), ` +
+            `${milliseconds(elapsed - sheet.milliseconds.total)} in the channel`
+          : "") +
+        ".",
       "good",
     );
     return true;

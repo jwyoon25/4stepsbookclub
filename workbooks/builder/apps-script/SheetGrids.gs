@@ -15,25 +15,48 @@
 /**
  * Read every tab of the active spreadsheet as a grid of cell values.
  *
- * Returns `{ spreadsheetName, grids }`, where `grids` maps a tab name to its
- * rows. Extra tabs — drafts, notes, scratch work — are included and ignored by
- * the contract, so a tutor can keep whatever else they need in the file.
+ * Returns `{ spreadsheetName, grids, tabs, cells, milliseconds }`, where `grids`
+ * maps a tab name to its rows. Extra tabs — drafts, notes, scratch work — are
+ * included and ignored by the contract, so a tutor can keep whatever else they
+ * need in the file.
+ *
+ * The timings come back with the cells because this is the wait an author hits
+ * most: it happens on every refresh, and it has measured between three and
+ * eleven seconds for a one-lesson workbook. Which part of that is the script
+ * and which is the trip to the browser is not something to infer from the
+ * outside, so it is reported from the inside.
  */
 function readWorkbookGrids() {
+  const startedAt = new Date().getTime();
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   SpreadsheetApp.flush();
+  const flushedAt = new Date().getTime();
 
   const grids = {};
+  let cells = 0;
   spreadsheet.getSheets().forEach(function (sheet) {
-    grids[sheet.getName()] = sheet
+    const rows = sheet
       .getDataRange()
       .getValues()
       .map(function (row) {
         return row.map(transferableCellValue_);
       });
+    cells += rows.length * (rows.length > 0 ? rows[0].length : 0);
+    grids[sheet.getName()] = rows;
   });
+  const readAt = new Date().getTime();
 
-  return { spreadsheetName: spreadsheet.getName(), grids };
+  return {
+    spreadsheetName: spreadsheet.getName(),
+    grids: grids,
+    tabs: Object.keys(grids).length,
+    cells: cells,
+    milliseconds: {
+      flush: flushedAt - startedAt,
+      read: readAt - flushedAt,
+      total: readAt - startedAt,
+    },
+  };
 }
 
 /**

@@ -58,17 +58,17 @@ transfer for the same work, which is why the export is designed around
 
 ### What the first real export measured
 
-Two exports of the same four PDFs, 0.60 MB, one call each, from the bound Sheet.
-Apps Script reports what it spends, so the channel is the remainder:
+Three exports of the same four PDFs, 0.60 MB, one call each, from the bound
+Sheet. Apps Script reports what it spends, so the channel is the remainder:
 
-| Stage | Run 1 | Run 2 | Per what |
-| --- | --- | --- | --- |
-| `DriveApp.createFile` | **1.58 s** | **1.17 s** | each file |
-| Build folder | 3.8 s | 3.1 s | each export |
-| Channel | 1.41 s | 1.63 s | 0.66 MB of base64 |
-| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.66 MB of base64 |
-| `Utilities.unzip` | **0.02 s** | **0.04 s** | the whole archive |
-| Whole export | 12.2 s | 10.1 s | |
+| Stage | Run 1 | Run 2 | Run 3 | Per what |
+| --- | --- | --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | **1.17 s** | **0.98 s** | each file |
+| Build folder | 3.8 s | 3.1 s | 2.9 s | each export |
+| Channel | 1.41 s | 1.63 s | 1.53 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.44 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | **0.04 s** | **0.04 s** | the whole archive |
+| Whole export | 12.2 s | 10.1 s | 8.9 s | |
 
 **The transfer was never the expensive part. Drive was.** The session was spent
 designing around `google.script.run`, and `google.script.run` turns out to cost
@@ -86,11 +86,26 @@ serially, so it is now asked for first. That buys the compile time and no more �
 is much the slower of the two. Worth the lines; not the saving it first looked
 like.
 
-A second export the same day is why that is stated so carefully. It came in two
-seconds faster, and none of it was the change: `createFile` took 1.17 seconds a
-file against 1.58, and the folder 3.1 seconds against 3.8. **Drive varies by a
-third run to run**, which is more than any of the optimizations considered here
+A second and third export the same day are why that is stated so carefully. Each
+came in faster than the last, and none of it was the change: `createFile` went
+1.58, 1.17, 0.98 seconds a file and the folder 3.8, 3.1, 2.9. **Drive spread 62%
+across three runs**, which is more than any of the optimizations considered here
 would have returned, and one measurement was not enough to see it.
+
+### The wait that was being ignored
+
+The export happens once a book. Reading the Sheet happens after every edit, and
+it is slower: 5.3, 5.4, and 10.6 seconds for a session's first read of a
+*one-lesson* workbook, and 3.5 seconds for a second read in the same window.
+Some of the first figure is a cold Apps Script container; 3.5 seconds is what is
+left when it is warm.
+
+That cannot be the channel, which carries 0.66 MB of base64 in 1.5 seconds. But
+having just been caught inferring, `readWorkbookGrids` was given the same
+treatment as the export: it reports flush, read, and tab count, and the window
+prints script against channel. The two candidates — reading only the six tabs
+the contract needs instead of every tab in the file, and the Sheets advanced
+service's `batchGet` — both wait on that number.
 
 ### What was learned
 
@@ -126,12 +141,12 @@ nothing after Phase 1 can start without it.
 
 The export that ran carried one lesson. A twelve-lesson book is twenty-six files
 and 4.09 MB of base64, and it is what settles the two things four files could
-not: whether the projection of about 50 seconds holds, and how much one
+not: whether the projection of about 40 seconds holds, and how much one
 `google.script.run` call actually carries. 0.66 MB is proven; the budget is 2 MB
 and halves on refusal, so a full book finds the ceiling if there is one without
 failing the export.
 
-If 50 seconds turns out to be worth improving — and for something an author does
+If 40 seconds turns out to be worth improving — and for something an author does
 once a book, it may well not be — the two candidates are the advanced Drive
 service in place of `DriveApp.createFile`, and several concurrent
 `google.script.run` calls, since Apps Script runs a user's executions in

@@ -387,23 +387,43 @@ assumed, and workbook PDFs deflate to about three quarters of their size —
 encoded. The build folder is created once, before any bytes move, so a run that
 fails partway leaves one timestamped folder holding what arrived.
 
+#### The wait an author actually pays
+
+The export happens once a book. **Reading the Sheet happens after every edit**,
+and it is slower: 5.3, 5.4, and 10.6 seconds for the first read of a session on
+a *one-lesson* workbook, and 3.5 seconds for a second read in an already-open
+window. Some of that is a cold Apps Script container, and 3.5 seconds is what
+remains when it is warm.
+
+It cannot be the channel — the same channel carries 0.66 MB of base64 in 1.5
+seconds, and a one-lesson workbook's cells are a fraction of that. So it is the
+script: `SpreadsheetApp.flush()` and one `getDataRange().getValues()` for every
+tab in the file. `readWorkbookGrids` now reports what it spends, the way the
+export does, because the next thing to optimize should be chosen from a
+measurement rather than from that inference.
+
+Two candidates, neither worth doing before the split is known: reading only the
+six tabs the contract needs rather than every tab in the file, and the Sheets
+advanced service, whose `batchGet` fetches every range in one call.
+
 #### Where the 7.78 seconds went — measured 2026-08-19
 
-Two exports of the same four PDFs, 0.60 MB, in one call each. Apps Script
+Three exports of the same four PDFs, 0.60 MB, in one call each. Apps Script
 returns what it spends, so the channel is what is left over:
 
-| Stage | Run 1 | Run 2 | Per what |
-| --- | --- | --- | --- |
-| `DriveApp.createFile` | **1.58 s** | **1.17 s** | each file |
-| Build folder | 3.8 s | 3.1 s | each export |
-| Channel | 1.41 s | 1.63 s | 0.66 MB of base64 |
-| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.66 MB of base64 |
-| `Utilities.unzip` | **0.02 s** | **0.04 s** | the whole archive |
-| Whole export | 12.2 s | 10.1 s | |
+| Stage | Run 1 | Run 2 | Run 3 | Per what |
+| --- | --- | --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | **1.17 s** | **0.98 s** | each file |
+| Build folder | 3.8 s | 3.1 s | 2.9 s | each export |
+| Channel | 1.41 s | 1.63 s | 1.53 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.44 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | **0.04 s** | **0.04 s** | the whole archive |
+| Whole export | 12.2 s | 10.1 s | 8.9 s | |
 
-**Drive varies by about a third between runs**, which is more than any remaining
-optimization would return, so anything measured here needs more than one run
-before it means something.
+**Drive spreads 62% across three runs and it fell every time**, which is more
+than any remaining optimization would return. Whether that is warming or luck
+needs more runs than three; either way, nothing measured here means anything
+from a single run.
 
 **The transfer was never the expensive part; Drive was.** Unzipping four PDFs
 costs twenty milliseconds and writing them costs six and a third seconds. This
@@ -413,9 +433,9 @@ the cost — and it changes what is worth optimizing:
 - **Archives were still the right move**, but for a different reason than
   expected. They removed twenty-five redundant folder resolutions and twenty-five
   calls' worth of channel, taking a twelve-lesson book from a projected 202
-  seconds to a projected **50**, give or take ten.
-- **Nothing about the transport can improve the remaining 36 seconds**, because
-  it is `createFile` called twenty-six times. Only two things could: the
+  seconds to a projected **40**, anywhere between 30 and 50.
+- **Nothing about the transport can improve the remaining 25 to 41 seconds**,
+  because it is `createFile` called twenty-six times. Only two things could: the
   advanced Drive service, which is often faster than `DriveApp`, or several
   concurrent `google.script.run` calls, since Apps Script will run a user's
   executions in parallel. Neither is worth doing before a full book has been
