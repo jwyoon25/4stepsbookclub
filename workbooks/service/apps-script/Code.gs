@@ -4,10 +4,18 @@ const FOURSTEPS_XLSX_MIME =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 function onOpen() {
-  SpreadsheetApp.getUi()
+  const menu = SpreadsheetApp.getUi()
     .createMenu(FOURSTEPS_MENU_TITLE)
-    .addItem("Create PDFs", "createWorkbookPdfs")
-    .addToUi();
+    .addItem("Create PDFs", "createWorkbookPdfs");
+
+  // The browser-compiler gate is a temporary spike. The item appears only while
+  // builder/apps-script/Phase0.gs is in the project, so removing that file after
+  // the gate removes the menu entry with it.
+  if (typeof openPhase0Gate === "function") {
+    menu.addItem("Browser compiler gate (Phase 0)", "openPhase0Gate");
+  }
+
+  menu.addToUi();
 }
 
 function createWorkbookPdfs() {

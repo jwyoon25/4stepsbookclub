@@ -323,6 +323,11 @@ function connectToDialog() {
     if (typeof message?.type !== "string" || !message.type.startsWith(MESSAGE_PREFIX)) {
       return;
     }
+    // The Apps Script dialog is the window that opened this one, and after it
+    // answers, its origin is the only one this page will send a workbook to.
+    if (event.source !== window.opener) {
+      return;
+    }
     if (state.driveOrigin !== null && event.origin !== state.driveOrigin) {
       return;
     }
@@ -331,6 +336,7 @@ function connectToDialog() {
       state.driveOrigin = event.origin;
       elements.save.disabled = state.current === null;
       record("Drive channel", `connected to ${event.origin}`);
+      record("Drive run", message.session);
       log(`Connected to the Google Sheet dialog at ${event.origin}.`, "good");
     } else if (message.type === `${MESSAGE_PREFIX}-saved`) {
       record("Drive transfer", milliseconds(message.milliseconds));

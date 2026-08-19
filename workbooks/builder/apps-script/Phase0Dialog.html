@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --ink: #17342f;
+        --muted: #5f7069;
+        --faint: #69786f;
+        --paper: #f7f3ea;
+        --line: #dfe4dc;
+        --good: #4f7d5b;
+        --bad: #b84431;
+      }
+
+      body {
+        margin: 0;
+        padding: 16px;
+        background: #fff;
+        color: var(--ink);
+        font: 13px/1.5 "Helvetica Neue", Arial, sans-serif;
+      }
+
+      h2 {
+        margin: 0 0 4px;
+        font-size: 14px;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      h3 {
+        margin: 16px 0 6px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      a.open {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: var(--ink);
+        color: #fff;
+        text-decoration: none;
+      }
+
+      pre,
+      .log {
+        margin: 0;
+        padding: 8px;
+        max-height: 150px;
+        overflow-y: auto;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 11px/1.5 ui-monospace, Menlo, monospace;
+        white-space: pre-wrap;
+      }
+
+      .good {
+        color: var(--good);
+      }
+
+      .bad {
+        color: var(--bad);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Browser compiler gate</h2>
+    <p>
+      Open the preview window, compile each workbook there, then save one back to
+      Drive. This dialog stays open: it is the only route the preview window has
+      to Google Drive.
+    </p>
+
+    <div id="config" data-preview-url="<?= previewUrl ?>"></div>
+    <a class="open" id="open" target="_blank" rel="opener">Open the preview window</a>
+
+    <h3>This dialog's environment</h3>
+    <pre id="probe">Checking…</pre>
+
+    <h3>Activity</h3>
+    <div class="log" id="log"></div>
+
+    <script>
+      // The preview window and this dialog are on different origins, so they
+      // talk over postMessage: the preview announces itself to its opener, this
+      // dialog replies with its own origin, and from then on both sides address
+      // each other explicitly. Everything Drive-facing stays here, because only
+      // an Apps Script page can call google.script.run.
+      var MESSAGE_PREFIX = "4steps-preview";
+      var previewUrl = document.getElementById("config").dataset.previewUrl;
+      var previewOrigin = new URL(previewUrl, window.location.href).origin;
+      var session = new Date().toISOString().replace(/[:.]/g, "-");
+      var previewWindow = null;
+
+      document.getElementById("open").href = previewUrl;
+
+      function log(message, level) {
+        var line = document.createElement("div");
+        if (level) {
+          line.className = level;
+        }
+        line.textContent = new Date().toLocaleTimeString() + "  " + message;
+        var element = document.getElementById("log");
+        element.appendChild(line);
+        element.scrollTop = element.scrollHeight;
+      }
+
+      function growableSharedMemory() {
+        try {
+          return new SharedArrayBuffer(0, { maxByteLength: 1 }).growable === true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      // Whether an Apps Script dialog can host the compiler itself is one of the
+      // open questions in the decision record. It cannot be answered from
+      // outside Google's iframe, so it is answered here and reported.
+      function probe() {
+        var lines = [
+          "origin: " + window.location.origin,
+          "cross-origin isolated: " + (self.crossOriginIsolated === true),
+          "shared memory: " + (typeof SharedArrayBuffer !== "undefined"),
+          "growable shared memory: " + growableSharedMemory(),
+          "JSPI: " +
+            (typeof WebAssembly.Suspending === "function" &&
+              typeof WebAssembly.promising === "function"),
+          "preview: " + previewUrl,
+          "browser: " + navigator.userAgent,
+        ];
+        document.getElementById("probe").textContent = lines.join("\n");
+      }
+
+      function saveToDrive(message) {
+        var startedAt = Date.now();
+        log("Receiving " + message.name + " (" + message.bytes + " bytes)…");
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            log("Saved to Drive: " + result.name, "good");
+            log(result.folderUrl);
+            previewWindow.postMessage(
+              {
+                type: MESSAGE_PREFIX + "-saved",
+                name: result.name,
+                url: result.url,
+                milliseconds: Date.now() - startedAt,
+              },
+              previewOrigin,
+            );
+          })
+          .withFailureHandler(function (error) {
+            log("Drive refused the file: " + error.message, "bad");
+            previewWindow.postMessage(
+              { type: MESSAGE_PREFIX + "-save-failed", error: error.message },
+              previewOrigin,
+            );
+          })
+          .savePhase0Pdf({
+            name: message.name,
+            base64: message.base64,
+            session: session,
+          });
+      }
+
+      window.addEventListener("message", function (event) {
+        if (event.origin !== previewOrigin) {
+          return;
+        }
+        var message = event.data;
+        if (!message || typeof message.type !== "string") {
+          return;
+        }
+
+        if (message.type === MESSAGE_PREFIX + "-ready") {
+          previewWindow = event.source;
+          previewWindow.postMessage(
+            { type: MESSAGE_PREFIX + "-hello", session: session },
+            previewOrigin,
+          );
+          log("Preview window connected.", "good");
+        } else if (message.type === MESSAGE_PREFIX + "-save" && previewWindow) {
+          saveToDrive(message);
+        }
+      });
+
+      probe();
+      log("Waiting for the preview window.");
+    </script>
+  </body>
+</html>
