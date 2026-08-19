@@ -143,6 +143,23 @@ export async function compileWorkbookPdf(compiler, bundle) {
 }
 
 /**
+ * Read the Typst version out of a generated PDF.
+ *
+ * The browser compiler and the installed CLI are versioned separately, so which
+ * two engines produced a matching pair of PDFs is part of the record.
+ */
+export function readPdfCreator(bytes) {
+  const decoder = new TextDecoder("latin1");
+  const pattern = /\/Creator\s*\(([^)]+)\)/;
+  // The document information dictionary is written near the end of the file, so
+  // the tail is read first and the whole document only if that misses.
+  const tail = decoder.decode(bytes.subarray(Math.max(0, bytes.length - 16384)));
+  return (
+    tail.match(pattern)?.[1] ?? decoder.decode(bytes).match(pattern)?.[1] ?? "unknown"
+  );
+}
+
+/**
  * Compile one normalized build bundle into page rasters.
  *
  * Only the parity harness needs this: comparing rendered pixels is how visual

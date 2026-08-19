@@ -25,6 +25,7 @@ import {
   compileWorkbookPdf,
   loadWorkbookProject,
   PROJECT_SOURCE_FILES,
+  readPdfCreator,
 } from "/workbook-compiler.mjs";
 
 const ENGINE_CORE_MODULES = [
@@ -244,11 +245,6 @@ async function loadFixtures() {
 
 // --- Compiling --------------------------------------------------------------
 
-function pdfProducer(bytes) {
-  const header = new TextDecoder("latin1").decode(bytes.subarray(0, 4096));
-  return header.match(/\/Creator\s*\(([^)]+)\)/)?.[1] ?? "unknown";
-}
-
 async function compileSelected() {
   const fixture = state.fixtures.find(({ id }) => id === elements.fixture.value);
   if (!fixture || !state.compiler) {
@@ -269,7 +265,7 @@ async function compileSelected() {
     const first = !state.measurements.has("First compile");
     record(first ? "First compile" : "Refresh compile", milliseconds(duration));
     record("PDF size", megabytes(pdf.byteLength));
-    record("Typst engine", pdfProducer(pdf));
+    record("Typst engine", readPdfCreator(pdf));
 
     show(fixture, pdf);
     log(
