@@ -191,10 +191,14 @@ function writeArchive(entries, now = new Date()) {
  * alternative is refusing to export a workbook that compiled perfectly well.
  * The budget decides how many calls an export costs, never which files it
  * contains.
+ *
+ * `limit` stops after that many archives. A sender that may have its budget
+ * changed under it wants only the next call's worth, because everything after
+ * it would have to be packed again anyway.
  */
 export function packPdfArchives(
   entries,
-  { maxArchiveBytes = DEFAULT_MAX_ARCHIVE_BYTES, now } = {},
+  { maxArchiveBytes = DEFAULT_MAX_ARCHIVE_BYTES, limit = Infinity, now } = {},
 ) {
   const batches = [];
   let batch = [];
@@ -203,13 +207,17 @@ export function packPdfArchives(
   for (const entry of entries) {
     if (batch.length > 0 && batchBytes + entry.deflated.length > maxArchiveBytes) {
       batches.push(batch);
+      if (batches.length >= limit) {
+        batch = [];
+        break;
+      }
       batch = [];
       batchBytes = 0;
     }
     batch.push(entry);
     batchBytes += entry.deflated.length;
   }
-  if (batch.length > 0) {
+  if (batch.length > 0 && batches.length < limit) {
     batches.push(batch);
   }
 

@@ -128,6 +128,26 @@ test("splits into as few archives as the budget allows", async () => {
   }
 });
 
+test("packs only what the sender asked for", async () => {
+  const entries = await compressPdfEntries(
+    Array.from({ length: 6 }, (_, index) => ({
+      name: `book-lesson-0${index + 1}-student.pdf`,
+      bytes: crypto.getRandomValues(new Uint8Array(40_000)),
+    })),
+  );
+
+  // The export sends one archive at a time, because a call Google refuses
+  // changes the budget and everything after it has to be packed again.
+  const [next] = packPdfArchives(entries, { maxArchiveBytes: 100_000, limit: 1 });
+  assert.deepEqual(next.names, [
+    "book-lesson-01-student.pdf",
+    "book-lesson-02-student.pdf",
+  ]);
+  assert.equal(packPdfArchives(entries, { maxArchiveBytes: 100_000, limit: 1 }).length, 1);
+  // And the last archive is still whole when the limit is never reached.
+  assert.equal(packPdfArchives(entries, { maxArchiveBytes: 100_000, limit: 9 }).length, 3);
+});
+
 test("still exports a PDF larger than the whole budget", async () => {
   const archives = await createPdfArchives(
     [

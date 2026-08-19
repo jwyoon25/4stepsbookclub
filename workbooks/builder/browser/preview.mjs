@@ -759,6 +759,7 @@ async function sendArchives(files, folderId) {
   while (remaining.length > 0) {
     const [archive] = packPdfArchives(remaining, {
       maxArchiveBytes: state.archiveBudget,
+      limit: 1,
     });
     const base64 = toBase64(archive.bytes);
 
