@@ -124,6 +124,23 @@ This is the direct fix for the reference PDF's densest failure, where five field
 forced into A4-width columns produced definitions wrapping at a few words per
 line and rows splitting across page breaks.
 
+### A vocabulary entry is indivisible
+
+`vocab-entry` is `breakable: false`. An entry moves to the next page whole rather
+than leaving its fields behind.
+
+This section previously claimed that "pagination happens between entries" while
+the component was `breakable: true`, so the claim was not enforced anywhere. A
+twelve-word lesson — an ordinary size — split two entries, and two of the four
+vocabulary pages opened with a bare `From book` / `Excerpt context` pair and no
+headword above it. An entry is a dictionary entry: the fields mean nothing
+without the word they define.
+
+Making entries indivisible cost no pages in that lesson, and it cannot cost more
+than one: `MAX_VOCABULARY_ENTRY_UNITS` in `lib/content.mjs` already rejects any
+entry too large for a single reference page, so an entry always has a page it
+fits on.
+
 ### Tutor-authored vocabulary content is never altered
 
 The system may wrap, paginate, and label it. It must not rewrite, shorten,
@@ -169,6 +186,20 @@ is deliberately not locked: it must be reviewed after the final page design is
 approved with the current 7 mm writing rhythm. Content stores the semantic
 choice rather than the derived number, so revising the mapping will not require
 curriculum edits.
+
+### Student panels are filled; teacher panels are outlined
+
+The `Guidance & requirements` panel a student must follow and the `Teacher
+guidance` panel that holds the answer key both sat on a `step-wash` ground. In
+grayscale both measured 243 out of 255 — identical on any black-and-white print
+or photocopy, which is how a teacher guide is normally used. The only difference
+was a 2 pt left bar and the label text.
+
+Teacher-only panels are now outlined on a near-white ground and keep the heavy
+step-coloured bar; student-facing panels stay filled and unbordered. Fill versus
+outline is a structural difference rather than a tonal one, so it survives
+grayscale, a bad photocopier, and a low-toner print — which is what separating
+an answer key from student instructions has to do.
 
 ### Grayscale legibility is load-bearing
 
@@ -223,6 +254,15 @@ They are a section finder when flipping and a progress indicator when reading,
 and they cost nothing to print. They do not bleed off the edge: a home printer
 cannot print to the edge, and a tab clipped by an unprintable margin looks broken
 rather than deliberate.
+
+**All four share an outer edge at `tab-right` (202 mm), and the active tab extends
+inward.** The active tab used to be the wider one measured *outward* from a shared
+left edge, which put its outer edge 4 mm from the sheet — inside the unprintable
+band of a common home laser or inkjet (roughly 4.2–5 mm). The one marker a student
+needs, the current section, was the first thing their printer clipped, while the
+three inactive tabs at 8 mm printed fine. Extending inward keeps every tab 8 mm
+clear and gives the stack the flush outer edge that makes it read as index tabs
+rather than four loose swatches.
 
 ### Every section begins on a fresh page
 
@@ -293,11 +333,20 @@ the answer lines.
 
 | Token | Value | Role |
 | --- | --- | --- |
-| `ink` | `#17342f` | The brand's black; a deep forest green |
-| `muted` | `#5f7069` | Secondary type and furniture |
+| `ink` | `#17342f` | The brand's black; a deep forest green — 13.4:1 on white |
+| `muted` | `#5f7069` | Secondary type and furniture — 5.2:1 |
+| `faint` | `#69786f` | Small caps labels, field labels, page numbers — 4.7:1 |
 | `paper` | `#f7f3ea` | Warm neutral for restrained callout panels |
-| `coral-deep` | `#b84431` | The margin rule |
+| `coral-deep` | `#b84431` | The margin rule — 5.4:1 |
 | `ruled` | `#c6d0c8` | Handwriting guides; dark enough for a home laser |
+
+**Every colour used as type clears 4.5:1 on white.** `faint` was `#8a978f` at
+3.04:1, which failed that bar while carrying the *smallest* type in the book —
+6.5 pt vocabulary field labels, 7.5 pt section labels, and the footer. The type
+scale was inverted against legibility: the smaller the text, the weaker its
+contrast. `faint` and `muted` now sit close in value; they stay distinguishable
+because `faint` is only ever used in tracked caps at 6.5–8 pt, which is already a
+different register from `muted` running text.
 
 Section colours follow the approved design in method order: green `#a9cdb0`,
 coral `#f0b6a4`, teal `#96cdc9`, and purple `#bfb2dc`, for Reading

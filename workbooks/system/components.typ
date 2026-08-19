@@ -23,8 +23,9 @@
   font: sans, size: size, weight: weight, fill: fill, tracking: tracking, upper(body),
 )
 
-// A ruled writing surface. Solid rules, because in this design solid means
-// "write on this" and dashed means "fill this in".
+// A ruled writing surface. Every rule in the system is solid; `stroke-ruled` is
+// the lightest of the three weights and is reserved for surfaces a student
+// writes on.
 #let response-lines(n) = stack(
   spacing: 0pt,
   ..range(n).map(_ => box(
@@ -89,12 +90,16 @@
 #let section-tabs(active) = {
   for i in range(4) {
     let on = i + 1 == active
+    // Every tab ends at `tab-right`; the active one starts further left. The
+    // outer edge is therefore flush and always inside the printable area, and
+    // the extra width of the current section grows into the page.
+    let width = if on { tab-width-active } else { tab-width }
     place(
       top + left,
-      dx: tab-x,
+      dx: tab-right - width,
       dy: tab-top + i * (tab-height + tab-gap),
       rect(
-        width: if on { tab-width-active } else { tab-width },
+        width: width,
         height: tab-height,
         fill: if on { step-fill.at(i) } else { step-pale.at(i) },
         radius: (right: tab-radius),
@@ -572,14 +577,26 @@
   },
 )
 
+// Answer-key material. It must never be mistakable for the `Guidance &
+// requirements` panel a student is meant to follow, and the two sat on the same
+// `step-wash` ground: in grayscale they were 243 and 243 out of 255, which is to
+// say identical on any black-and-white print or photocopy of a teacher guide.
+//
+// The distinction is now structural rather than tonal. Student-facing panels are
+// filled and unbordered; teacher-only panels are outlined on a near-white ground
+// and keep the heavy step-coloured bar. Fill versus outline survives grayscale,
+// a fax, and a bad photocopier, which is what a printed answer key has to.
 #let teacher-panel(step, label, body) = {
   block(
     width: 100%,
     above: 3.5mm,
     below: 0mm,
-    fill: step-wash.at(step - 1),
+    fill: canvas,
     inset: (x: 4.5mm, y: 3.4mm),
-    stroke: (left: 2pt + step-deep.at(step - 1)),
+    stroke: (
+      left: 2pt + step-deep.at(step - 1),
+      rest: 0.25mm + step-deep.at(step - 1),
+    ),
     radius: (right: 2pt),
     {
       caps(label, size: 7pt, fill: step-deep.at(step - 1))
@@ -736,6 +753,16 @@
 // tutor definition grows without distorting its neighbours, and pagination
 // happens between entries instead of inside a cell. A rule under the term line
 // gives the scannability a table would have given, without the cramped columns.
+//
+// `breakable: false` is what actually delivers "pagination happens between
+// entries". While entries were breakable a page could open with a bare
+// `From book` / `Excerpt context` pair and no word above it — in a twelve-word
+// lesson that happened on two of the four vocabulary pages. An entry is a
+// dictionary entry: it means nothing without its headword, so it moves whole.
+//
+// This is safe because entry size is already bounded upstream:
+// MAX_VOCABULARY_ENTRY_UNITS in lib/content.mjs rejects any entry too large for
+// one reference page long before it reaches Typst.
 #let vocab-entry(
   number,
   term,
@@ -746,7 +773,7 @@
   chapter-reference: none,
   index: 0,
 ) = block(
-  breakable: true,
+  breakable: false,
   width: 100%,
   above: 0mm,
   below: 0mm,

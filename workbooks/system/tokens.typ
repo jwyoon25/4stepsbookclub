@@ -21,7 +21,7 @@
 #let ink-soft = rgb("#24483f")
 #let ink-body = rgb("#263a34")
 #let muted = rgb("#5f7069")
-#let faint = rgb("#8a978f") // small labels and quiet furniture
+#let faint = rgb("#69786f") // small labels and quiet furniture; 4.65:1 on white
 
 #let paper = rgb("#f7f3ea") // warm neutral for restrained callouts
 #let paper-deep = rgb("#eee7da")
@@ -50,10 +50,14 @@
 
 // --- Rules ------------------------------------------------------------------
 //
-// Two rule weights carry the notebook motif, and they mean different things:
-// solid rules are for writing on, dashed rules are for fields to be filled in.
-// The distinction is the mark's own — it alternates solid and dashed — reused
-// here as a signal rather than as texture.
+// Three rules carry the notebook motif, separated by weight and colour rather
+// than by dash pattern:
+//   stroke-ruled     the handwriting guides a student writes on
+//   stroke-hairline  the quiet border of a callout panel
+//   stroke-margin    the rust spine
+// Every rule in the system is solid. An earlier draft of this file described a
+// solid/dashed grammar for "write here" versus "fill this in"; no dashed stroke
+// was ever built, so the grammar is not claimed here.
 
 #let ruled = rgb("#c6d0c8") // handwriting guides; dark enough for a home laser
 #let stroke-ruled = 0.2mm + ruled
@@ -124,8 +128,19 @@
 //
 // They do not bleed. A home printer cannot print to the edge, and a tab clipped
 // by an unprintable margin looks broken rather than deliberate.
+//
+// All four share an outer edge at `tab-right`, and the active tab extends
+// *inward* rather than outward. Two reasons, and the first is not cosmetic:
+//
+//   - A common home laser or inkjet cannot print within about 4.2-5 mm of the
+//     sheet edge. An outward-extending active tab put the current section — the
+//     one marker that has to survive — inside that band, so the "you are here"
+//     signal was the first thing a home printer clipped. `tab-right` keeps
+//     every tab 8 mm clear of the edge.
+//   - A stack of index tabs reads as a stack because its outer edge is flush.
+//     Ragged outer edges read as four unrelated swatches.
 
-#let tab-x = 191mm
+#let tab-right = 202mm // 8mm of clearance; safe on a home printer
 #let tab-width = 11mm
 #let tab-width-active = 15mm
 #let tab-height = 8.5mm
