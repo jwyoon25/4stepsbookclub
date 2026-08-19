@@ -37,6 +37,7 @@ npm run workbook:specimen:watch  # rebuild it on every save
 npm run workbook:validate        # validate the example content package
 npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
 npm run workbook:render          # render every example PDF variant
+npm run workbook:serve           # run the Sheets PDF service locally
 npm run workbook:build           # build the compilation smoke test
 npm run workbook:watch
 ```
@@ -75,10 +76,62 @@ To import, validate, and immediately create all student and teacher PDFs:
 npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx --render
 ```
 
-This MVP intentionally keeps Google Sheets as the editor and the repository as
-the controlled generation boundary. PDF preview is therefore a download-and-run
-step, not a live viewer inside the sheet. A split editor/PDF viewer can be added
-after the authoring contract is proven with real workbook makers.
+The bound Apps Script in `service/apps-script/Code.gs` adds a **4steps → Create
+PDFs** menu to the Sheet. It exports the current workbook, sends it to the same
+checked importer and Typst renderer used locally, and saves every resulting PDF
+to this Drive structure:
+
+```text
+<sheet's parent folder>/4steps PDF Builds/<book title>/<timestamp>/
+```
+
+The menu keeps Google Sheets as the authoring surface while preserving the
+student/teacher editions, standalone lessons, validation, layout rules, and PDF
+audits. It is generation-on-demand rather than a live viewer; a split editor/PDF
+viewer can still be added after real authors have proven the content contract.
+
+### One-time renderer deployment
+
+The menu calls a small token-protected HTTP service because Apps Script cannot
+run Typst. `Dockerfile` packages the importer, renderer, audited PDF build, and
+Typst CLI for Cloud Run. After selecting a Google Cloud project with billing
+enabled, deploy from the repository root:
+
+```bash
+export FOURSTEPS_RENDERER_TOKEN="$(openssl rand -hex 32)"
+gcloud run deploy 4steps-workbook-renderer \
+  --source workbooks \
+  --region asia-northeast3 \
+  --allow-unauthenticated \
+  --concurrency 1 \
+  --memory 1Gi \
+  --timeout 300 \
+  --set-env-vars "RENDERER_TOKEN=${FOURSTEPS_RENDERER_TOKEN}"
+```
+
+The Cloud Run endpoint must accept public network requests because Apps Script
+cannot attach Google Cloud IAM credentials. The application still rejects every
+render request that does not contain the separate 32-byte bearer token. Keep the
+token out of the spreadsheet cells and source repository.
+
+In the bound Apps Script project, open **Project Settings → Script Properties**
+and add:
+
+- `RENDERER_URL`: the deployed Cloud Run service URL, without a trailing slash
+- `RENDERER_TOKEN`: the exact token used for the Cloud Run deployment
+
+Copy `service/apps-script/Code.gs` into the Sheet's bound Apps Script project.
+The optional `appsscript.json` records the minimal explicit scopes. Reload the
+Sheet, choose **4steps → Create PDFs**, and approve the first-run Google Sheets,
+Drive, and external-request permissions. Later clicks validate and render the
+latest sheet contents without a manual `.xlsx` download.
+
+For a local service smoke test, use a token of at least 32 characters:
+
+```bash
+RENDERER_TOKEN=replace-with-at-least-32-characters npm run workbook:serve
+curl http://localhost:8080/healthz
+```
 
 Validate a production manifest by passing its path after `--`:
 
