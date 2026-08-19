@@ -837,10 +837,12 @@ async function exportApprovedPdfs() {
 
   try {
     const startedAt = performance.now();
-    // Drive takes about four seconds to make the folder and the compiler takes
-    // about one to make everything that goes in it, so the two are asked for at
-    // once. Settled rather than left pending, because nothing looks at a
-    // rejection here until the compiling is finished.
+    // Drive takes three or four seconds to make the folder, so it is asked for
+    // before the compiling rather than after it. This buys the compile time and
+    // no more — under a second for a whole book — because the folder is much
+    // the slower of the two. It is worth those lines and not worth more.
+    // Settled rather than left pending, because nothing looks at a rejection
+    // here until the compiling is finished.
     const folderRequest = askTheDialog(
       { type: `${MESSAGE_PREFIX}-export-start` },
       `${MESSAGE_PREFIX}-export-started`,

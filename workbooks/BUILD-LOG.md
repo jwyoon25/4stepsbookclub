@@ -58,16 +58,17 @@ transfer for the same work, which is why the export is designed around
 
 ### What the first real export measured
 
-Four PDFs, 0.60 MB, one call, from the bound Sheet. Apps Script reports what it
-spends, so the channel is the remainder:
+Two exports of the same four PDFs, 0.60 MB, one call each, from the bound Sheet.
+Apps Script reports what it spends, so the channel is the remainder:
 
-| Stage | Measured | Per what |
-| --- | --- | --- |
-| `DriveApp.createFile` | **1.58 s** | each file |
-| Build folder | 3.8 s | each export |
-| Channel | 1.41 s | 0.66 MB of base64 |
-| `Utilities.base64Decode` | 0.36 s | 0.66 MB of base64 |
-| `Utilities.unzip` | **0.02 s** | the whole archive |
+| Stage | Run 1 | Run 2 | Per what |
+| --- | --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | **1.17 s** | each file |
+| Build folder | 3.8 s | 3.1 s | each export |
+| Channel | 1.41 s | 1.63 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | **0.04 s** | the whole archive |
+| Whole export | 12.2 s | 10.1 s | |
 
 **The transfer was never the expensive part. Drive was.** The session was spent
 designing around `google.script.run`, and `google.script.run` turns out to cost
@@ -75,13 +76,21 @@ designing around `google.script.run`, and `google.script.run` turns out to cost
 
 That does not make the archives wrong — they removed twenty-five redundant
 folder resolutions and twenty-five calls, which is why a twelve-lesson book now
-projects to 56 seconds instead of 202. It makes them wrong *about what they were
-for*. The remaining 41 seconds is `createFile` called twenty-six times, and no
-transport change reaches it.
+projects to about 50 seconds instead of 202. It makes them wrong *about what
+they were for*. The remaining 36 seconds is `createFile` called twenty-six
+times, and no transport change reaches it.
 
-One thing the numbers immediately paid for: the build folder took 3.8 seconds
-after compiling had already finished, serially, for no reason. It is now
-requested while the compiler runs.
+The build folder took 3.8 seconds after compiling had already finished,
+serially, so it is now asked for first. That buys the compile time and no more —
+0.12 seconds on four PDFs, under a second on a whole book — because the folder
+is much the slower of the two. Worth the lines; not the saving it first looked
+like.
+
+A second export the same day is why that is stated so carefully. It came in two
+seconds faster, and none of it was the change: `createFile` took 1.17 seconds a
+file against 1.58, and the folder 3.1 seconds against 3.8. **Drive varies by a
+third run to run**, which is more than any of the optimizations considered here
+would have returned, and one measurement was not enough to see it.
 
 ### What was learned
 
@@ -117,12 +126,12 @@ nothing after Phase 1 can start without it.
 
 The export that ran carried one lesson. A twelve-lesson book is twenty-six files
 and 4.09 MB of base64, and it is what settles the two things four files could
-not: whether the projection of 56 seconds holds, and how much one
+not: whether the projection of about 50 seconds holds, and how much one
 `google.script.run` call actually carries. 0.66 MB is proven; the budget is 2 MB
 and halves on refusal, so a full book finds the ceiling if there is one without
 failing the export.
 
-If 56 seconds turns out to be worth improving — and for something an author does
+If 50 seconds turns out to be worth improving — and for something an author does
 once a book, it may well not be — the two candidates are the advanced Drive
 service in place of `DriveApp.createFile`, and several concurrent
 `google.script.run` calls, since Apps Script runs a user's executions in

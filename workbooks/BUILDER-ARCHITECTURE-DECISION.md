@@ -389,16 +389,21 @@ fails partway leaves one timestamped folder holding what arrived.
 
 #### Where the 7.78 seconds went — measured 2026-08-19
 
-The first real export carried four PDFs, 0.60 MB, in one call. Apps Script
+Two exports of the same four PDFs, 0.60 MB, in one call each. Apps Script
 returns what it spends, so the channel is what is left over:
 
-| Stage | Measured | Per what |
-| --- | --- | --- |
-| `DriveApp.createFile` | **1.58 s** | each file |
-| Build folder | 3.8 s | each export |
-| Channel | 1.41 s | 0.66 MB of base64 |
-| `Utilities.base64Decode` | 0.36 s | 0.66 MB of base64 |
-| `Utilities.unzip` | **0.02 s** | the whole archive |
+| Stage | Run 1 | Run 2 | Per what |
+| --- | --- | --- | --- |
+| `DriveApp.createFile` | **1.58 s** | **1.17 s** | each file |
+| Build folder | 3.8 s | 3.1 s | each export |
+| Channel | 1.41 s | 1.63 s | 0.66 MB of base64 |
+| `Utilities.base64Decode` | 0.36 s | 0.40 s | 0.66 MB of base64 |
+| `Utilities.unzip` | **0.02 s** | **0.04 s** | the whole archive |
+| Whole export | 12.2 s | 10.1 s | |
+
+**Drive varies by about a third between runs**, which is more than any remaining
+optimization would return, so anything measured here needs more than one run
+before it means something.
 
 **The transfer was never the expensive part; Drive was.** Unzipping four PDFs
 costs twenty milliseconds and writing them costs six and a third seconds. This
@@ -408,15 +413,17 @@ the cost — and it changes what is worth optimizing:
 - **Archives were still the right move**, but for a different reason than
   expected. They removed twenty-five redundant folder resolutions and twenty-five
   calls' worth of channel, taking a twelve-lesson book from a projected 202
-  seconds to a projected **56**.
-- **Nothing about the transport can improve the remaining 41 seconds**, because
+  seconds to a projected **50**, give or take ten.
+- **Nothing about the transport can improve the remaining 36 seconds**, because
   it is `createFile` called twenty-six times. Only two things could: the
   advanced Drive service, which is often faster than `DriveApp`, or several
   concurrent `google.script.run` calls, since Apps Script will run a user's
   executions in parallel. Neither is worth doing before a full book has been
   exported once and the projection confirmed.
-- **The folder is now requested while the compiler runs**, which is worth its
-  whole 3.8 seconds and cost nothing.
+- **The folder is now requested before the compiling rather than after it**,
+  which is worth the compile time and no more: 0.12 seconds on four PDFs, under
+  a second on a whole book. The folder is much the slower of the two, so
+  overlapping them cannot recover it.
 - **How much one call carries is still unestablished.** 0.66 MB of base64 is now
   proven; the 2 MB budget stays where it is because a refused call halves it and
   repacks, so a full book's first export finds the ceiling if there is one. The
