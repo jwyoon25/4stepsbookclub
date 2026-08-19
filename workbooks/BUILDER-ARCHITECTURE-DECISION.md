@@ -517,6 +517,7 @@ Nothing in the repository hardcodes a hostname. It appears once, in the
 
 ### What Phase 1 still has to decide
 
-Nothing. **Phase 1 is complete**, subject to two things that are not decisions:
-a full twelve-lesson book has not been exported, and the Pages project has to
-build from a branch — this work is on `workbook-production-audit`, not `main`.
+Nothing. **Phase 1 is complete** and merged to `main`. One thing about it
+remains unmeasured rather than undecided: every export so far has carried a
+single lesson, and the twelve-lesson projection of about 40 seconds is a
+projection.

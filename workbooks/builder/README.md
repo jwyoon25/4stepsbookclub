@@ -284,11 +284,9 @@ Set a `PREVIEW_URL` script property in the bound Apps Script project to
 appears; nothing in this repository hardcodes a hostname, and the default stays
 the local gate server so the runbook above keeps working.
 
-Two things to decide before the first deploy. The Pages project needs a branch
-to build from, and this work is on `workbook-production-audit` rather than
-`main`. And if the hostname is `admin.<domain>`, be aware the public site
-already serves the Decap CMS at `<domain>/admin/`; they are different tools with
-one name between them.
+One thing to weigh before the first deploy: if the hostname is `admin.<domain>`,
+the public site already serves the Decap CMS at `<domain>/admin/`. They are
+different tools with one name between them.
 
 ## Known constraints
 

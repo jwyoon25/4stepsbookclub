@@ -165,8 +165,7 @@ cost seconds.
 Where the bundle is hosted is settled: a second Cloudflare Pages project over
 this repository, built the same way the site is, behind Cloudflare Access. It
 needs no deploy script and no `wrangler`, because the build already runs in
-Cloudflare's CI on every push and wants no Typst CLI. What it does need is a
-branch to build from, and this work is not on `main`.
+Cloudflare's CI on every push and wants no Typst CLI.
 
 **Phase 1 is complete.** What is left is not decisions.
 
