@@ -1,8 +1,8 @@
 # 4steps Bookclub
 
 The 4steps Bookclub repository contains the public Astro website, its Decap
-CMS announcement editor, and the initial Typst-based workbook publishing
-system.
+CMS announcement editor, the Typst-based workbook publishing system, and the
+Python engine that generates verified workbook content from book PDFs.
 
 The live site is [4stepsbookclub.com](https://4stepsbookclub.com).
 
@@ -10,10 +10,11 @@ The live site is [4stepsbookclub.com](https://4stepsbookclub.com).
 
 ```text
 .
-├── functions/       # Cloudflare Pages Functions for GitHub OAuth
+├── bookengine/       # Python engine: book PDF in, verified content out
+├── functions/        # Cloudflare Pages Functions for GitHub OAuth
 ├── tests/            # OAuth and admin media-guard tests
 ├── website/          # Astro site, content, assets, and Decap CMS admin
-└── workbooks/        # Typst workbook publishing scaffold
+└── workbooks/        # Typst workbook publishing system
 ```
 
 Announcements are stored as Markdown in
@@ -24,6 +25,7 @@ Announcements are stored as Markdown in
 
 - Node.js and npm
 - [Typst](https://typst.app/) only if you are working on the workbook system
+- Python 3.11 or newer only if you are working on the book engine
 
 Install the Node dependencies from the repository root:
 
@@ -108,6 +110,41 @@ must pass `--font-path`; the npm scripts already do. See
 [workbooks/DESIGN-DECISIONS.md](workbooks/DESIGN-DECISIONS.md) for the design
 reasoning.
 
+## Book engine
+
+`bookengine/` turns a book PDF into vocabulary rows for a workbook's Google
+Sheet, and refuses to produce them when it cannot prove they are right. It is
+Python rather than Node, for the same reason the workbook system shells out to
+Typst: the ecosystem it needs — PDF extraction, lemmatization, and later local
+models and embeddings — lives there. It is a command-line tool that writes
+files; nothing else in the repository imports it.
+
+One-time setup:
+
+```bash
+cd bookengine
+python3 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+```
+
+Then, from the repository root:
+
+```bash
+npm run book:ingest -- --book bookengine/sources/the-book.pdf
+npm run book:vocab  -- --config bookengine/configs/the-book.yaml
+npm run book:test
+npm run book:lint
+```
+
+Book PDFs go in `bookengine/sources/`, which is gitignored along with its
+outputs and caches. No book is ever committed.
+
+See [bookengine/README.md](bookengine/README.md) for how the source-verification
+guarantee works, [bookengine/SKILL.md](bookengine/SKILL.md) for driving it from a
+coding agent, and
+[bookengine/ARCHITECTURE-DECISION.md](bookengine/ARCHITECTURE-DECISION.md) for
+why it is built the way it is.
+
 ## Deployment checklist
 
 Before deploying, run:
@@ -115,6 +152,13 @@ Before deploying, run:
 ```bash
 npm test
 npm run build
+```
+
+`npm test` covers the Node code. The book engine has its own suite, which the
+website deploy does not depend on:
+
+```bash
+npm run book:test
 ```
 
 The Cloudflare Pages project should use the repository root as its project
