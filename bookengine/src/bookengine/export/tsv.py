@@ -3,7 +3,8 @@
 Everything upstream of this module is about being right. This module is about
 arriving. A tutor opens the Vocabulary tab, clicks A5, and pastes once, so the
 output has to be tab-separated text whose columns line up with the tab's
-headings and whose rows the builder will accept.
+headings and whose rows the builder will accept — and whose first line is
+vocabulary item 1, since the headings are already in the sheet at row 4.
 
 Two things could quietly ruin that. A quotation containing a newline would end
 its row early and shift every column after it, which is why every cell is
@@ -92,8 +93,19 @@ def vocabulary_rows(items: list[VocabularyItem]) -> list[list[str]]:
     return rows
 
 
-def render_tsv(items: list[VocabularyItem], *, include_header: bool = True) -> str:
-    """The rows as tab-separated text, ready for the clipboard or a file."""
+def render_tsv(items: list[VocabularyItem], *, include_header: bool = False) -> str:
+    """The rows as tab-separated text, ready for the clipboard or a file.
+
+    Headerless by default, because of where this is pasted. The Vocabulary tab
+    already has its headings, in row 4, and the operator is told to click A5 —
+    `FIRST_DATA_ROW` — and paste. A header row in the file lands in A5 as
+    vocabulary item 1, and the workbook then carries a row whose word is
+    `Status` and whose Korean meaning is `Order`.
+
+    `include_header=True` is for a standalone export: a file somebody opens in
+    a spreadsheet on its own, where the columns need naming because no tab is
+    naming them.
+    """
     lines: list[list[str]] = [list(VOCABULARY_COLUMNS)] if include_header else []
     lines.extend(vocabulary_rows(items))
     # Each line ends in a newline, the last one included. A trailing blank line
@@ -103,7 +115,7 @@ def render_tsv(items: list[VocabularyItem], *, include_header: bool = True) -> s
 
 
 def write_tsv(
-    items: list[VocabularyItem], path: Path, *, include_header: bool = True
+    items: list[VocabularyItem], path: Path, *, include_header: bool = False
 ) -> Path:
     """Write the paste block to disk, preserving every character in it.
 

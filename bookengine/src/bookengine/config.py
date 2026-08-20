@@ -236,7 +236,9 @@ class OutputConfig(_Strict):
     tsv_name: str = "vocabulary.tsv"
     json_name: str = "vocabulary.json"
     audit_name: str = "audit.json"
-    include_header: bool = True
+    # Off by default: the paste target is the first data row of a tab that
+    # already carries its headings, so a header line would become item 1.
+    include_header: bool = False
 
 
 class JobConfig(_Strict):

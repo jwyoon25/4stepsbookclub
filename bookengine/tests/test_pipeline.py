@@ -134,8 +134,8 @@ def test_only_ready_rows_are_exported(document, job, tmp_path):
 
     text = render_tsv(result.items)
     lines = text.splitlines()
-    assert lines[0].split("\t") == list(VOCABULARY_COLUMNS)
-    assert len(lines) - 1 == result.report.ready_total
+    assert all(len(line.split("\t")) == len(VOCABULARY_COLUMNS) for line in lines)
+    assert len(lines) == result.report.ready_total
     assert "predicament\t" not in text
 
 

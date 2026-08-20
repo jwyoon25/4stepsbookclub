@@ -83,9 +83,38 @@ def test_the_field_limits_still_match_the_workbook_content_schema():
 # --- the paste block -------------------------------------------------------
 
 
-def test_the_header_row_is_the_sheet_s_own_wording():
-    text = render_tsv([ready_item()])
-    assert text.splitlines()[0].split("\t") == list(VOCABULARY_COLUMNS)
+def test_the_paste_block_starts_with_vocabulary_item_one():
+    """The tab's headings are in row 4; the paste target is A5.
+
+    A header line in the file lands in A5 and the workbook gets a vocabulary
+    entry whose word is `Status` and whose Korean meaning is `Order`. So the
+    default carries no header, and the assertion is tied to the contract rather
+    than to a remembered row number.
+    """
+    rows = [line.split("\t") for line in render_tsv([ready_item()]).splitlines()]
+
+    assert FIRST_DATA_ROW == HEADER_ROW + 1
+    assert len(rows) == 1
+    assert rows[0][0] != VOCABULARY_COLUMNS[0]
+    assert rows[0][3] == "predicament"
+
+
+def test_a_header_is_still_available_for_a_standalone_export():
+    """A file opened on its own needs its columns named. The Sheet does not."""
+    rows = [
+        line.split("\t")
+        for line in render_tsv([ready_item()], include_header=True).splitlines()
+    ]
+
+    assert rows[0] == list(VOCABULARY_COLUMNS)
+    assert rows[1][3] == "predicament"
+
+
+def test_the_written_file_is_headerless_too():
+    """`write_tsv` is what the CLI calls, so its default is the one that ships."""
+    from inspect import signature
+
+    assert signature(write_tsv).parameters["include_header"].default is False
 
 
 def test_nothing_below_ready_is_exported():
@@ -94,7 +123,7 @@ def test_nothing_below_ready_is_exported():
     rejected.fail("too easy")
 
     text = render_tsv([ready, rejected])
-    assert len(text.splitlines()) == 2
+    assert len(text.splitlines()) == 1
     assert "wall" not in text
 
 
@@ -105,7 +134,7 @@ def test_a_tab_or_newline_in_a_cell_cannot_shift_the_columns():
 
     rows = [line.split("\t") for line in render_tsv([item]).splitlines()]
     assert all(len(row) == len(VOCABULARY_COLUMNS) for row in rows)
-    assert "She waits. Then she moves." in rows[1]
+    assert "She waits. Then she moves." in rows[0]
 
 
 def test_korean_and_the_book_s_punctuation_survive_the_file(tmp_path):
@@ -138,4 +167,4 @@ def test_rows_are_ordered_by_lesson_then_order():
 
     text = render_tsv([second, third, first])
     rows = [line.split("\t") for line in text.splitlines()]
-    assert [row[3] for row in rows[1:]] == ["predicament", "articulate", "monotonous"]
+    assert [row[3] for row in rows] == ["predicament", "articulate", "monotonous"]

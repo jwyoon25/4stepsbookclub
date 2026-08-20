@@ -101,4 +101,4 @@ output:
   tsv_name: vocabulary.tsv
   json_name: vocabulary.json
   audit_name: audit.json
-  include_header: true
+  include_header: false

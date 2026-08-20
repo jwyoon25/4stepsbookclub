@@ -52,8 +52,8 @@ VOCABULARY_COLUMNS: tuple[str, ...] = (
 
 # Mirrors `HEADER_ROW` and `FIRST_DATA_ROW` in sheet-contract.mjs. Rows go under
 # the headings, so "paste at A5" is derived from the contract rather than
-# remembered; pasting the header too, at A4, rewrites the headings with the same
-# words, which is a free check that the paste landed on the right tab.
+# remembered — and so is the export being headerless, since row 4 already holds
+# the headings and anything pasted at A5 is read as a vocabulary entry.
 HEADER_ROW = 4
 FIRST_DATA_ROW = 5
 PASTE_TARGET = f"A{FIRST_DATA_ROW}"
