@@ -34,7 +34,13 @@ and nothing you are told here should ever be used to work around them.
 4. **Never commit a book PDF.** They belong in `bookengine/sources/`, which is
    gitignored.
 5. **Never add `--no-cache` or edit a config to loosen a check** in order to get
-   a run to pass. A refusal is the product working.
+   a run to pass. A refusal is the product working. In particular, never set
+   `excerpt.allow_uncertain_repairs`, `llm.audit.on_shared: allow`, or a higher
+   `limits.provider_calls_per_candidate` to make a run finish — each turns a
+   refusal into an export.
+6. **Never run `ingest --approve` yourself.** It records that a *person* has
+   checked a chapter map against the book. You have not got the book. Show the
+   operator the report and the command, and let them run it.
 
 ## Where things go
 
@@ -60,6 +66,24 @@ find out whether a book is usable before anything else happens.
 
 If it refuses, stop. An image-only scan is not supported and an ambiguous
 chapter map is not something to work around. Report what it said.
+
+If the status is `REVIEW_REQUIRED`, stop and hand it to the operator. The
+concerns are listed under "A person has to check these before generating", and
+the answer to them is somebody reading the chapter listing against the book —
+then running `ingest --book ... --approve` themselves. `vocab` will refuse until
+they have. See `FIRST-REAL-BOOK.md` for what a first run against a published
+novel needs beyond this.
+
+### 1b. Smoke-test the endpoints
+
+```bash
+.venv/bin/bookengine smoke --config configs/<the-book>.yaml
+```
+
+One tiny request per endpoint, before a run rather than during one. It reports
+which keys work, which model ids still exist, which endpoints honour a schema,
+and whether the job's audit independence requirement can actually be met with
+what is reachable today.
 
 ### 2. Write the job
 
@@ -107,8 +131,10 @@ On success, tell the operator:
 
 - how many items, over how many lessons
 - that quotations, chapter references and duplicates all passed
+- what independence level the audit actually reached, if it is not `provider`
 - where the TSV is
-- to open the workbook's **Vocabulary** tab, click **A5**, and paste
+- to open the workbook's **Vocabulary** tab, click **A5**, and paste — the file
+  has no header row, so the first line pasted is vocabulary item 1
 
 On a shortfall, quote the engine's own explanation. It already names the lesson,
 the count, and the reasons. Do not summarise it into "some items failed".
@@ -124,6 +150,8 @@ item with its reason. The common causes, and the honest response to each:
 | The audit rejected it | The second model found the definition, Korean, or context wrong | Nothing to do; it was replaced. Persistent failures suggest a weak auditor model |
 | Candidate pool exhausted | The lesson's chapters do not hold enough teachable words | Raise `candidates.pool_size`, widen the chapter range, or lower `vocabulary_per_lesson` |
 | Not scored | The model's reply omitted candidates | Usually a rate limit; re-run, since the cache makes it cheap |
+| Audited by the endpoint that wrote it | Both chains fell back to one provider | Add a reachable endpoint to `llm.fallbacks` and re-run. Do not change `llm.audit.on_shared` |
+| Stopped at its budget | An endpoint answered badly for a whole lesson | Read the rejection reasons first. It is a provider problem, not a book problem |
 
 Raising `excerpt.max_characters` above 600 is not an option — that is the
 workbook content schema's own limit and a longer excerpt is a row the builder

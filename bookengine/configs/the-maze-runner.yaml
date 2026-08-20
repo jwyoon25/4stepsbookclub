@@ -1,0 +1,103 @@
+# The Maze Runner — the first real book this engine is meant to run against.
+#
+# The lesson structure below is the one 4Steps has already taught from, so the
+# generated vocabulary lines up with workbooks that exist. Everything else is
+# the engine's default.
+#
+# Before this will run you need two things this file cannot supply:
+#
+#   1. The PDF, at ../sources/the-maze-runner.pdf. `sources/` is gitignored and
+#      a book is never committed. Use a copy 4Steps already owns.
+#
+#   2. The real chapter count, read off the book's own contents page. The value
+#      below is what the lesson plan implies, not something anybody has checked
+#      against this edition. See the note on expected_chapters.
+#
+# Then, in order:
+#
+#   bookengine ingest --book sources/the-maze-runner.pdf --expected-chapters <N>
+#   bookengine smoke  --config configs/the-maze-runner.yaml
+#   bookengine vocab  --config configs/the-maze-runner.yaml
+#
+# The ingest step first, on its own, and read what it prints. See
+# FIRST-REAL-BOOK.md for what to check in it and why.
+
+book:
+  path: ../sources/the-maze-runner.pdf
+  title: The Maze Runner
+
+  # 62 is what the lesson plan below adds up to, and it is a claim about this
+  # edition that nobody has verified. The PDF is the source of truth: run
+  # `ingest` first and use the count it reports, once you have checked that
+  # count against the contents page.
+  #
+  # A mismatch here is a refusal, not a warning, and that is the point — an
+  # edition with an epilogue detected as chapter 63, or a prologue detected as
+  # chapter 1, would shift every chapter reference in the workbook by one and
+  # nothing downstream would notice.
+  expected_chapters: 62
+
+audience:
+  grade_min: 7
+  grade_max: 8
+  description: >-
+    Korean middle-school students reading a full English novel. They can follow
+    the story; the vocabulary is the part that stops them.
+
+vocabulary_per_lesson: 20
+
+# Three times the final count. The audit rejects entries, and a lesson with no
+# room to replace one fails instead.
+candidates_per_lesson: 60
+
+# The chapter ranges 4Steps has taught from. Five lessons, one hundred words.
+lessons:
+  - lesson: 1
+    start_chapter: 1
+    end_chapter: 12
+  - lesson: 2
+    start_chapter: 13
+    end_chapter: 24
+  - lesson: 3
+    start_chapter: 25
+    end_chapter: 36
+  - lesson: 4
+    start_chapter: 37
+    end_chapter: 48
+  - lesson: 5
+    start_chapter: 49
+    end_chapter: 62
+
+exclusions:
+  # This book invents its own slang, and a student learning `shuck` learns
+  # nothing they can use. The audit would catch most of these on
+  # `generality`; naming them costs nothing and saves the candidates.
+  terms:
+    - shuck
+    - shuck-face
+    - klunk
+    - greenie
+    - griever
+    - shank
+    - slinthead
+    - glade
+    - glader
+    - wicked
+  allow_invented_terms: false
+
+llm:
+  generator:
+    provider: groq
+    model: ${GENERATOR_MODEL:-llama-3.3-70b-versatile}
+  auditor:
+    provider: nvidia
+    model: ${AUDITOR_MODEL:-meta/llama-3.3-70b-instruct}
+  fallbacks:
+    - provider: gemini
+      model: ${GEMINI_MODEL:-gemini-2.0-flash}
+  audit:
+    requirement: provider
+    on_shared: needs_review
+
+output:
+  directory: ../output/the-maze-runner

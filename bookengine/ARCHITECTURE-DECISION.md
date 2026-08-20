@@ -117,16 +117,62 @@ merge two unrelated words and drop one from the book. Silently merging is worse
 than not merging, so those inflections are reached only when the optional
 `lemminflect` extra is installed, and every run records which lemmatizer it used.
 
-## Hyphen repair is recorded, not hidden
+## Hyphen repair is decided by the book, and what it cannot decide is not quoted
 
 A justified book breaks `incomprehensible` across a line, and without rejoining
 it the word is in the book but not findable in it. Rejoining is therefore
-necessary and occasionally wrong — a book breaking the existing hyphen in
-`self-aware` is locally indistinguishable. So every repair records its offset in
-the chapter text, excerpt ranking penalises passages containing one, and the
-ingestion report states how many there were.
+necessary and locally undecidable: `extraor-` + `dinary` and `self-` +
+`conscious` look identical at the break, and closing up the second invents a
+spelling no English book contains.
 
-## Refusing is a feature, and the confidence model has two tiers
+It is not undecidable globally. A novel that writes `self-conscious` sets it
+whole somewhere else and never writes `selfconscious`. So both reconstructions
+are looked up in a lexicon of every word the book sets complete on one line, and
+the attested one wins. That is the same principle as everything else here: the
+source document is the authority, and the engine's job is to ask it rather than
+to guess well.
+
+Where the book attests both forms or neither, the repair is recorded as
+uncertain, and no excerpt is drawn through one. Preferring passages without them
+would not be enough — a word with one usable occurrence would still be quoted
+through a spelling nobody can prove. `excerpt.allow_uncertain_repairs` is the
+deliberate way out for a book hyphenated past usefulness, and the ingestion
+report says how much of the book the bar is costing.
+
+## Page furniture is labelled, not deleted
+
+Running heads are stripped before chapter detection, because a title repeated
+three hundred times otherwise looks like the most dependable heading in the
+book. But some books set their chapter headings in the same margin band, and for
+those the strip takes the headings too and the book reads as chapterless — so
+detection retries over the whole line stream.
+
+The two needs are opposite: detection sometimes wants the furniture, quoting
+never does. So the furniture is marked on the line rather than removed from the
+list. Detection reads everything and its heading indices stay valid; paragraph
+assembly reads only the prose. Neither pass can put `THE MAZE RUNNER 143` in a
+student's excerpt.
+
+## A lesson is filled before the next one starts
+
+Lessons are built in order, and each claims its vocabulary from a registry the
+next one then has to work around. That guarantees uniqueness cheaply, and it
+costs something real: if `reluctant` is a strong candidate in lessons 1 and 4,
+lesson 1 takes it whether or not lesson 4 had anything else as good.
+
+Accepted for now, because the alternative — building every lesson's pool first,
+measuring the collisions, and allocating globally — is an optimisation over
+educational quality, and there is no evidence yet about how often it matters.
+The engine does not foreclose it: `build_pool` and `build_lesson` are separate,
+the registry is passed in rather than owned, and `conflicts_among` can judge any
+proposed allocation. A global allocator would sit between them without either
+changing.
+
+What would settle it is a real book. `audit.json` records every candidate pool,
+so a first Maze Runner run says how many strong candidates two lessons actually
+compete for.
+
+## Refusing is a feature, and the confidence model has three tiers
 
 Chapter detection reports `high`, `acceptable` or `low`. Blockers — no headings,
 fewer than two, two heading styles that explain the book equally well — cannot be
@@ -134,6 +180,18 @@ cleared by anything. Warnings, such as chapters that do not start on a fresh
 page, can be cleared by `book.expected_chapters`, and only by that: it is the one
 fact about a book the PDF cannot supply about itself, and requiring a human to
 supply it is the point.
+
+Between those and success sits the third tier. A chapter map can parse cleanly
+and still look wrong in a way only somebody holding the book can settle — a
+chapter of thirty-seven characters is usually a heading matched inside the
+prose, and every quotation filed under it would be real and misattributed.
+Ingestion reports `REVIEW_REQUIRED` for those and `vocab` refuses to run.
+
+The way past is a person, and the approval is kept so they are only asked once
+per book. What is approved is the chapter map rather than the file: the record
+carries a fingerprint of every chapter's number, heading, pages and length, so a
+change to the ingester invalidates the approvals it would have altered. A file
+hash alone would let a new parser inherit confidence earned by the old one.
 
 ## Configuration is YAML, validated by pydantic
 
@@ -152,9 +210,15 @@ come from the environment, because a free provider's catalogue is the single
 thing most certain to go stale. Any endpoint speaking the OpenAI shape works
 with a `base_url` in the job file and no code change.
 
-Generator and auditor get separate chains that share the fallback list. When a
-fallback is reached for both, the audit is weaker than designed, and the run says
-so in its output and in `audit.json` rather than quietly continuing.
+Generator and auditor get separate chains that share the fallback list, which
+creates the case worth naming: both primaries down, both chains on the same
+fallback, one model writing and marking every row while the job file still names
+two providers. So independence is computed from the completions that came back
+rather than from the configuration, at three levels — two providers, two models
+on one provider, or neither — and a run claims the weakest level any exported
+row reached. `llm.audit.requirement` sets the bar and `llm.audit.on_shared` says
+what happens to rows below it; the default keeps the work and refuses to call it
+proved.
 
 ## Deferred
 

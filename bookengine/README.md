@@ -79,8 +79,28 @@ Detected chapters............... 62  (style: chapter-arabic, confidence: high)
 Chapter 1   pages 1-7           3,912 characters
 ...
 Running heads removed........... 748 lines ("THE MAZE RUNNER", "#")
-Words rejoined across lines..... 191
+Words rejoined across lines..... 191 (12 unconfirmed)
 Paragraphs / sentences.......... 4,102 / 11,884
+Ingestion status................ PASS
+```
+
+A book whose chapter map looks wrong in a way only a person can settle comes
+back `REVIEW_REQUIRED` instead, with the reasons listed, and `vocab` refuses to
+run against it. Read the chapter listing against the book, then record that you
+have:
+
+```bash
+.venv/bin/bookengine ingest --book sources/the-maze-runner.pdf --approve
+```
+
+The approval is kept per book and covers that exact chapter map, so the same
+PDF is not queried again — and a change to the ingester that would alter the map
+asks again.
+
+Then check the endpoints, which costs one tiny request each:
+
+```bash
+.venv/bin/bookengine smoke --config configs/the-maze-runner.yaml
 ```
 
 Then write a job and run it:
@@ -112,7 +132,10 @@ output/the-maze-runner/
 ```
 
 The TSV's columns are the Vocabulary tab's columns, in its order, with its
-wording. Select the tab, click `A5`, paste once.
+wording, and it carries no header row: the tab's headings are already in row 4,
+so the first line of the file is vocabulary item 1. Select the tab, click `A5`,
+paste once. (`output.include_header: true` adds one, for a file somebody will
+open on its own.)
 
 `vocabulary.json` is the debugging artifact. Every item carries the sentence IDs
 its excerpt came from, the page range, how many occurrences the word had, which
@@ -137,6 +160,18 @@ about itself.
 
 **A lesson plan that does not fit.** Checked against the chapters the book
 actually has, with the missing ones named.
+
+**A chapter map nobody has checked.** Separate from detection failing outright.
+A map that parsed but looks wrong — a chapter of thirty-seven characters, a
+book that only produced headings once the running heads were put back — is
+`REVIEW_REQUIRED`, and generation stops until somebody has run
+`ingest --approve` against it.
+
+**An audit that was not independent.** Both provider chains fall back to the
+same list, so a job naming two providers can end up with one writing and
+marking every row. Independence is measured from the completions that came
+back, and rows that fall short of `llm.audit.requirement` are not exported as
+proved. What happens to them is `llm.audit.on_shared`.
 
 **A lesson that cannot be filled.** Twenty requested means twenty verified or a
 failed run. Never nineteen and a success message.
@@ -209,7 +244,7 @@ gets a module in `src/bookengine/llm/` implementing one method, and an entry in
 .venv/bin/pytest
 ```
 
-173 tests, no network, no book PDFs, no API keys. Test books are real PDFs built
+295 tests, no network, no book PDFs, no API keys. Test books are real PDFs built
 at test time by `tests/fixtures/synthetic_book.py` — with running heads, page
 numbers, first-line indents, words hyphenated across line breaks and typographic
 quotes — from prose written for this repository, so nothing copyrighted is
@@ -221,6 +256,13 @@ passage that does not exist, propose a word the book does not contain, return
 malformed JSON, or approve nothing. `tests/test_pipeline.py` asserts that none of
 it reaches a `READY` row. A suite that only ever saw good answers would pass
 against a design with no verification in it.
+
+`tests/test_source_fidelity.py` builds PDFs with specific typesetting defects in
+them — a compound broken at its own hyphen, headings sharing a margin band with
+the running head — and checks that neither an invented spelling nor a folio can
+reach a quotation. `tests/test_smoke.py` runs the provider smoke test against a
+local HTTP server, so status codes and error handling are exercised for real
+with nothing hosted.
 
 `tests/test_export.py` opens `workbooks/builder/browser/sheet-contract.mjs` and
 `workbooks/schema/lesson.schema.json` and asserts this engine's mirrored copies
@@ -235,7 +277,9 @@ bookengine/
 ├── SKILL.md                  # how a coding agent should drive this
 ├── ARCHITECTURE-DECISION.md  # why it is built this way
 ├── pyproject.toml
+├── FIRST-REAL-BOOK.md        # what to check before trusting a published novel
 ├── configs/example.yaml      # every setting, with its default
+├── configs/the-maze-runner.yaml
 ├── prompts/                  # versioned prompt files
 ├── sources/                  # book PDFs (gitignored)
 ├── output/                   # runs (gitignored)
@@ -248,9 +292,11 @@ bookengine/
     │   ├── document.py       # chapters, paragraphs, sentences, offsets
     │   ├── excerpt.py        # locators, and how a quotation is proved
     │   ├── search.py         # occurrences and context windows
-    │   ├── ingest.py         # orchestration and the ingestion report
+    │   ├── ingest.py         # orchestration, the report, PASS/REVIEW_REQUIRED
+    │   ├── approval.py       # a person's word on a chapter map, kept per book
     │   └── cache.py
-    ├── llm/                  # providers, chain, structured output, cache
+    ├── llm/                  # providers, chain, structured output, cache,
+    │                         # and the smoke test
     ├── vocabulary/           # harvest, candidates, quotes, entries, audit,
     │   │                     # dedupe, verify, pipeline, models
     ├── export/               # TSV, artifacts, the Sheet contract
