@@ -4,7 +4,7 @@ Every pipeline test runs against this. It answers each prompt by the shape it
 was asked for, which is enough to exercise the whole run, and it can be told to
 misbehave in the specific ways real endpoints misbehave: fabricate a quotation,
 claim the wrong chapter, propose a word the book does not contain, return
-malformed JSON, or fail a healthy item at audit.
+malformed JSON, contradict its own findings, or fail a healthy item at audit.
 
 The point of the misbehaviour switches is that the engine's guarantees are meant
 to hold against a hostile model, not a cooperative one. A test suite that only
@@ -14,6 +14,7 @@ ever sees good answers proves nothing about the part of the design that matters.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 
 from bookengine.errors import ProviderError
@@ -210,6 +211,122 @@ class ScriptedProvider:
             "The fake provider was asked something it does not recognise:\n"
             + messages[-1].content[:400]
         )
+
+    def close(self) -> None:
+        pass
+
+
+# Words that carry no claim, so their presence or absence in the source proves
+# nothing about whether a context sentence describes it.
+_FUNCTION_WORDS = frozenset(
+    {
+        "a", "an", "and", "are", "as", "at", "be", "been", "being", "but",
+        "by", "for", "from", "had", "has", "have", "he", "her", "hers", "him",
+        "his", "in", "into", "is", "it", "its", "me", "my", "no", "not", "of",
+        "on", "or", "our", "she", "so", "than", "that", "the", "their", "them",
+        "there", "these", "they", "this", "to", "up", "us", "was", "we",
+        "were", "what", "when", "where", "which", "while", "who", "whom",
+        "will", "with", "you", "your", "about", "after", "again", "all",
+        "also", "any", "because", "before", "between", "both", "down",
+        "during", "each", "few", "how", "more", "most", "other", "over",
+        "own", "same", "some", "such", "then", "those", "through", "too",
+        "under", "until", "very",
+    }
+)
+
+
+def _entry_blocks(prompt: str) -> list[tuple[str, str, str]]:
+    """Split a rendered audit prompt into (word, context claim, source) triples.
+
+    Reading it back out of the prompt is the point. A fake handed the items
+    directly would answer the same way whether or not the renderer put any
+    source in the message, and the renderer is the thing under test.
+    """
+    blocks: list[tuple[str, str, str]] = []
+    for chunk in prompt.split("### Entry ")[1:]:
+        word = claim = ""
+        source: list[str] = []
+        collecting = False
+        for line in chunk.splitlines():
+            if line.startswith("Word: "):
+                word = line[len("Word: ") :].strip()
+            elif line.startswith("Excerpt context: "):
+                claim = line[len("Excerpt context: ") :].strip()
+            elif line.startswith("SOURCE CONTEXT"):
+                collecting = True
+            elif collecting:
+                source.append(line)
+        if word:
+            blocks.append((word, claim, "\n".join(source)))
+    return blocks
+
+
+@dataclass
+class GroundedAuditor:
+    """An auditor that checks each context claim against the source it was sent.
+
+    Deliberately crude: it asks whether the claim's content words appear in the
+    paragraphs printed under the entry. A real model reasons about the passage
+    instead. What the two share is the only property this fake exists to
+    exercise — neither can answer `context_accuracy` at all unless the renderer
+    actually supplied the source, so an audit stage that shows its auditor
+    nothing makes this provider fail every entry it is given.
+    """
+
+    name: str = "fake-auditor"
+    model: str = "grounded-1"
+    # The share of a claim's content words that must appear in the source
+    # before the claim counts as something those paragraphs show.
+    required_share: float = 0.6
+    seen: list[str] = field(default_factory=list)
+
+    def complete(
+        self,
+        messages: list[Message],
+        *,
+        json_schema: dict | None = None,
+        temperature: float | None = None,
+        max_output_tokens: int | None = None,
+    ) -> Completion:
+        prompt = messages[-1].content
+        self.seen.append(prompt)
+        items = [
+            self._judge(word, claim, source)
+            for word, claim, source in _entry_blocks(prompt)
+        ]
+        return Completion(
+            text=json.dumps({"items": items}, ensure_ascii=False),
+            provider=self.name,
+            model=self.model,
+            prompt_tokens=None,
+            completion_tokens=None,
+            schema_mode="json_schema",
+        )
+
+    def _judge(self, word: str, claim: str, source: str) -> dict:
+        shown = self._shown_by(claim, source)
+        return {
+            "word": word,
+            "verdict": "PASS" if shown else "FAIL",
+            "difficulty": "APPROPRIATE",
+            "definition_accuracy": "ACCURATE",
+            "korean_accuracy": "ACCURATE",
+            "context_accuracy": "ACCURATE" if shown else "INACCURATE",
+            "excerpt_fit": "GOOD",
+            "notes": None if shown else "The supplied paragraphs do not show this.",
+        }
+
+    def _shown_by(self, claim: str, source: str) -> bool:
+        content = [
+            word
+            for word in re.findall(r"[a-z']+", claim.lower())
+            if word not in _FUNCTION_WORDS and len(word) > 2
+        ]
+        if not content:
+            return False
+        haystack = source.lower()
+        found = sum(1 for word in content if word.rstrip("s") in haystack)
+        return found >= len(content) * self.required_share
 
     def close(self) -> None:
         pass

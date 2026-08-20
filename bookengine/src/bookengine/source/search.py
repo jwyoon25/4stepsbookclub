@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .document import BookDocument, Chapter
+from .excerpt import ExcerptLocator
 from .text import whole_word_pattern
 
 
@@ -47,6 +48,11 @@ class Occurrence:
         return f"Chapter {self.chapter}"
 
 
+# What an elided neighbouring paragraph is replaced with, so a model reading
+# the window can tell a trimmed paragraph from one that ended there.
+ELISION = "[...]"
+
+
 @dataclass(frozen=True, slots=True)
 class ContextWindow:
     """The prose around a quotation, for grounding an explanation."""
@@ -57,15 +63,53 @@ class ContextWindow:
     passage: str
     after: str
 
-    def as_prompt_block(self) -> str:
-        """The window as it is shown to a model, with the passage marked."""
+    def as_prompt_block(self, *, limit: int | None = None) -> str:
+        """The window as it is shown to a model, with the passage marked.
+
+        `limit` bounds the whole block. The paragraph the excerpt sits in is
+        never trimmed — it is the thing being judged — so the budget comes off
+        the neighbours, the previous paragraph losing its opening and the next
+        one its ending, which are the ends furthest from the passage.
+        """
+        before, after = self.before, self.after
+        if limit is not None:
+            before, after = self._trimmed(limit)
+
         parts = []
-        if self.before:
-            parts.append(f"[previous paragraph]\n{self.before}")
+        if before:
+            parts.append(f"[previous paragraph]\n{before}")
         parts.append(f"[paragraph containing the excerpt]\n{self.passage}")
-        if self.after:
-            parts.append(f"[next paragraph]\n{self.after}")
+        if after:
+            parts.append(f"[next paragraph]\n{after}")
         return "\n\n".join(parts)
+
+    def _trimmed(self, limit: int) -> tuple[str, str]:
+        """The neighbouring paragraphs, cut to fit whatever budget is left."""
+        spare = limit - len(self.passage)
+        if spare <= 0:
+            return "", ""
+
+        share = spare // 2
+        return (
+            _keep_end(self.before, share),
+            _keep_start(self.after, spare - min(share, len(self.before))),
+        )
+
+
+def _keep_end(text: str, budget: int) -> str:
+    """The last `budget` characters of a paragraph, marked as cut."""
+    if len(text) <= budget:
+        return text
+    room = budget - len(ELISION) - 1
+    return "" if room <= 0 else f"{ELISION} {text[-room:].lstrip()}"
+
+
+def _keep_start(text: str, budget: int) -> str:
+    """The first `budget` characters of a paragraph, marked as cut."""
+    if len(text) <= budget:
+        return text
+    room = budget - len(ELISION) - 1
+    return "" if room <= 0 else f"{text[:room].rstrip()} {ELISION}"
 
 
 def _sentence_overlaps_repair(
@@ -162,11 +206,61 @@ def context_window(
     paragraphs_after: int = 1,
 ) -> ContextWindow:
     """The paragraphs around an occurrence, for a grounded explanation."""
-    chapter = document.chapter(occurrence.chapter)
+    return _window_around(
+        document,
+        chapter_number=occurrence.chapter,
+        paragraph_id=occurrence.paragraph_id,
+        page=occurrence.page,
+        paragraphs_before=paragraphs_before,
+        paragraphs_after=paragraphs_after,
+    )
+
+
+def context_for_locator(
+    document: BookDocument,
+    locator: ExcerptLocator,
+    *,
+    paragraphs_before: int = 1,
+    paragraphs_after: int = 1,
+) -> ContextWindow:
+    """The paragraphs around a quotation that has already been cut.
+
+    The generator gets its window from the occurrence it was writing about; the
+    auditor has only a finished item, and a finished item carries a locator.
+    Both routes land in the same function, because an auditor shown different
+    source text from the writer would be checking a claim nobody made.
+    """
+    chapter = document.chapter(locator.chapter)
+    paragraph = chapter.paragraph_containing(locator.char_start)
+    if paragraph is None:
+        raise KeyError(
+            f"Chapter {locator.chapter} has no paragraph at character "
+            f"{locator.char_start}."
+        )
+    return _window_around(
+        document,
+        chapter_number=locator.chapter,
+        paragraph_id=paragraph.id,
+        page=locator.page_start or paragraph.page_start,
+        paragraphs_before=paragraphs_before,
+        paragraphs_after=paragraphs_after,
+    )
+
+
+def _window_around(
+    document: BookDocument,
+    *,
+    chapter_number: int,
+    paragraph_id: str,
+    page: int,
+    paragraphs_before: int,
+    paragraphs_after: int,
+) -> ContextWindow:
+    chapter = document.chapter(chapter_number)
     position = next(
         index
         for index, paragraph in enumerate(chapter.paragraphs)
-        if paragraph.id == occurrence.paragraph_id
+        if paragraph.id == paragraph_id
     )
 
     def joined(start: int, stop: int) -> str:
@@ -177,8 +271,8 @@ def context_window(
 
     target = chapter.paragraphs[position]
     return ContextWindow(
-        chapter=occurrence.chapter,
-        page=occurrence.page,
+        chapter=chapter_number,
+        page=page,
         before=joined(position - paragraphs_before, position),
         passage=chapter.slice(target.char_start, target.char_end),
         after=joined(position + 1, position + 1 + paragraphs_after),

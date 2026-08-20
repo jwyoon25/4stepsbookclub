@@ -7,7 +7,7 @@ Placeholders the caller must supply:
 | `{book_title}` | The book's title. |
 | `{audience}` | Who the vocabulary is for, such as `Grades 7-8`. |
 | `{item_count}` | How many entries are being audited. |
-| `{items}` | The entries themselves: for each one the word, Korean meaning, English definition, excerpt, story context, chapter reference, and the paragraphs surrounding the excerpt. |
+| `{items}` | The entries themselves: for each one the word, Korean meaning, English definition, excerpt, story context, chapter reference, and a `SOURCE CONTEXT` block holding the paragraphs the excerpt sits between. |
 
 ## Role
 
@@ -30,6 +30,26 @@ Do not spend your judgement on these; they are proved in code, not claimed:
 
 Treat all three as true. Your questions are about meaning, accuracy and fit.
 
+## The source is what is under each entry
+
+Every entry below is followed by a `SOURCE CONTEXT` block: the paragraph the
+excerpt was taken from, and the paragraphs on either side of it, cut from the
+book itself.
+
+**That block is the only account of this book you may use.** Judge each entry
+against the source printed under it and against nothing else. If you have read
+{book_title}, set that aside — what you remember is not evidence here, and an
+entry that agrees with your memory but not with these paragraphs is wrong.
+
+The direction that matters: a claim the source does not support is not accurate.
+You are not being asked whether a claim could be true somewhere in the book. You
+are being asked whether these paragraphs show it. If they do not, the entry
+failed, whether it is contradicted or merely unsupported.
+
+You cannot change an excerpt, and there is nowhere to write a replacement. A
+badly chosen passage is reported through `excerpt_fit`, and the system picks a
+different one.
+
 ## The entries
 
 - Book: {book_title}
@@ -40,10 +60,9 @@ Treat all three as true. Your questions are about meaning, accuracy and fit.
 
 ## Instructions
 
-Judge every entry, and judge it only against the material supplied above and the
-stated audience. Do not rely on what you remember about {book_title}; if the
-supplied paragraphs do not show what an entry claims, that is an error in the
-entry, because the entry was written from these same paragraphs.
+Judge every entry, and judge it only against its own `SOURCE CONTEXT` and the
+stated audience. The entry was written from those same paragraphs, so anything
+in it they do not support is an error in the entry.
 
 For each one, decide:
 
@@ -56,10 +75,13 @@ For each one, decide:
 - `korean_accuracy` — whether the Korean is a correct and natural rendering of
   that same sense. A Korean word that translates a different sense of the
   English word is an error, not a nuance.
-- `context_accuracy` — whether the story context describes what the excerpt and
-  the surrounding paragraphs actually show, and whether it stays a description
-  of the scene. A sentence that explains the word instead of the moment is not
-  accurate: that is not what the field is for.
+- `context_accuracy` — whether the story context describes what this entry's
+  `SOURCE CONTEXT` actually shows, and whether it stays a description of the
+  scene. A statement about the plot that these paragraphs do not support is
+  `INACCURATE`, and so is one they contradict; being plausible for the book as
+  a whole does not make it accurate here. A sentence that explains the word
+  instead of the moment is not accurate either: that is not what the field is
+  for.
 - `excerpt_fit` — how well the passage teaches the word. `GOOD` if the meaning
   is recoverable from it, `WEAK` if it barely helps, `POOR` if it does not teach
   the word at all.

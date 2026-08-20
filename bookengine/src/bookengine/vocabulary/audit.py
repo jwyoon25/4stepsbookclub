@@ -27,6 +27,7 @@ from ..llm.chain import ProviderChain
 from ..llm.structured import generate_structured
 from ..prompts import PromptLibrary
 from ..source.document import BookDocument
+from ..source.search import context_for_locator
 from ..source.text import normalize_term
 from .models import AUDIT_ASSESSMENT_LABELS, AuditVerdict, VocabularyItem
 from .schemas import AuditReport
@@ -35,8 +36,40 @@ from .schemas import AuditReport
 # large enough that the auditor can notice two entries teaching one idea.
 AUDIT_BATCH = 8
 
+# One paragraph either side, the same window the entry was written from.
+CONTEXT_PARAGRAPHS = 1
 
-def _render_item(index: int, item: VocabularyItem) -> str:
+# How much source context one entry may carry. Eight entries at this size is a
+# request a free endpoint still answers; the target paragraph is never trimmed,
+# so what a tighter budget costs is the neighbours' outer ends.
+CONTEXT_CHARACTER_BUDGET = 1800
+
+# What the auditor is told when the source could not be produced for an entry.
+# It reads as a refusal rather than as an absence, because an auditor that
+# thinks it has the source and does not is the exact failure being avoided.
+NO_CONTEXT = (
+    "unavailable — this entry cannot be judged on context accuracy, so mark "
+    "context_accuracy INACCURATE"
+)
+
+
+def _render_item(
+    index: int, item: VocabularyItem, document: BookDocument
+) -> str:
+    """One entry as the auditor sees it, with the book underneath it.
+
+    Without the surrounding source, `context_accuracy` is not a question the
+    auditor can answer. "Thomas realises Minho has betrayed him" is either
+    true of these paragraphs or it is not, and a model with only a
+    two-sentence excerpt to go on has nothing to check it against — so it
+    checks it against its memory of the novel, which is the one source this
+    engine does not accept. Supplying the paragraphs is what turns that field
+    from a guess into a reading.
+
+    The source is cut from the `BookDocument` at the item's own locator, so it
+    is the same text the entry was written from and no model had a hand in
+    choosing it.
+    """
     return "\n".join(
         [
             f"### Entry {index}",
@@ -46,8 +79,27 @@ def _render_item(index: int, item: VocabularyItem) -> str:
             f"Excerpt from the book: {item.excerpt}",
             f"Excerpt context: {item.excerpt_context}",
             f"Chapter: {item.chapter_reference}",
+            "",
+            f"SOURCE CONTEXT for entry {index} (from the book itself):",
+            _render_source(item, document),
         ]
     )
+
+
+def _render_source(item: VocabularyItem, document: BookDocument) -> str:
+    """The paragraphs around this item's excerpt, or an honest refusal."""
+    if item.locator is None:
+        return NO_CONTEXT
+    try:
+        window = context_for_locator(
+            document,
+            item.locator,
+            paragraphs_before=CONTEXT_PARAGRAPHS,
+            paragraphs_after=CONTEXT_PARAGRAPHS,
+        )
+    except (KeyError, StopIteration):
+        return NO_CONTEXT
+    return window.as_prompt_block(limit=CONTEXT_CHARACTER_BUDGET)
 
 
 def audit_batch(
@@ -72,7 +124,8 @@ def audit_batch(
         book_title=job.book.title or document.title,
         item_count=len(items),
         items="\n\n".join(
-            _render_item(index, item) for index, item in enumerate(items, start=1)
+            _render_item(index, item, document)
+            for index, item in enumerate(items, start=1)
         ),
     )
 
