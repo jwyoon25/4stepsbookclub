@@ -30,6 +30,7 @@ from pathlib import Path
 from ..config import JobConfig
 from ..source.document import BookDocument
 from ..vocabulary.audit import independence_of, weakest_independence
+from ..vocabulary.dedupe import conflicts_among
 from ..vocabulary.models import Status, VocabularyItem
 from .tsv import exportable_items, vocabulary_rows
 from .workbook_contract import VOCABULARY_COLUMNS
@@ -217,27 +218,21 @@ def _chapter_checks(
 def _duplicate_count(exported: list[VocabularyItem], *, job: JobConfig) -> int:
     """How many exported rows repeat a word already exported.
 
-    Applies the job's own duplicate policy, so the number answers the question
-    the operator configured rather than a general one. Zero is the only
-    acceptable value; it is reported rather than enforced because the item
-    carrying the duplicate has already been through every other check, and an
-    operator deciding what to do about it needs to see the run.
+    Through the same registry the run was held to, so the number answers the
+    question the operator configured rather than a similar one. It used to
+    compare `item.lemma or item.normalized_term`, and `item.lemma` is never
+    set — so a run configured for lemma-level uniqueness had its artifact
+    report exact-match duplicates and call it a lemma check.
+
+    Zero is the only acceptable value; it is reported rather than enforced
+    because the item carrying the duplicate has been through every other check,
+    and an operator deciding what to do about it needs to see the run.
     """
-    seen: set[tuple[int, str]] = set()
-    duplicates = 0
-    for item in exported:
-        word = (
-            (item.lemma or item.normalized_term)
-            if job.dedupe.policy == "lemma"
-            else item.normalized_term
+    return len(
+        conflicts_among(
+            [(item.term, item.lesson) for item in exported], job.dedupe
         )
-        scope = item.lesson if job.dedupe.scope == "lesson" else 0
-        key = (scope, word)
-        if key in seen:
-            duplicates += 1
-        else:
-            seen.add(key)
-    return duplicates
+    )
 
 
 def _audit_counts(items: list[VocabularyItem], *, job: JobConfig) -> dict:

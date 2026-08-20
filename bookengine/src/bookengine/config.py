@@ -169,6 +169,25 @@ class ExcerptConfig(_Strict):
         return self
 
 
+class LimitsConfig(_Strict):
+    """The ceiling on what one lesson may spend before the run gives up.
+
+    The candidate pool is the real bound on a lesson's work: each candidate is
+    taken from it once and never returned, so a lesson cannot attempt more
+    words than it was given. This is the second bound, against the case the
+    first one does not cover — an endpoint that answers every request with
+    something unusable, where the pool drains at full price and produces
+    nothing.
+
+    Expressed per candidate rather than as a flat number so that it scales with
+    the pool an operator configured, and set high enough that ordinary retries
+    and a fallback or two do not trip it. Reaching it is reported as what it
+    is: a run stopped by its budget, not a book that ran out of words.
+    """
+
+    provider_calls_per_candidate: int = Field(default=8, ge=1, le=100)
+
+
 class ExclusionConfig(_Strict):
     """Words this book should not teach.
 
@@ -282,6 +301,7 @@ class JobConfig(_Strict):
     dedupe: DedupeConfig = Field(default_factory=DedupeConfig)
     excerpt: ExcerptConfig = Field(default_factory=ExcerptConfig)
     exclusions: ExclusionConfig = Field(default_factory=ExclusionConfig)
+    limits: LimitsConfig = Field(default_factory=LimitsConfig)
     llm: LLMConfig
     output: OutputConfig = Field(default_factory=OutputConfig)
 

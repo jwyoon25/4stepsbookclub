@@ -43,11 +43,6 @@ from .quotes import ExcerptCandidate, choose_excerpt, render_shortlist
 from .schemas import OccurrenceChoice
 from .verify import FinalReport, assign_orders, final_verification, verify_item
 
-# A lesson gets this many passes at filling itself before the pool is declared
-# exhausted. Each pass is a full round of excerpt, entry, and audit for however
-# many words are still missing.
-MAX_ROUNDS = 6
-
 
 @dataclass(slots=True)
 class RunStats:
@@ -68,6 +63,7 @@ class RunStats:
     cache_hits: int = 0
     replacements: int = 0
     rounds: dict[int, int] = field(default_factory=dict)
+    provider_calls: dict[int, int] = field(default_factory=dict)
     pools: list[dict] = field(default_factory=list)
     duplicates_blocked: list[str] = field(default_factory=list)
 
@@ -87,6 +83,7 @@ class RunStats:
             "cache_hits": self.cache_hits,
             "replacements": self.replacements,
             "rounds_per_lesson": self.rounds,
+            "provider_calls_per_lesson": self.provider_calls,
             "candidate_pools": self.pools,
             "duplicates_blocked": self.duplicates_blocked,
         }
@@ -244,14 +241,34 @@ def build_lesson(
     stats: RunStats,
     progress: Progress,
 ) -> list[VocabularyItem]:
-    """Fill one lesson, replacing what fails until the pool is spent."""
+    """Fill one lesson, replacing what fails until the pool is spent.
+
+    The pool is what ends this loop. Every candidate is taken from `remaining`
+    once and never put back, so a lesson attempts at most the words it was
+    given, and it stops when it has enough or has tried them all. A round is
+    just however many candidates were needed at the time — usually the target,
+    then a handful, then one — and counting rounds says nothing useful about
+    how much work is left.
+
+    It used to stop after six of them. A lesson wanting twenty words from a
+    pool of fifty could exhaust six rounds having touched twenty-nine
+    candidates, and fail with twenty-one perfectly good words unexamined. The
+    budget below is the bound that was actually wanted: a ceiling on what the
+    lesson may spend, in the one unit that costs anything.
+    """
     target = job.vocabulary_per_lesson
     remaining = list(pool)
     produced: list[VocabularyItem] = []
     ready: list[VocabularyItem] = []
     rounds = 0
 
-    while len(ready) < target and remaining and rounds < MAX_ROUNDS:
+    budget = len(pool) * job.limits.provider_calls_per_candidate
+    spent_before = generator.calls + auditor.calls
+
+    def spent() -> int:
+        return generator.calls + auditor.calls - spent_before
+
+    while len(ready) < target and remaining and spent() < budget:
         rounds += 1
         needed = target - len(ready)
         batch: list[tuple[VocabularyItem, str]] = []
@@ -321,6 +338,18 @@ def build_lesson(
                 ready.append(item)
 
     stats.rounds[lesson.lesson] = rounds
+    stats.provider_calls[lesson.lesson] = spent()
+    # Only when the budget is what stopped it. A lesson that spent its budget
+    # on the way to trying every candidate was ended by the pool, and saying
+    # otherwise would send an operator after the wrong problem.
+    if remaining and spent() >= budget:
+        progress.note(
+            f"Lesson {lesson.lesson} stopped at its budget of {budget} provider "
+            f"call(s) with {len(remaining)} candidate(s) untried. That is an "
+            "endpoint answering badly rather than a book short of words: check "
+            "the rejection reasons in audit.json before raising "
+            "`limits.provider_calls_per_candidate`."
+        )
     return produced
 
 
@@ -370,7 +399,9 @@ def run_job(
         )
 
     assign_orders(items)
-    report = final_verification(document, job, items)
+    # The same lemmatizer the registry used, so the final check answers the
+    # question the run was actually held to rather than a similar one.
+    report = final_verification(document, job, items, lemmatizer)
     # Ordering is assigned before the final pass and re-assigned after it,
     # because an item demoted during final verification would otherwise leave a
     # gap in a lesson's numbering.

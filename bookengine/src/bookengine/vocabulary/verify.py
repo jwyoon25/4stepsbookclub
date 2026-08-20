@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from ..config import JobConfig
+from ..config import DedupeConfig, JobConfig
 from ..export.workbook_contract import VOCABULARY_FIELD_LIMITS
 from ..source.document import BookDocument
 from ..source.excerpt import (
@@ -24,8 +24,8 @@ from ..source.excerpt import (
     verify_excerpt,
 )
 from ..source.search import occurs_in_chapters
-from ..source.text import normalize_term
 from .audit import independence_of, weakest_independence
+from .dedupe import Lemmatizer, conflicts_among
 from .models import Status, VocabularyItem
 
 # The workbook schema's field name for each part of an item, so a length
@@ -257,33 +257,39 @@ def verify_item(
     return verification
 
 
-def find_duplicates(items: list[VocabularyItem]) -> list[str]:
-    """Exact normalized duplicates across everything being exported.
+def find_duplicates(
+    items: list[VocabularyItem],
+    config: DedupeConfig | None = None,
+    lemmatizer: Lemmatizer | None = None,
+) -> list[str]:
+    """Whatever the job calls a duplicate, across everything being exported.
 
     The registry already prevents these while candidates are being selected.
-    This is the independent second look, run over the finished set, because the
+    This is the independent second look over the finished set, because the
     guarantee is about what leaves the engine rather than about what the
-    registry believed at the time.
+    registry believed at the time — and it applies the job's own policy, so a
+    run promising that `run` and `running` are one entry has that promise
+    checked rather than a weaker one.
+
+    Defaulting to `DedupeConfig()` rather than to exact matching matters: a
+    caller who forgets to pass the policy gets the engine's default policy,
+    not silently the laxest one available.
     """
-    seen: dict[str, VocabularyItem] = {}
-    conflicts: list[str] = []
-
-    for item in items:
-        key = normalize_term(item.term)
-        if key in seen:
-            first = seen[key]
-            conflicts.append(
-                f"{item.term!r} appears in lesson {first.lesson} (order "
-                f"{first.order}) and lesson {item.lesson} (order {item.order})."
-            )
-            continue
-        seen[key] = item
-
-    return conflicts
+    ordered = sorted(
+        items, key=lambda item: (item.lesson, item.order or 0, item.normalized_term)
+    )
+    return conflicts_among(
+        [(item.term, item.lesson) for item in ordered],
+        config or DedupeConfig(),
+        lemmatizer,
+    )
 
 
 def final_verification(
-    document: BookDocument, job: JobConfig, items: list[VocabularyItem]
+    document: BookDocument,
+    job: JobConfig,
+    items: list[VocabularyItem],
+    lemmatizer: Lemmatizer | None = None,
 ) -> FinalReport:
     """Re-prove the whole finished set, after every replacement has settled.
 
@@ -324,7 +330,9 @@ def final_verification(
     _apply_independence_policy(job, items, report)
 
     report.duplicate_conflicts = find_duplicates(
-        [item for item in items if item.status is Status.READY]
+        [item for item in items if item.status is Status.READY],
+        job.dedupe,
+        lemmatizer,
     )
     for conflict in report.duplicate_conflicts:
         report.item_failures.append(conflict)

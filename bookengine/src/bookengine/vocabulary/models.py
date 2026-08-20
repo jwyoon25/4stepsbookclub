@@ -214,7 +214,6 @@ class VocabularyItem:
     lesson: int
     term: str
     normalized_term: str
-    lemma: str = ""
     status: Status = Status.CANDIDATE
     order: int | None = None
 
@@ -315,7 +314,6 @@ class VocabularyItem:
             "order": self.order,
             "term": self.term,
             "normalized_term": self.normalized_term,
-            "lemma": self.lemma,
             "status": str(self.status),
             "korean_meaning": self.korean_meaning,
             "definition": self.definition,

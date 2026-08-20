@@ -54,6 +54,13 @@ candidates:
   rank_batch: 50
   max_exclusion_risk: 3
 
+limits:
+  # The candidate pool is what ends a lesson: each candidate is taken from it
+  # once and never returned. This is the second bound, for the case where an
+  # endpoint answers every request with something unusable and the pool drains
+  # at full price. Raise it only after reading why the rejections happened.
+  provider_calls_per_candidate: 8
+
 dedupe:
   # `lemma` treats run/running/ran as one entry; `exact` teaches them
   # separately. Exact duplicates are blocked across the book either way.

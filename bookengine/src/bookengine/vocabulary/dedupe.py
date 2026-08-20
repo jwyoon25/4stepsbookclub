@@ -260,3 +260,35 @@ class DuplicateRegistry:
             f"{term!r} duplicates {held!r}, already taught in lesson {lesson} "
             f"({reason})."
         )
+
+
+def conflicts_among(
+    terms: list[tuple[str, int]],
+    config: DedupeConfig,
+    lemmatizer: Lemmatizer | None = None,
+) -> list[str]:
+    """Replay a finished set of (term, lesson) pairs and report what collides.
+
+    The registry the pipeline used is not consulted: this builds a fresh one
+    and walks the set that is actually about to be exported. Rows change after
+    selection — an audit rejects one, a replacement takes its place, another
+    fails final verification — so the set the registry believed in is not
+    necessarily the set leaving the engine, and the guarantee is about the
+    second one.
+
+    Using the registry rather than a second comparison is the point. A final
+    check with its own idea of what "the same word" means would prove something
+    the job never asked for, and would pass a run that taught `run` and
+    `running` under a policy that merges them.
+    """
+    registry = DuplicateRegistry(config, lemmatizer=lemmatizer or build_lemmatizer())
+    found: list[str] = []
+
+    for term, lesson in terms:
+        clash = registry.conflict(term, lesson=lesson)
+        if clash is not None:
+            found.append(clash)
+            continue
+        registry.claim(term, lesson=lesson)
+
+    return found
