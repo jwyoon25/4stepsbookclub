@@ -383,9 +383,9 @@ def _apply_independence_policy(
         return
 
     shared = [
-        (item, independence_of(item))
-        for item in ready
-        if not independence_of(item).satisfies(job.llm.audit.requirement)
+        (item, found)
+        for item, found in ((item, independence_of(item)) for item in ready)
+        if not found.satisfies(job.llm.audit.requirement)
     ]
     report.audit_not_independent = len(shared)
     if not shared:

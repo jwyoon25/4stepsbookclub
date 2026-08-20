@@ -66,10 +66,12 @@ class ContextWindow:
     def as_prompt_block(self, *, limit: int | None = None) -> str:
         """The window as it is shown to a model, with the passage marked.
 
-        `limit` bounds the whole block. The paragraph the excerpt sits in is
-        never trimmed — it is the thing being judged — so the budget comes off
-        the neighbours, the previous paragraph losing its opening and the next
-        one its ending, which are the ends furthest from the passage.
+        `limit` bounds the source text, not the rendered block: the paragraph
+        labels are a fixed overhead on top of it. The paragraph the excerpt
+        sits in is never trimmed — it is the thing being judged — so the budget
+        comes off the neighbours, the previous paragraph losing its opening and
+        the next one its ending, which are the ends furthest from the passage.
+        A passage already over the budget leaves them out entirely.
         """
         before, after = self.before, self.after
         if limit is not None:
