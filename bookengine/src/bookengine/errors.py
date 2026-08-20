@@ -47,7 +47,13 @@ class ProviderError(BookEngineError):
 
 
 class ProviderChainError(BookEngineError):
-    """Every configured provider failed for one call."""
+    """Every configured provider failed for one call.
+
+    `attempts` carries what each provider actually said, so a caller can tell a
+    rate limit from a rejected key without reading the message.
+    """
+
+    attempts: list = []
 
 
 class StructuredResponseError(BookEngineError):

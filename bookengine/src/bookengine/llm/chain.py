@@ -132,7 +132,13 @@ class ProviderChain:
                 )
             )
 
-        raise ProviderChainError(self._summary(history))
+        failure = ProviderChainError(self._summary(history))
+        # The attempts travel with the error as well as inside its message. A
+        # caller that has to act differently for "slow down" than for "wrong
+        # key" — the smoke test does — should not have to parse prose to find
+        # out which one it was.
+        failure.attempts = list(history)
+        raise failure
 
     def _delay(self, attempt: int, error: ProviderError) -> float:
         """How long to wait before trying the same provider again.

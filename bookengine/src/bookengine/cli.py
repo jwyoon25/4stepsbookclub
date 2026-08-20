@@ -14,7 +14,9 @@ and why the missing items were rejected. "Error." is not a report.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .config import JobConfig, load_job, validate_lessons_against_book
@@ -27,6 +29,7 @@ from .export import (
     write_vocabulary_json,
 )
 from .llm.registry import build_chains
+from .llm.smoke import render_report, smoke_test_all
 from .prompts import PromptLibrary
 from .source.approval import ApprovalStore
 from .source.cache import ParseCache
@@ -135,6 +138,46 @@ def _record_approval(report, store: ApprovalStore) -> int:
         "changed ingester produces a different map and asks again."
     )
     return EXIT_OK
+
+
+def command_smoke(arguments: argparse.Namespace) -> int:
+    """Ask every endpoint a job could reach the smallest possible question.
+
+    Worth running before a book. A generation run reaches its first audit batch
+    after an ingestion and a hundred model calls; this reaches the same
+    endpoints in one request each, and answers the four questions a provider
+    adapter tested against a fake cannot: does the key work, does the model id
+    still exist, does the endpoint honour a schema, and what does it do at its
+    rate limit.
+    """
+    job = load_job(arguments.config)
+    print(BANNER)
+    print()
+    print("Provider smoke test")
+    print()
+
+    results = smoke_test_all(job.llm)
+    for result in results:
+        print(f"  {result.render()}")
+    print()
+    print(render_report(results, job.llm))
+
+    if arguments.json:
+        Path(arguments.json).parent.mkdir(parents=True, exist_ok=True)
+        Path(arguments.json).write_text(
+            json.dumps(
+                {
+                    "checked_at": datetime.now(UTC).isoformat(timespec="seconds"),
+                    "endpoints": [result.as_dict() for result in results],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        print()
+        print(f"Written to {arguments.json}")
+
+    return EXIT_OK if any(result.ok for result in results) else EXIT_INCOMPLETE
 
 
 def command_vocab(arguments: argparse.Namespace) -> int:
@@ -373,6 +416,14 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     ingest.set_defaults(handler=command_ingest)
+
+    smoke = subcommands.add_parser(
+        "smoke",
+        help="Call every endpoint a job could reach, once, and report what happened.",
+    )
+    smoke.add_argument("--config", required=True, help="Path to the job YAML.")
+    smoke.add_argument("--json", help="Also write the results to this file.")
+    smoke.set_defaults(handler=command_smoke)
 
     vocab = subcommands.add_parser(
         "vocab", help="Generate a book's vocabulary from a job configuration."
