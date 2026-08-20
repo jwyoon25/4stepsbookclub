@@ -162,6 +162,35 @@ def verify_excerpt(
     return verification
 
 
+def unconfirmed_words(document: BookDocument, locator: ExcerptLocator) -> list[str]:
+    """The words inside a locator's span that ingestion could not confirm.
+
+    A word broken across a line ending is reconstructed at ingestion, and the
+    book usually settles which reconstruction was meant by using the word
+    elsewhere. Where it does not, the passage contains characters this engine
+    chose rather than characters the book printed — so it is not a quotation,
+    whatever else is true of it.
+
+    Excerpt selection already refuses these passages. This is the check made
+    again at the end, over the item that is actually about to be exported,
+    because the guarantee is about what leaves the engine.
+    """
+    chapter = document.chapter(locator.chapter)
+    found: list[str] = []
+
+    for paragraph in chapter.paragraphs:
+        for offset in paragraph.uncertain_repair_offsets:
+            position = paragraph.char_start + offset
+            if not locator.char_start <= position < locator.char_end:
+                continue
+            start = chapter.text.rfind(" ", locator.char_start, position) + 1
+            end = chapter.text.find(" ", position)
+            end = locator.char_end if end == -1 else min(end, locator.char_end)
+            found.append(chapter.text[max(start, locator.char_start) : end])
+
+    return found
+
+
 def locator_from_sentences(
     document: BookDocument, chapter_number: int, sentence_ids: list[str]
 ) -> ExcerptLocator:

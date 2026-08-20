@@ -166,8 +166,9 @@ def _attach_excerpt(
     if chosen is None:
         item.fail(
             f"No usable passage for {item.term!r} in {lesson.reading_range}: every "
-            "occurrence sits in a sentence outside the excerpt length limits or "
-            "crossing a paragraph break."
+            "occurrence sits in a sentence outside the excerpt length limits, "
+            "crossing a paragraph break, or reading a word rejoined across a "
+            "line break in a form the book does not confirm."
         )
         return False
 

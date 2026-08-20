@@ -38,7 +38,15 @@ PARAGRAPH_SEPARATOR = "\n\n"
 
 @dataclass(frozen=True, slots=True)
 class Paragraph:
-    """One paragraph, located in its chapter's text."""
+    """One paragraph, located in its chapter's text.
+
+    Two lists of repair offsets, not one. `repair_offsets` is every word this
+    engine rejoined across a line break, which is what the ingestion report
+    counts. `uncertain_repair_offsets` is the subset the book itself could not
+    settle — where `self-conscious` and `selfconscious` were equally consistent
+    with the rest of the novel — and those are the only ones that stop a
+    passage being quoted, because those are the only ones that might be wrong.
+    """
 
     id: str
     chapter: int
@@ -47,6 +55,7 @@ class Paragraph:
     char_start: int
     char_end: int
     repair_offsets: tuple[int, ...] = ()
+    uncertain_repair_offsets: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,6 +161,7 @@ class IngestionStats:
     sentences: int = 0
     characters: int = 0
     hyphen_repairs: int = 0
+    hyphen_repairs_uncertain: int = 0
 
 
 @dataclass(slots=True)
@@ -221,13 +231,20 @@ def build_document(
     *,
     title: str,
     furniture_dropped: int = 0,
+    lexicon: frozenset[str] | None = None,
 ) -> BookDocument:
     """Assemble chapters, paragraphs, and sentences into the book's structure.
 
     Chapter bodies run from just after their heading line to just before the
     next one. Front matter and back matter are simply not in the document: a
     lesson cannot reference them, and a quotation drawn from an acknowledgements
-    page would be worse than no quotation at all.
+    page would be worse than no quotation at all. Lines marked as page furniture
+    are not in it either, whichever detection pass produced the headings.
+
+    `lexicon` is the book's own unbroken vocabulary, used to decide what a word
+    split across a line ending was. It is passed in rather than derived here
+    because it has to be built from the whole book: a chapter is far too small
+    a sample to say whether this novel writes `self-conscious` or not.
     """
     stats = IngestionStats(
         pages=book.page_count,
@@ -251,8 +268,11 @@ def build_document(
             end = body_end
         end = max(start, min(end, body_end))
 
-        chapter_lines = lines[start:end]
-        assembled = assemble_paragraphs(chapter_lines, metrics)
+        # Detection needed every line, including the running heads a book may
+        # set its headings beside. A quotation needs none of them: this is the
+        # point where the two streams part, and only prose goes on.
+        chapter_lines = [line for line in lines[start:end] if not line.furniture]
+        assembled = assemble_paragraphs(chapter_lines, metrics, lexicon)
 
         pieces: list[str] = []
         paragraphs: list[Paragraph] = []
@@ -271,6 +291,7 @@ def build_document(
                 char_start=offset,
                 char_end=offset + len(block.text),
                 repair_offsets=tuple(block.repair_offsets),
+                uncertain_repair_offsets=tuple(block.uncertain_repair_offsets),
             )
             paragraphs.append(paragraph)
 
@@ -313,6 +334,9 @@ def build_document(
         stats.characters += len(text)
         stats.hyphen_repairs += sum(
             len(paragraph.repair_offsets) for paragraph in paragraphs
+        )
+        stats.hyphen_repairs_uncertain += sum(
+            len(paragraph.uncertain_repair_offsets) for paragraph in paragraphs
         )
 
     return BookDocument(
@@ -366,7 +390,15 @@ def document_from_dict(payload: dict) -> BookDocument:
             page_end=entry["page_end"],
             text=entry["text"],
             paragraphs=[
-                Paragraph(**{**item, "repair_offsets": tuple(item["repair_offsets"])})
+                Paragraph(
+                    **{
+                        **item,
+                        "repair_offsets": tuple(item["repair_offsets"]),
+                        "uncertain_repair_offsets": tuple(
+                            item["uncertain_repair_offsets"]
+                        ),
+                    }
+                )
                 for item in entry["paragraphs"]
             ],
             sentences=[Sentence(**item) for item in entry["sentences"]],

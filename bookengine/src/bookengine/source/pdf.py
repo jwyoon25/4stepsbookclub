@@ -34,7 +34,14 @@ _SPAN_GAP_RATIO = 0.18
 
 @dataclass(frozen=True, slots=True)
 class TextLine:
-    """One horizontal run of text, as the PDF laid it out."""
+    """One horizontal run of text, as the PDF laid it out.
+
+    `furniture` is set by `layout.detect_furniture` rather than here — this
+    module has no opinion about what a line is for. It travels on the line so
+    that one stream can serve two purposes: chapter detection reads every line,
+    including the running heads that some books set their headings beside, and
+    paragraph assembly reads only the ones that are prose.
+    """
 
     page: int
     block: int
@@ -44,6 +51,7 @@ class TextLine:
     x1: float
     y1: float
     size: float
+    furniture: bool = False
 
     @property
     def height(self) -> float:

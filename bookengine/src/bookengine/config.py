@@ -145,6 +145,19 @@ class ExcerptConfig(_Strict):
     min_characters: int = Field(default=40, ge=1)
     max_sentences: int = Field(default=2, ge=1, le=4)
     prefer_unrepaired: bool = True
+    # Whether a passage may be quoted through a word the book could not
+    # confirm the spelling of.
+    #
+    # Ingestion rejoins words broken across a line, and for most of them the
+    # book settles the question itself: `extraordinary` appears whole
+    # elsewhere, `self-conscious` appears hyphenated elsewhere. Where it
+    # settles neither, the engine has produced a reading it cannot prove, and
+    # a student excerpt is the wrong place for one. The default is to pick a
+    # different occurrence of the word, or a different word — the pool is large
+    # and both are cheap. Setting this true is for a book so heavily hyphenated
+    # that too little survives the bar, and it means accepting that some
+    # excerpt somewhere spells a word the way the typesetter broke it.
+    allow_uncertain_repairs: bool = False
 
     @model_validator(mode="after")
     def _ordered(self) -> ExcerptConfig:

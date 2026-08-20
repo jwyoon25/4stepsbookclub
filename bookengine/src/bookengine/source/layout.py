@@ -7,11 +7,21 @@ across lines, so `incompre-` and `hensible` arrive as separate lines and the
 word is in the book without being findable in it.
 
 Both fixes change the characters that later get quoted, so both are counted and
-reported. The hyphen repair in particular is a judgement call — a book that
-breaks the existing hyphen in `self-aware` across a line is indistinguishable,
-locally, from one that breaks `incomprehensible` — so every repair records its
-offset. Excerpt selection can then prefer passages containing none of them, and
-an operator can see from the ingestion report how often it had to happen.
+reported, and both are arranged so that the change cannot reach a quotation
+unproved.
+
+The running heads are labelled rather than deleted. Chapter detection needs
+them — some books set their headings in the same margin band — but paragraph
+assembly never does, so one stream serves both and `THE MAZE RUNNER 143` has no
+route into a student excerpt.
+
+The hyphen repair is a judgement call locally: a book that breaks the existing
+hyphen in `self-aware` across a line looks exactly like one that breaks
+`incomprehensible`. It is not a judgement call globally, because a book that
+writes `self-aware` uses it whole somewhere else and never writes `selfaware`.
+So both readings are looked up in the book's own vocabulary and the book
+decides. Where it decides nothing, the repair is recorded as uncertain and the
+passage is not quoted from at all.
 """
 
 from __future__ import annotations
@@ -20,10 +30,10 @@ import re
 import statistics
 import unicodedata
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from .pdf import ExtractedBook, TextLine
-from .text import normalize_for_matching
+from .text import normalize_for_matching, normalize_term
 
 # A line is furniture when the same text appears on at least this share of
 # pages in the same margin band. Three pages is the floor, because a two-page
@@ -51,6 +61,24 @@ _SENTENCE_END = re.compile("[.!?][\"'”’)\\]]*$")
 # The characters a typesetter breaks a word with. Kept explicit rather than
 # folded, because the canonical text keeps the book's own punctuation.
 _LINE_BREAK_HYPHENS = ("-", "‐", "‑", "\u00ad")
+
+# What the book itself had to say about a word broken across a line.
+#
+# `extraor-` + `dinary` and `self-` + `conscious` look identical at the break:
+# a hyphen, a letter before it, a lowercase letter after it. Joining is right
+# for the first and destroys a word in the second. Nothing local separates
+# them — but the book is not local. A novel that hyphenates `self-conscious`
+# at one line ending has almost certainly set it whole somewhere else, and one
+# that broke `extraordinary` has `extraordinary` elsewhere and never
+# `extraor-dinary`. So the two reconstructions are looked up in the book's own
+# unbroken vocabulary and the book decides.
+REPAIR_JOINED = "joined"  # the closed-up form is attested elsewhere in the book
+REPAIR_HYPHENATED = "hyphenated"  # the hyphen is the author's; it is kept
+REPAIR_UNCERTAIN = "uncertain"  # the book attests both forms, or neither
+
+# A word this short either side of the break is not evidence of anything, and
+# looking it up mostly finds coincidences.
+_MIN_LOOKUP_LENGTH = 4
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,6 +116,20 @@ class FurnitureReport:
         return len(self.dropped)
 
 
+@dataclass(frozen=True, slots=True)
+class WordRepair:
+    """One word rejoined across a line break, and how sure the engine is."""
+
+    offset: int
+    kind: str
+    word: str
+
+    @property
+    def certain(self) -> bool:
+        """Whether the book itself settled which form was meant."""
+        return self.kind != REPAIR_UNCERTAIN
+
+
 @dataclass(slots=True)
 class AssembledParagraph:
     """One paragraph of prose, rebuilt from its lines."""
@@ -96,7 +138,16 @@ class AssembledParagraph:
     page_start: int
     page_end: int
     line_count: int
-    repair_offsets: list[int] = field(default_factory=list)
+    repairs: list[WordRepair] = field(default_factory=list)
+
+    @property
+    def repair_offsets(self) -> list[int]:
+        return [repair.offset for repair in self.repairs]
+
+    @property
+    def uncertain_repair_offsets(self) -> list[int]:
+        """Where this paragraph reads a word the book could not confirm."""
+        return [repair.offset for repair in self.repairs if not repair.certain]
 
 
 def page_metrics(lines: list[TextLine]) -> PageMetrics:
@@ -206,26 +257,110 @@ def prose_lines(
     return kept
 
 
-def _join(previous: str, addition: str) -> tuple[str, bool]:
+def marked_lines(
+    book: ExtractedBook, furniture: FurnitureReport
+) -> list[TextLine]:
+    """Every line in the book, with the page furniture labelled rather than gone.
+
+    Chapter detection sometimes needs the running heads: a book that sets
+    `CHAPTER 9` in the same margin band as its running title loses its headings
+    to the strip and reads as chapterless. Quoting never needs them, and a
+    student excerpt carrying `THE MAZE RUNNER 143` across a page break is a
+    defect however the headings were found.
+
+    Keeping one stream with the furniture labelled serves both. Detection reads
+    the whole list, so the line indices its headings carry stay valid; the
+    document is built from the labelled subset, so what a chapter is made of is
+    prose either way.
+    """
+    return [
+        replace(line, furniture=not furniture.keeps(page.number, index))
+        for page in book.pages
+        for index, line in enumerate(page.lines)
+    ]
+
+
+def build_lexicon(lines: list[TextLine]) -> frozenset[str]:
+    """Every word the book sets whole on one line, in comparison form.
+
+    This is the evidence a hyphen decision is made against, and it is built
+    only from words that were never broken: the fragment before a line-ending
+    hyphen is dropped, because a fragment is what is in question rather than
+    what answers it.
+    """
+    found: set[str] = set()
+    for line in lines:
+        words = line.text.split()
+        if words and words[-1].endswith(_LINE_BREAK_HYPHENS):
+            words = words[:-1]
+        for word in words:
+            normalized = normalize_term(word)
+            if normalized:
+                found.add(normalized)
+    return frozenset(found)
+
+
+def classify_repair(
+    tail: str, head: str, lexicon: frozenset[str]
+) -> tuple[str, str]:
+    """Decide what a word broken across a line was, and say how sure that is.
+
+    Returns the kind and the word as it will now read. The two readings are
+    looked up in the book's own vocabulary, and the one the book uses elsewhere
+    wins. When the book uses both, or neither, nothing here is allowed to
+    guess: the closed-up form is still produced, because it is right far more
+    often, but the repair is marked uncertain and excerpt selection will not
+    quote through it.
+    """
+    joined = normalize_term(tail[:-1] + head)
+    hyphenated = normalize_term(tail + head)
+
+    if min(len(joined), len(hyphenated)) < _MIN_LOOKUP_LENGTH:
+        return REPAIR_UNCERTAIN, joined
+
+    closed_up = joined in lexicon
+    kept = hyphenated in lexicon
+
+    if closed_up and not kept:
+        return REPAIR_JOINED, joined
+    if kept and not closed_up:
+        return REPAIR_HYPHENATED, hyphenated
+    return REPAIR_UNCERTAIN, joined
+
+
+def _join(
+    previous: str, addition: str, lexicon: frozenset[str] = frozenset()
+) -> tuple[str, str | None, str]:
     """Join two lines of one paragraph, repairing a broken word if that is what
     the line break was.
 
     The condition is narrow on purpose: a trailing hyphen, a letter before it,
     and a lowercase letter starting the next line. A line ending in a dash used
     as punctuation, or one whose next line starts a proper noun, is left alone.
+
+    Returns the joined text, the kind of repair, and the word that repair
+    produced. The kind is `None` where the line break was just a line break.
     """
-    if (
+    if not (
         previous.endswith(_LINE_BREAK_HYPHENS)
         and len(previous) >= 2
         and previous[-2].isalpha()
         and addition[:1].islower()
     ):
-        return previous[:-1] + addition, True
-    return f"{previous} {addition}", False
+        return f"{previous} {addition}", None, ""
+
+    kind, word = classify_repair(
+        previous.rsplit(" ", 1)[-1], addition.split(" ", 1)[0], lexicon
+    )
+    if kind == REPAIR_HYPHENATED:
+        return previous + addition, kind, word
+    return previous[:-1] + addition, kind, word
 
 
 def assemble_paragraphs(
-    lines: list[TextLine], metrics: PageMetrics
+    lines: list[TextLine],
+    metrics: PageMetrics,
+    lexicon: frozenset[str] | None = None,
 ) -> list[AssembledParagraph]:
     """Group consecutive lines into paragraphs and rejoin their words.
 
@@ -234,27 +369,40 @@ def assemble_paragraphs(
     visible — a previous line that both ended a sentence and stopped short of
     the right margin. A change of type size starts one too, which is what
     separates a chapter heading from the prose under it.
+
+    `lexicon` is the book's own unbroken vocabulary, from `build_lexicon`, and
+    it is what decides whether a word split at a line ending closes up or keeps
+    its hyphen. Without one every repair is recorded as uncertain, which is the
+    right answer when there is no evidence rather than a degraded one.
     """
+    vocabulary = frozenset() if lexicon is None else lexicon
     paragraphs: list[AssembledParagraph] = []
     current: list[TextLine] = []
 
     def flush() -> None:
         if not current:
             return
-        text = unicodedata.normalize("NFC", current[0].text)
-        offsets: list[int] = []
+        # The leading whitespace comes off before anything is measured. A strip
+        # applied at the end would move every character in the paragraph left
+        # and leave the recorded repair offsets pointing one word over.
+        text = unicodedata.normalize("NFC", current[0].text).lstrip()
+        repairs: list[WordRepair] = []
         for line in current[1:]:
             addition = unicodedata.normalize("NFC", line.text)
-            text, repaired = _join(text, addition)
-            if repaired:
-                offsets.append(len(text) - len(addition))
+            text, kind, word = _join(text, addition, vocabulary)
+            if kind is not None:
+                repairs.append(
+                    WordRepair(
+                        offset=len(text) - len(addition), kind=kind, word=word
+                    )
+                )
         paragraphs.append(
             AssembledParagraph(
-                text=text.strip(),
+                text=text.rstrip(),
                 page_start=current[0].page,
                 page_end=current[-1].page,
                 line_count=len(current),
-                repair_offsets=offsets,
+                repairs=repairs,
             )
         )
         current.clear()

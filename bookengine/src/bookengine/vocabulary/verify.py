@@ -18,7 +18,11 @@ from dataclasses import dataclass, field
 from ..config import JobConfig
 from ..export.workbook_contract import VOCABULARY_FIELD_LIMITS
 from ..source.document import BookDocument
-from ..source.excerpt import ExcerptVerification, verify_excerpt
+from ..source.excerpt import (
+    ExcerptVerification,
+    unconfirmed_words,
+    verify_excerpt,
+)
 from ..source.search import occurs_in_chapters
 from ..source.text import normalize_term
 from .models import Status, VocabularyItem
@@ -190,6 +194,18 @@ def verify_item(
             verification.reasons.append(
                 f"{item.term!r} has no {attribute.replace('_', ' ')}."
             )
+
+    unconfirmed = unconfirmed_words(document, item.locator)
+    verification.checks["excerpt_is_confirmed_text"] = (
+        job.excerpt.allow_uncertain_repairs or not unconfirmed
+    )
+    if not verification.checks["excerpt_is_confirmed_text"]:
+        listed = ", ".join(repr(word) for word in unconfirmed[:3])
+        verification.reasons.append(
+            f"{item.term!r}: the excerpt reads {listed}, rejoined across a line "
+            "break in a form the book itself does not use elsewhere. Those are "
+            "this engine's characters, not the book's."
+        )
 
     verification.checks["audit_passed"] = (
         item.audit is not None and item.audit.passed

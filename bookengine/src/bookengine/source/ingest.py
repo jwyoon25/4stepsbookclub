@@ -41,7 +41,9 @@ from .chapters import (
 from .document import BookDocument, Chapter, build_document
 from .layout import (
     FurnitureRecord,
+    build_lexicon,
     detect_furniture,
+    marked_lines,
     page_metrics,
     prose_lines,
 )
@@ -123,7 +125,11 @@ class IngestionReport:
         rows.extend(
             [
                 self._furniture_row(),
-                _row("Words rejoined across lines", f"{stats.hyphen_repairs:,}"),
+                _row(
+                    "Words rejoined across lines",
+                    f"{stats.hyphen_repairs:,} "
+                    f"({stats.hyphen_repairs_uncertain:,} unconfirmed)",
+                ),
                 _row(
                     "Paragraphs / sentences",
                     f"{stats.paragraphs:,} / {stats.sentences:,}",
@@ -204,29 +210,34 @@ def ingest_book(
     detection = detect_chapters(stripped)
     lines = stripped
     chapter_pass = STRIPPED_PASS
-    dropped = furniture.dropped_count
     notes: list[str] = []
 
     if not detection.headings:
         # A book whose headings live in the margin band loses them to the
         # furniture strip. Detection has to run on the same line list the
         # document is built from — the headings carry indices into it — so the
-        # retry keeps the furniture in the prose as well as in the search.
-        whole = prose_lines(book, None)
+        # retry runs over every line, with the furniture labelled rather than
+        # removed. `build_document` drops the labelled lines when it assembles
+        # paragraphs, so the headings are found and the running heads still
+        # never reach a quotation.
+        whole = marked_lines(book, furniture)
         retried = detect_chapters(whole)
         if retried.headings:
             detection = retried
             lines = whole
             chapter_pass = FULL_TEXT_PASS
-            dropped = 0
             notes.append(
                 "Chapter headings were only found once page furniture was put "
-                "back, so this book's headings sit in the margin band. Running "
-                "heads and page numbers remain inside the chapter text and will "
-                "appear in quotations drawn from a page break."
+                "back, so this book's headings sit in the same margin band as "
+                "its running heads. The furniture was used to find the chapter "
+                "map and then left out of the chapter text, so quotations are "
+                "unaffected — but the chapter boundaries are worth checking in "
+                "the listing above."
             )
 
-    metrics = page_metrics(lines)
+    prose = [line for line in lines if not line.furniture]
+    metrics = page_metrics(prose)
+
     require_confident_detection(
         detection, book_name=path.name, expected_chapters=expected_chapters
     )
@@ -237,7 +248,8 @@ def ingest_book(
         lines,
         metrics,
         title=book_title,
-        furniture_dropped=dropped,
+        furniture_dropped=furniture.dropped_count,
+        lexicon=build_lexicon(prose),
     )
 
     notes.extend(_detection_notes(document))
@@ -392,21 +404,40 @@ def _chapter_size_notes(document: BookDocument) -> list[str]:
 
 
 def _repair_notes(document: BookDocument) -> list[str]:
+    """What the hyphen repairs cost, where it is enough to matter.
+
+    Most repairs are settled by the book itself — the closed-up form turns up
+    whole somewhere else, or the hyphenated one does — and those are as
+    quotable as any other text. The unconfirmed remainder is what an operator
+    should know about, because passages containing one are not quoted at all,
+    which is a shrinking of the pool rather than a risk to the output.
+    """
     stats = document.stats
     if not stats.paragraphs:
         return []
 
+    notes: list[str] = []
     rate = stats.hyphen_repairs / stats.paragraphs
-    if rate < HIGH_REPAIR_PER_PARAGRAPH:
-        return []
 
-    return [
-        f"{stats.hyphen_repairs:,} words were rejoined across a line break, "
-        f"about {rate:.2f} per paragraph. At that rate this book hyphenates "
-        "heavily enough that a hyphen the author wrote has probably been "
-        "removed somewhere; excerpt selection prefers passages with no repairs "
-        "in them, but read a few of the quotations."
-    ]
+    if rate >= HIGH_REPAIR_PER_PARAGRAPH:
+        notes.append(
+            f"{stats.hyphen_repairs:,} words were rejoined across a line break, "
+            f"about {rate:.2f} per paragraph. This book hyphenates heavily, so "
+            "read a few of the generated quotations."
+        )
+
+    unconfirmed = stats.hyphen_repairs_uncertain
+    if unconfirmed:
+        share = unconfirmed / max(stats.hyphen_repairs, 1)
+        notes.append(
+            f"{unconfirmed:,} of {stats.hyphen_repairs:,} rejoined words "
+            f"({share:.0%}) are spellings the book does not use anywhere else, "
+            "so the engine cannot tell which reading was meant. Passages "
+            "containing one are not quoted; nothing unproved is exported, but "
+            "the pool of usable passages is that much smaller."
+        )
+
+    return notes
 
 
 def _sparse_page_notes(book: ExtractedBook) -> list[str]:

@@ -31,6 +31,7 @@ from ..source.excerpt import (
     ExcerptLocator,
     excerpt_for_cell,
     locator_from_sentences,
+    unconfirmed_words,
 )
 from ..source.search import Occurrence, find_occurrences
 from ..source.text import contains_whole_word
@@ -95,7 +96,8 @@ def build_excerpt(
 
     A sentence longer than the limit is refused rather than trimmed. Trimming
     would produce a passage that is not a sentence in the book, and the point of
-    this engine is that everything it prints is.
+    this engine is that everything it prints is. A passage reading a word the
+    book could not confirm the spelling of is refused for the same reason.
     """
     run = _sentences_from(document, occurrence)
 
@@ -123,6 +125,16 @@ def build_excerpt(
     except (ExcerptError, KeyError):
         return None
 
+    # Asked over the span actually chosen, not over the occurrence's own
+    # sentence: an excerpt may run to a second sentence, and the repair that
+    # matters could be in either. The passage reads a word this engine
+    # reconstructed and the book did not confirm — probably right, and
+    # "probably right" is the one thing a quotation may not be, because the
+    # student is told these are the book's own words.
+    unconfirmed = unconfirmed_words(document, locator)
+    if unconfirmed and not config.allow_uncertain_repairs:
+        return None
+
     text = excerpt_for_cell(document, locator)
     if not contains_whole_word(text, occurrence.surface):
         return None
@@ -140,6 +152,10 @@ def build_excerpt(
         if config.prefer_unrepaired:
             score -= 3.0
         notes.append("contains a word rejoined across a line break")
+    if unconfirmed:
+        notes.append(
+            f"reads {unconfirmed[0]!r}, rejoined in a form the book does not confirm"
+        )
 
     if _WEAK_OPENING.match(text.lstrip("\"'“‘")):
         score -= 1.5

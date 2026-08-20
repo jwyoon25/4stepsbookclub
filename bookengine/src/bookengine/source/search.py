@@ -115,12 +115,13 @@ def _keep_start(text: str, budget: int) -> str:
 def _sentence_overlaps_repair(
     chapter: Chapter, paragraph_id: str, start: int, end: int
 ) -> bool:
-    """Whether a passage contains a word this engine rejoined across a line.
+    """Whether a sentence contains a word this engine rejoined across a line.
 
-    A rejoined word is usually right and occasionally wrong — a book that broke
-    the hyphen in `self-aware` across a line is indistinguishable from one that
-    broke `incomprehensible`. Excerpt ranking prefers passages with none, so
-    the ones that go to print are the ones nothing was done to.
+    This is a preference, not a bar: excerpt ranking scores these passages down
+    so the ones that go to print are the ones nothing was done to. The bar is
+    `excerpt.unconfirmed_words`, which asks the narrower question — whether the
+    repair was one the book itself confirmed — over the span actually chosen
+    rather than over one sentence of it.
     """
     paragraph = chapter.paragraph(paragraph_id)
     return any(
