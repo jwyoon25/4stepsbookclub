@@ -43,7 +43,7 @@ from .document import BookDocument, document_from_dict, document_to_dict
 # from the same PDF: paragraph assembly, sentence segmentation, chapter
 # boundaries, identifier formats, or the serialised shape itself. Entries
 # written under any other value are ignored.
-CACHE_FORMAT_VERSION = 2
+CACHE_FORMAT_VERSION = 3
 
 _ENTRY_SUFFIX = ".json"
 

@@ -28,6 +28,7 @@ from .export import (
 )
 from .llm.registry import build_chains
 from .prompts import PromptLibrary
+from .source.approval import ApprovalStore
 from .source.cache import ParseCache
 from .source.ingest import ingest_book
 from .vocabulary.pipeline import Progress, RunResult, run_job
@@ -81,10 +82,58 @@ def command_ingest(arguments: argparse.Namespace) -> int:
         use_cache=not arguments.no_cache,
     )
     print(report.render())
-    if report.notes:
-        print("\nWorth checking by hand:")
-        for note in report.notes:
-            print(f"  - {note}")
+
+    store = ApprovalStore(directory=Path(arguments.cache))
+    if arguments.approve:
+        return _record_approval(report, store)
+
+    if report.needs_review:
+        existing = store.find(report.document)
+        if existing is not None:
+            print()
+            print(
+                f"This chapter map was approved on {existing.approved_at}, so "
+                "`vocab` will run against it."
+            )
+            return EXIT_OK
+
+        print()
+        print(
+            "Read the chapter listing above against the book itself — the first "
+            "chapter, the last, and any flagged above. Then re-run this command "
+            "with --approve to record that you have, and `vocab` will accept it."
+        )
+        return EXIT_INCOMPLETE
+
+    return EXIT_OK
+
+
+def _record_approval(report, store: ApprovalStore) -> int:
+    """Write down that a person has checked this chapter map.
+
+    Refused when there was nothing to check. An approval that could be given
+    without reading anything would train everyone to give it, and the value of
+    the whole mechanism is that it is only ever asked for when it matters.
+    """
+    if not report.needs_review:
+        print()
+        print(
+            f"Nothing to approve: this book ingested {report.status} and `vocab` "
+            "will run against it as it stands."
+        )
+        return EXIT_OK
+
+    approval = store.record(report.document, report.concerns)
+    print()
+    print(
+        f"Recorded: {approval.chapters} chapters in {approval.title}, "
+        f"reviewed against {len(approval.reviewed)} concern(s)."
+    )
+    print(f"  {store.path}")
+    print(
+        "This covers this exact chapter map. Re-parsing the same PDF with a "
+        "changed ingester produces a different map and asks again."
+    )
     return EXIT_OK
 
 
@@ -113,8 +162,12 @@ def command_vocab(arguments: argparse.Namespace) -> int:
     )
     document = ingestion.document
     cached = " (cached)" if ingestion.from_cache else ""
-    print(_line("Book ingestion", f"PASS{cached}"))
+    print(_line("Book ingestion", f"{ingestion.status}{cached}"))
     print(_line("Detected chapters", str(len(document.chapters))))
+
+    approval = _require_review(ingestion, cache_directory)
+    if approval is None:
+        return EXIT_INCOMPLETE
 
     notes = validate_lessons_against_book(job, document.chapter_numbers)
     print(_line("Lesson configuration", "PASS"))
@@ -160,6 +213,63 @@ def command_vocab(arguments: argparse.Namespace) -> int:
         f"{PASTE_TARGET}."
     )
     return EXIT_OK
+
+
+def _require_review(ingestion, cache_directory: Path | None):
+    """Stop a run whose chapter map nobody has vouched for.
+
+    Chapter assignment is the one workbook fact nothing downstream can check:
+    every quotation can be real and the whole book still filed one chapter off.
+    So a suspicious map is a stop rather than a note printed above the output —
+    which is what it used to be.
+
+    Returns the approval covering this map, a sentinel meaning none was needed,
+    or `None` to refuse.
+    """
+    if not ingestion.needs_review:
+        return _NO_REVIEW_NEEDED
+
+    print()
+    print("Ingestion needs a person to look at it before generating:")
+    for concern in ingestion.concerns:
+        print(f"  - {concern}")
+
+    if cache_directory is None:
+        print()
+        print(
+            "Approvals are kept in the cache directory, and this run has "
+            "--no-cache. Run `bookengine ingest --book <pdf> --approve` first, "
+            "or drop --no-cache."
+        )
+        return None
+
+    store = ApprovalStore(directory=cache_directory)
+    approval = store.find(ingestion.document)
+    if approval is not None:
+        print()
+        print(f"  approved on {approval.approved_at}; continuing.")
+        return approval
+
+    print()
+    print(
+        "Nobody has confirmed this chapter map. Check the listing against the "
+        "book, then record it:"
+    )
+    print(
+        f"  bookengine ingest --book {ingestion.document.source_name} "
+        f"--cache {cache_directory} --approve"
+    )
+    print()
+    print(
+        "Generation stopped rather than put unchecked chapter numbers on a "
+        "workbook page."
+    )
+    return None
+
+
+# Returned when no review was required, so that "approved" and "nothing to
+# approve" are distinguishable from `None`, which means refuse.
+_NO_REVIEW_NEEDED = object()
 
 
 def _print_summary(result: RunResult, job: JobConfig) -> None:
@@ -254,6 +364,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ingest.add_argument("--cache", default="cache/books", help="Parse cache directory.")
     ingest.add_argument("--no-cache", action="store_true")
+    ingest.add_argument(
+        "--approve",
+        action="store_true",
+        help=(
+            "Record that you have checked this chapter map against the book, "
+            "so `vocab` will run against it."
+        ),
+    )
     ingest.set_defaults(handler=command_ingest)
 
     vocab = subcommands.add_parser(

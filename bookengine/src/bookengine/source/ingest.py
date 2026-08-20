@@ -49,7 +49,6 @@ from .layout import (
 )
 from .pdf import (
     MAX_SPARSE_PAGE_SHARE,
-    ExtractedBook,
     content_hash,
     extract_pdf,
 )
@@ -81,20 +80,45 @@ NOTABLE_SPARSE_PAGE_SHARE = 0.10
 
 _LABEL_WIDTH = 32
 
+# What ingestion concluded about a book as a whole.
+#
+# There is no `FAIL` value here, and that is deliberate rather than an
+# omission: a book that cannot be used raises `ChapterDetectionError` or
+# `UnsupportedBookError` before a report exists to carry a status. What this
+# distinguishes is the two outcomes that both produce a usable document —
+# one where nothing looked wrong, and one where something did.
+#
+# The second used to be a note printed under the report, which a run then
+# proceeded past. Chapter assignment is the one workbook fact nothing
+# downstream can check, so "chapter 31 contains 37 characters" has to stop a
+# generation run until a person has looked, not scroll past above it.
+INGESTION_PASS = "PASS"
+INGESTION_REVIEW_REQUIRED = "REVIEW_REQUIRED"
+
+# The share of rejoined words the book could not confirm, above which the
+# chapter text is worth reading before quoting from it. Passages containing one
+# are already refused, so this is about how much of the book that costs.
+NOTABLE_UNCONFIRMED_REPAIR_SHARE = 0.25
+
 
 @dataclass(slots=True)
 class IngestionReport:
     """Everything one ingestion produced, including what to look at by hand.
 
-    `notes` are advisory by definition. Anything that makes the book unusable
-    has already been raised by the time this exists, so a note is always
-    something a person can judge and the engine cannot.
+    Two lists, and the difference between them is what a run does about them.
+    `notes` are things worth knowing. `concerns` are things a person has to
+    judge before this book's chapter numbers go on a page — and they are what
+    makes `status` `REVIEW_REQUIRED` rather than `PASS`.
+
+    Anything that makes the book unusable has already been raised by the time
+    this exists, so neither list contains a refusal.
     """
 
     document: BookDocument
     from_cache: bool
     furniture: list[FurnitureRecord] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    concerns: list[str] = field(default_factory=list)
     # Which detection pass produced the chapter map. A cached document does not
     # record it, so on that path it is unknown rather than assumed.
     chapter_pass: str | None = None
@@ -102,6 +126,14 @@ class IngestionReport:
     @property
     def chapter_count(self) -> int:
         return len(self.document.chapters)
+
+    @property
+    def status(self) -> str:
+        return INGESTION_REVIEW_REQUIRED if self.concerns else INGESTION_PASS
+
+    @property
+    def needs_review(self) -> bool:
+        return bool(self.concerns)
 
     def render(self) -> str:
         """The report an operator reads before trusting a chapter map."""
@@ -117,6 +149,8 @@ class IngestionReport:
         ]
         if self.chapter_pass is not None:
             rows.append(_row("Chapter detection pass", self.chapter_pass))
+
+        rows.append(_row("Ingestion status", self.status))
 
         rows.append("")
         rows.extend(_chapter_rows(document.chapters))
@@ -141,6 +175,11 @@ class IngestionReport:
                 ),
             ]
         )
+
+        if self.concerns:
+            rows.append("")
+            rows.append("A person has to check these before generating")
+            rows.extend(f"  - {concern}" for concern in self.concerns)
 
         if self.notes:
             rows.append("")
@@ -211,6 +250,7 @@ def ingest_book(
     lines = stripped
     chapter_pass = STRIPPED_PASS
     notes: list[str] = []
+    chapter_pass_concerns: list[str] = []
 
     if not detection.headings:
         # A book whose headings live in the margin band loses them to the
@@ -226,7 +266,7 @@ def ingest_book(
             detection = retried
             lines = whole
             chapter_pass = FULL_TEXT_PASS
-            notes.append(
+            chapter_pass_concerns.append(
                 "Chapter headings were only found once page furniture was put "
                 "back, so this book's headings sit in the same margin band as "
                 "its running heads. The furniture was used to find the chapter "
@@ -252,10 +292,11 @@ def ingest_book(
         lexicon=build_lexicon(prose),
     )
 
-    notes.extend(_detection_notes(document))
-    notes.extend(_chapter_size_notes(document))
+    concerns = list(chapter_pass_concerns)
+    concerns.extend(_detection_concerns(document))
+    concerns.extend(_chapter_size_concerns(document))
+    concerns.extend(_sparse_page_concerns(document))
     notes.extend(_repair_notes(document))
-    notes.extend(_sparse_page_notes(book))
 
     if cache is not None and use_cache:
         cache.store(document)
@@ -270,6 +311,7 @@ def ingest_book(
         from_cache=False,
         furniture=list(furniture.records),
         notes=notes,
+        concerns=concerns,
         chapter_pass=chapter_pass,
     )
 
@@ -299,11 +341,20 @@ def _from_cache(
         "This document came from the parse cache. Clear the cache to reparse "
         "the PDF from scratch."
     ]
-    notes.extend(_detection_notes(document))
-    notes.extend(_chapter_size_notes(document))
     notes.extend(_repair_notes(document))
 
-    return IngestionReport(document=document, from_cache=True, notes=notes)
+    # The same concerns are raised on this path as on the fresh one. A cache is
+    # a way to skip parsing, never a way to skip a review: the map it hands
+    # back is the same map somebody would have been asked about.
+    concerns = [
+        *_detection_concerns(document),
+        *_chapter_size_concerns(document),
+        *_sparse_page_concerns(document),
+    ]
+
+    return IngestionReport(
+        document=document, from_cache=True, notes=notes, concerns=concerns
+    )
 
 
 def _restored_detection(document: BookDocument) -> ChapterDetection:
@@ -341,7 +392,7 @@ def _restored_detection(document: BookDocument) -> ChapterDetection:
     )
 
 
-def _detection_notes(document: BookDocument) -> list[str]:
+def _detection_concerns(document: BookDocument) -> list[str]:
     """Say out loud that a chapter map was accepted with reservations."""
     notes: list[str] = []
 
@@ -357,7 +408,7 @@ def _detection_notes(document: BookDocument) -> list[str]:
     return notes
 
 
-def _chapter_size_notes(document: BookDocument) -> list[str]:
+def _chapter_size_concerns(document: BookDocument) -> list[str]:
     """Point at chapters whose length does not look like a chapter's.
 
     A heading matched inside the prose produces a chapter of a few hundred
@@ -440,21 +491,27 @@ def _repair_notes(document: BookDocument) -> list[str]:
     return notes
 
 
-def _sparse_page_notes(book: ExtractedBook) -> list[str]:
-    """Flag near-empty pages, which are illustrations or a partial scan."""
-    if not book.page_count:
+def _sparse_page_concerns(document: BookDocument) -> list[str]:
+    """Flag near-empty pages, which are illustrations or a partial scan.
+
+    Read off the document's own stats rather than the extraction, so that a run
+    against a cached parse raises this exactly as a fresh one does. A concern
+    that only appeared on first ingestion would be a review requirement any
+    second run walked straight past.
+    """
+    stats = document.stats
+    if not stats.pages or not stats.sparse_pages:
         return []
 
-    share = len(book.sparse_pages) / book.page_count
+    share = stats.sparse_pages / stats.pages
     if share < NOTABLE_SPARSE_PAGE_SHARE:
         return []
 
-    listed = _examples((str(page) for page in book.sparse_pages), quote=False)
     return [
-        f"{len(book.sparse_pages)} of {book.page_count} pages ({share:.0%}) "
-        f"carry almost no text: {listed}. Illustrations and part titles look "
-        f"like this, and so does a partly scanned book; the run is refused "
-        f"above {MAX_SPARSE_PAGE_SHARE:.0%}."
+        f"{stats.sparse_pages} of {stats.pages} pages ({share:.0%}) carry "
+        f"almost no text. Illustrations and part titles look like this, and so "
+        f"does a partly scanned book; the run is refused above "
+        f"{MAX_SPARSE_PAGE_SHARE:.0%}."
     ]
 
 

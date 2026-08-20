@@ -153,6 +153,11 @@ class IngestionStats:
     """What ingestion did, in numbers an operator can sanity-check."""
 
     pages: int = 0
+    # Pages carrying almost no text. Recorded on the document rather than left
+    # in the extraction it came from, because the ingestion report has to raise
+    # the same concerns from a cached parse as from a fresh one, and a cached
+    # parse has no `ExtractedBook` to ask.
+    sparse_pages: int = 0
     lines_extracted: int = 0
     furniture_lines_dropped: int = 0
     front_matter_lines: int = 0
@@ -248,6 +253,7 @@ def build_document(
     """
     stats = IngestionStats(
         pages=book.page_count,
+        sparse_pages=len(book.sparse_pages),
         lines_extracted=len(lines),
         furniture_lines_dropped=furniture_dropped,
         front_matter_lines=(
