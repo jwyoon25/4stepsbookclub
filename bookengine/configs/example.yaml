@@ -1,0 +1,104 @@
+# A vocabulary job. Copy this, point it at a book, and adjust the lessons.
+#
+# Run it with:
+#   bookengine vocab --config configs/the-book.yaml
+#
+# Everything with a default is shown here with its default, so this file is
+# also the reference. Delete the settings you are not changing.
+
+book:
+  # Relative paths resolve against this file. Book PDFs live in `sources/`,
+  # which is gitignored: a book is never committed.
+  path: ../sources/the-hollow-road.pdf
+  title: The Hollow Road
+
+  # The chapter count from the book's own contents page. Optional, and worth
+  # setting: it is the only fact about a book the PDF cannot supply about
+  # itself, so it is the check that catches a misread chapter map. Without it,
+  # a book whose chapters do not start on a fresh page will refuse to run.
+  expected_chapters: 12
+
+audience:
+  grade_min: 7
+  grade_max: 8
+  # Optional free text, passed to the model alongside the grade range.
+  description: Korean students reading their first full English novel.
+
+vocabulary_per_lesson: 20
+
+# The pool each lesson chooses from. Two to three times the final count leaves
+# room to reject a candidate without regenerating anything.
+candidates_per_lesson: 50
+
+lessons:
+  - lesson: 1
+    start_chapter: 1
+    end_chapter: 3
+  - lesson: 2
+    start_chapter: 4
+    end_chapter: 6
+  - lesson: 3
+    start_chapter: 7
+    end_chapter: 9
+  - lesson: 4
+    start_chapter: 10
+    end_chapter: 12
+
+candidates:
+  # `harvest` takes the pool from the book's own text and asks a model to judge
+  # it. `model` sends the chapters and asks a model to propose words. `hybrid`
+  # does both. Harvest is the default: every candidate provably occurs in the
+  # reading, and only one example sentence per word leaves this machine.
+  mode: harvest
+  pool_size: 250
+  rank_batch: 50
+  max_exclusion_risk: 3
+
+dedupe:
+  # `lemma` treats run/running/ran as one entry; `exact` teaches them
+  # separately. Exact duplicates are blocked across the book either way.
+  policy: lemma
+  scope: book
+
+excerpt:
+  # 600 is the workbook content schema's own limit for a vocabulary excerpt.
+  max_characters: 600
+  min_characters: 40
+  max_sentences: 2
+  # Prefer passages containing no word this engine rejoined across a line break.
+  prefer_unrepaired: true
+
+exclusions:
+  # Per-book exclusions. The generic rules — no proper nouns, no invented
+  # terminology, nothing far below the audience — are built in and are not
+  # listed here. This is for a particular book's own vocabulary, for example
+  # the Glader slang in The Maze Runner.
+  terms: []
+  allow_invented_terms: false
+
+llm:
+  # Model identifiers come from the environment. Free providers change their
+  # catalogues without notice, so a model id committed to this file goes stale.
+  generator:
+    provider: groq
+    model: ${GENERATOR_MODEL:-llama-3.3-70b-versatile}
+
+  # A different provider and a different model family, so the audit is a second
+  # opinion rather than the same opinion twice.
+  auditor:
+    provider: nvidia
+    model: ${AUDITOR_MODEL:-meta/llama-3.3-70b-instruct}
+
+  fallbacks:
+    - provider: gemini
+      model: ${GEMINI_MODEL:-gemini-2.0-flash}
+
+  cache: true
+  max_attempts: 3
+
+output:
+  directory: ../output/the-hollow-road
+  tsv_name: vocabulary.tsv
+  json_name: vocabulary.json
+  audit_name: audit.json
+  include_header: true

@@ -14,3 +14,16 @@ workbooks/output/.build/
 
 # Generated browser-compiler bundle for the workbook builder
 workbooks/output/browser-bundle/
+
+# Book ingestion engine: never commit a book, a virtualenv, or a generated run
+bookengine/.venv/
+bookengine/sources/
+bookengine/output/
+bookengine/cache/
+bookengine/*.egg-info/
+bookengine/src/*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage

@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "4steps-bookengine"
+version = "0.1.0"
+description = "Verified book-content generation for 4steps Book Club workbooks"
+requires-python = ">=3.11"
+license = { text = "UNLICENSED" }
+
+# The core stays deliberately small. Everything needed to ingest a book, prove a
+# quotation came out of it, and talk to a hosted model is here; anything that
+# pulls a model file or a compiler is an extra, so the deterministic layer — the
+# part that has to be trusted — installs and tests without them.
+dependencies = [
+    "pymupdf>=1.24",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "httpx>=0.27",
+    "pysbd>=0.3.4",
+]
+
+[project.optional-dependencies]
+# Lemma-level duplicate policy. Without it the engine falls back to the
+# rule-based lemmatizer in `vocabulary/dedupe.py`, which is weaker but honest
+# about being weaker.
+lemma = ["lemminflect>=0.2.3"]
+# Apple Silicon local inference, the last link in the fallback chain.
+local = ["mlx-lm>=0.18"]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.6"]
+
+[project.scripts]
+bookengine = "bookengine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+# The test helpers live beside the tests rather than in the package, so ruff
+# has to be told they are ours; otherwise it sorts them in with httpx.
+known-first-party = ["bookengine", "fixtures", "fakes", "conftest"]
