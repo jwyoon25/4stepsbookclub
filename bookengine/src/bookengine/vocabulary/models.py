@@ -102,6 +102,40 @@ class RubricScore:
         )
 
 
+# What each of the auditor's assessments has to say for an item to pass. A
+# value not listed here is a complaint, and one complaint is enough.
+#
+# This table, not the auditor's own `verdict` field, is what decides whether an
+# item passed. A free endpoint returning `{"verdict": "PASS", "korean_accuracy":
+# "INACCURATE"}` is not a rare event and it is not a judgement worth honouring;
+# it is a model that filled in a summary field without reading back what it had
+# just written. `prompts/audit.md` asks for consistency, and consistency is
+# checked here rather than assumed, because a prompt is a request and this is a
+# rule.
+#
+# `MINOR_ISSUE` is not acceptable either. It reads like a small thing, and for
+# an internal draft it would be; for a definition a student learns from, "the
+# Korean is nearly right" is not a state anything should ship in. An item can
+# always be replaced from the pool, so the cost of being strict here is a
+# candidate, and the cost of being lax is a wrong workbook row.
+AUDIT_REQUIRED_ASSESSMENTS: dict[str, frozenset[str]] = {
+    "difficulty": frozenset({"APPROPRIATE"}),
+    "definition_accuracy": frozenset({"ACCURATE"}),
+    "korean_accuracy": frozenset({"ACCURATE"}),
+    "context_accuracy": frozenset({"ACCURATE"}),
+    "excerpt_fit": frozenset({"GOOD"}),
+}
+
+# How each assessment is named in a sentence an operator reads.
+AUDIT_ASSESSMENT_LABELS: dict[str, str] = {
+    "difficulty": "the difficulty",
+    "definition_accuracy": "the definition",
+    "korean_accuracy": "the Korean meaning",
+    "context_accuracy": "the context sentence",
+    "excerpt_fit": "the excerpt",
+}
+
+
 @dataclass(frozen=True, slots=True)
 class AuditVerdict:
     """What the independent auditor concluded about one finished item."""
@@ -117,8 +151,25 @@ class AuditVerdict:
     model: str | None = None
 
     @property
+    def complaints(self) -> list[str]:
+        """Every assessment that is not one this engine accepts."""
+        return [
+            name
+            for name, acceptable in AUDIT_REQUIRED_ASSESSMENTS.items()
+            if str(getattr(self, name, "")).strip().upper() not in acceptable
+        ]
+
+    @property
     def passed(self) -> bool:
-        return self.verdict.upper() == "PASS"
+        """Whether this verdict clears an item, decided field by field.
+
+        Every condition has to hold: the top-level verdict *and* all five
+        assessments. A model cannot pass an item by writing `PASS` over its own
+        findings, and it cannot fail one by accident either — a `FAIL` with
+        five clean assessments still fails, because the auditor saw something
+        it did not have a field for and said so in the only way it could.
+        """
+        return self.verdict.strip().upper() == "PASS" and not self.complaints
 
 
 @dataclass(slots=True)

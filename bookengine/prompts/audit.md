@@ -66,14 +66,23 @@ For each one, decide:
 
 Then give the entry a verdict. Mark `FAIL` when any of these is true:
 
-- Any of the three accuracy judgements is `INACCURATE`.
-- `excerpt_fit` is `POOR`.
-- `difficulty` is `TOO_EASY` or `TOO_HARD`.
+- Any of the three accuracy judgements is anything other than `ACCURATE`.
+- `excerpt_fit` is anything other than `GOOD`.
+- `difficulty` is anything other than `APPROPRIATE`.
 - The word should not be taught at all: a proper noun, a word invented for this
   book, or something offensive.
 
-Otherwise mark `PASS`. One `MINOR_ISSUE` on its own is not a failure; say what
-it is in `notes` and pass the entry.
+Otherwise mark `PASS`.
+
+`MINOR_ISSUE` and `WEAK` are failures here, and they are worth using rather than
+rounding away. A student learns this definition; "nearly right" is not a state
+to publish in, and a rejected entry costs the system one candidate out of a much
+larger pool. Report what you actually saw and let the verdict follow from it.
+
+The verdict must agree with the five judgements above it. A `PASS` sitting over
+a judgement that is not `ACCURATE`, `GOOD` and `APPROPRIATE` is read as a `FAIL`
+by the system calling you, because the specific judgements are what you looked
+at and the verdict is only a summary of them.
 
 Write `notes` whenever the verdict is `FAIL` or any judgement is less than
 `ACCURATE`. Say what is wrong and what would fix it. A failure without a reason

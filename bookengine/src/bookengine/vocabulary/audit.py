@@ -28,7 +28,7 @@ from ..llm.structured import generate_structured
 from ..prompts import PromptLibrary
 from ..source.document import BookDocument
 from ..source.text import normalize_term
-from .models import AuditVerdict, VocabularyItem
+from .models import AUDIT_ASSESSMENT_LABELS, AuditVerdict, VocabularyItem
 from .schemas import AuditReport
 
 # Items per audit request. Small enough that a free endpoint answers in full,
@@ -139,34 +139,17 @@ def apply_verdicts(
     return passed, failed
 
 
-# The values each assessment field may take, from `schemas.py`. Anything not
-# listed here is a complaint. They are spelled out rather than derived because
-# an assessment silently reading as acceptable is exactly the direction this
-# stage must not fail in.
-_ACCEPTABLE = {
-    "definition_accuracy": {"ACCURATE"},
-    "korean_accuracy": {"ACCURATE"},
-    "context_accuracy": {"ACCURATE"},
-    "excerpt_fit": {"GOOD"},
-    "difficulty": {"APPROPRIATE"},
-}
-
-_FIELD_LABELS = {
-    "definition_accuracy": "the definition",
-    "korean_accuracy": "the Korean meaning",
-    "context_accuracy": "the context sentence",
-    "excerpt_fit": "the excerpt",
-    "difficulty": "the difficulty",
-}
-
-
 def _explain(verdict: AuditVerdict) -> str:
-    """Why the auditor rejected an item, in a sentence an operator can read."""
-    problems = []
-    for field_name, acceptable in _ACCEPTABLE.items():
-        value = getattr(verdict, field_name, "")
-        if value.upper() not in acceptable:
-            problems.append(f"{_FIELD_LABELS[field_name]} ({value})")
+    """Why the auditor rejected an item, in a sentence an operator can read.
+
+    The complaints come from `AuditVerdict.complaints`, which is the same list
+    the pass/fail decision is made from. Two lists would let an item be
+    rejected for a reason the message does not mention.
+    """
+    problems = [
+        f"{AUDIT_ASSESSMENT_LABELS[name]} ({getattr(verdict, name)})"
+        for name in verdict.complaints
+    ]
 
     listed = ", ".join(problems) if problems else "the entry as a whole"
     note = f" Auditor: {verdict.notes}" if verdict.notes else ""

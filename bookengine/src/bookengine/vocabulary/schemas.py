@@ -29,7 +29,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from .models import AUDIT_REQUIRED_ASSESSMENTS
 
 # These mirror the vocabulary entry in workbooks/schema/lesson.schema.json. A
 # value past one of them is not a matter of taste: the workbook builder rejects
@@ -303,6 +305,38 @@ class AuditItemVerdict(_Answer):
             "the verdict is FAIL or anything is less than ACCURATE."
         ),
     )
+
+    @model_validator(mode="after")
+    def _verdict_agrees_with_its_own_findings(self) -> AuditItemVerdict:
+        """Make a self-contradicting reply say the thing it actually found.
+
+        A model that writes `INACCURATE` under `korean_accuracy` and `PASS` at
+        the top has not judged the entry acceptable; it has filled in a summary
+        field without reading back its own answers, which free endpoints do
+        often enough to plan for. The findings are the specific claims and the
+        verdict is the summary, so the findings win.
+
+        Raising instead would be worse. `AuditReport` is one object covering a
+        whole batch, so refusing it would throw away every correct verdict
+        beside the inconsistent one — including any genuine `FAIL`. Rewriting
+        the summary keeps the batch and loses nothing that was true.
+
+        This is a repair, not the gate. `AuditVerdict.passed` re-derives the
+        same decision downstream from the same table, so an item is not
+        depending on this validator having run.
+        """
+        if self.verdict == "PASS" and _dissenting_assessments(self):
+            self.verdict = "FAIL"
+        return self
+
+
+def _dissenting_assessments(verdict: AuditItemVerdict) -> list[str]:
+    """The assessments on one verdict that do not clear the engine's bar."""
+    return [
+        name
+        for name, acceptable in AUDIT_REQUIRED_ASSESSMENTS.items()
+        if str(getattr(verdict, name)).upper() not in acceptable
+    ]
 
 
 class AuditReport(_Answer):
