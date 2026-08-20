@@ -29,7 +29,12 @@ from ..llm.structured import generate_structured
 from ..prompts import PromptLibrary
 from ..source.document import BookDocument
 from ..source.search import find_occurrences
-from .audit import AUDIT_BATCH, apply_verdicts, audit_batch
+from .audit import (
+    AUDIT_BATCH,
+    apply_verdicts,
+    audit_batch,
+    weakest_independence,
+)
 from .candidates import Candidate, PoolReport, build_pool
 from .dedupe import DuplicateRegistry, build_lemmatizer
 from .entries import apply_draft, draft_entry
@@ -52,7 +57,11 @@ class RunStats:
     finished_at: str = ""
     generator_labels: list[str] = field(default_factory=list)
     auditor_labels: list[str] = field(default_factory=list)
-    audit_is_independent: bool = True
+    # Both are recorded because they answer different questions. The configured
+    # one is what the job asked for; the actual one is what the endpoints did,
+    # and only the second is evidence.
+    audit_independence_configured: str = "none"
+    audit_independence_actual: str = "none"
     lemmatizer: str = ""
     dedupe_policy: str = ""
     llm_calls: int = 0
@@ -68,7 +77,10 @@ class RunStats:
             "finished_at": self.finished_at,
             "generator": self.generator_labels,
             "auditor": self.auditor_labels,
-            "audit_is_independent": self.audit_is_independent,
+            "audit_independence": {
+                "configured": self.audit_independence_configured,
+                "actual": self.audit_independence_actual,
+            },
             "lemmatizer": self.lemmatizer,
             "dedupe_policy": self.dedupe_policy,
             "llm_calls": self.llm_calls,
@@ -95,6 +107,11 @@ class RunResult:
     @property
     def ok(self) -> bool:
         return self.report.ok
+
+    @property
+    def audit_was_independent(self) -> bool:
+        """Whether every exported row was audited by something else."""
+        return self.report.audit_not_independent == 0
 
 
 class Progress:
@@ -325,7 +342,7 @@ def run_job(
         started_at=datetime.now(UTC).isoformat(timespec="seconds"),
         generator_labels=generator.labels,
         auditor_labels=auditor.labels,
-        audit_is_independent=job.llm.audit_is_independent,
+        audit_independence_configured=job.llm.configured_independence,
         lemmatizer=lemmatizer.name,
         dedupe_policy=registry.policy_note,
     )
@@ -359,6 +376,9 @@ def run_job(
     # gap in a lesson's numbering.
     assign_orders(items)
 
+    stats.audit_independence_actual = weakest_independence(
+        [item for item in items if item.status is Status.READY]
+    )
     stats.duplicates_blocked = list(registry.blocked)
     stats.llm_calls = generator.calls + auditor.calls
     stats.cache_hits = generator.cache_hits + auditor.cache_hits

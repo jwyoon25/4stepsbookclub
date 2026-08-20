@@ -20,6 +20,8 @@ candidate pool.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from ..config import JobConfig
 from ..errors import StructuredResponseError
 from ..llm.base import Message
@@ -207,3 +209,80 @@ def _explain(verdict: AuditVerdict) -> str:
     listed = ", ".join(problems) if problems else "the entry as a whole"
     note = f" Auditor: {verdict.notes}" if verdict.notes else ""
     return f"The independent audit rejected {listed}.{note}"
+
+
+# How far apart the writer and the auditor actually were, strongest first. The
+# order matters: a run's independence is the weakest any of its items reached.
+INDEPENDENCE_ORDER = ("none", "model", "provider")
+
+# What was not recorded cannot be claimed. An item missing either side's
+# provenance is treated as the weakest reading rather than the likeliest one.
+UNKNOWN_INDEPENDENCE = "none"
+
+
+@dataclass(frozen=True, slots=True)
+class Independence:
+    """How independent one item's audit actually was, and from what."""
+
+    level: str
+    generator: str
+    auditor: str
+
+    def satisfies(self, requirement: str) -> bool:
+        """Whether this clears the job's bar.
+
+        `provider` is met only by two providers; `model` by two providers or
+        two models on one; `none` by anything, including a model marking its
+        own work.
+        """
+        return INDEPENDENCE_ORDER.index(self.level) >= INDEPENDENCE_ORDER.index(
+            requirement
+        )
+
+    def as_dict(self) -> dict:
+        return {
+            "level": self.level,
+            "generator": self.generator,
+            "auditor": self.auditor,
+        }
+
+
+def independence_of(item: VocabularyItem) -> Independence:
+    """What actually wrote this item and what actually audited it.
+
+    From the completions, not from the job file. Both chains fall back to the
+    same list, so a job naming Groq for writing and NVIDIA for auditing can
+    have Gemini answer both on a bad afternoon — and the configuration would
+    still read as two providers. This asks the only question with an answer:
+    which endpoint's words are in this row, and which endpoint approved them.
+    """
+    provenance = item.provenance
+    generator = _label(provenance.generator_provider, provenance.generator_model)
+    auditor = _label(provenance.auditor_provider, provenance.auditor_model)
+
+    if not provenance.generator_provider or not provenance.auditor_provider:
+        return Independence(UNKNOWN_INDEPENDENCE, generator, auditor)
+    if provenance.generator_provider != provenance.auditor_provider:
+        return Independence("provider", generator, auditor)
+    if provenance.generator_model != provenance.auditor_model:
+        return Independence("model", generator, auditor)
+    return Independence("none", generator, auditor)
+
+
+def weakest_independence(items: list[VocabularyItem]) -> str:
+    """The independence a whole run may claim: the least any item reached.
+
+    A run is not independently audited on average. One row marked by its own
+    writer is one row nobody checked, so the run's word for itself is the word
+    that row earned.
+    """
+    if not items:
+        return UNKNOWN_INDEPENDENCE
+    return min(
+        (independence_of(item).level for item in items),
+        key=INDEPENDENCE_ORDER.index,
+    )
+
+
+def _label(provider: str | None, model: str | None) -> str:
+    return f"{provider}/{model}" if provider else "unrecorded"

@@ -25,10 +25,16 @@ from fakes import ScriptedProvider
 
 
 def run(document, job, provider=None, auditor=None):
-    generator = ProviderChain(providers=[provider or ScriptedProvider()])
-    audit_chain = ProviderChain(
-        providers=[auditor or provider or ScriptedProvider(name="fake-auditor")]
-    )
+    """One run against scripted endpoints, with the two roles kept apart.
+
+    The auditor is a twin of the generator rather than the same object: same
+    scripted behaviour, different provider identity. The engine reads
+    independence off the completions that came back, so one object answering
+    both would make every test a test of a run that audited its own work.
+    """
+    writer = provider or ScriptedProvider()
+    generator = ProviderChain(providers=[writer])
+    audit_chain = ProviderChain(providers=[auditor or writer.as_auditor()])
     return run_job(document, job, generator, audit_chain, PromptLibrary())
 
 

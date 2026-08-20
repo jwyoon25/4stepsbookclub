@@ -25,6 +25,7 @@ from ..source.excerpt import (
 )
 from ..source.search import occurs_in_chapters
 from ..source.text import normalize_term
+from .audit import independence_of, weakest_independence
 from .models import Status, VocabularyItem
 
 # The workbook schema's field name for each part of an item, so a length
@@ -67,6 +68,11 @@ class FinalReport:
     chapter_checks_failed: int = 0
     audit_passed: int = 0
     audit_failed: int = 0
+    # How independent the audit actually turned out to be, from the completions
+    # rather than from the job file, and how many rows fell short of the job's
+    # requirement.
+    audit_independence: dict = field(default_factory=dict)
+    audit_not_independent: int = 0
 
     @property
     def ok(self) -> bool:
@@ -108,6 +114,17 @@ class FinalReport:
             remaining = len(lesson.shortfall_reasons) - 6
             if remaining > 0:
                 lines.append(f"    - and {remaining} further reasons; see audit.json")
+
+        if self.audit_not_independent:
+            actual = self.audit_independence.get("actual", "none")
+            lines.append(
+                f"{self.audit_not_independent} row(s) were audited by the same "
+                f"endpoint that wrote them. The job requires "
+                f"{self.audit_independence.get('required')}-level independence "
+                f"and the run reached {actual}: both chains fell back to one "
+                "provider. Add another endpoint to `llm.fallbacks`, or set "
+                "`llm.audit.requirement` to what this setup can actually offer."
+            )
 
         for conflict in self.duplicate_conflicts:
             lines.append(f"Duplicate vocabulary: {conflict}")
@@ -304,6 +321,8 @@ def final_verification(
             report.item_failures.append(reason)
             item.needs_review(f"Final verification failed: {reason}")
 
+    _apply_independence_policy(job, items, report)
+
     report.duplicate_conflicts = find_duplicates(
         [item for item in items if item.status is Status.READY]
     )
@@ -327,6 +346,52 @@ def final_verification(
         )
 
     return report
+
+
+def _apply_independence_policy(
+    job: JobConfig, items: list[VocabularyItem], report: FinalReport
+) -> None:
+    """Hold the run to the independence it actually got, not the one configured.
+
+    This is decided over the finished set rather than per item mid-run, because
+    it is not a property of an item and cannot be fixed by replacing one. If
+    the auditor was the generator, it will be the generator for the next
+    candidate too — so a run that failed items here would burn the whole pool
+    proving the same thing twenty times.
+
+    `needs_review` demotes the affected items: the work is kept and readable,
+    and it is not exported as proved. `fail` puts it in the run's failures.
+    `allow` records what happened and exports anyway.
+    """
+    ready = [item for item in items if item.status is Status.READY]
+    report.audit_independence = {
+        "required": job.llm.audit.requirement,
+        "configured": job.llm.configured_independence,
+        "actual": weakest_independence(ready),
+        "on_shared": job.llm.audit.on_shared,
+    }
+
+    if job.llm.audit.requirement == "none" or job.llm.audit.on_shared == "allow":
+        return
+
+    shared = [
+        (item, independence_of(item))
+        for item in ready
+        if not independence_of(item).satisfies(job.llm.audit.requirement)
+    ]
+    report.audit_not_independent = len(shared)
+    if not shared:
+        return
+
+    for item, found in shared:
+        reason = (
+            f"{item.term!r} was written by {found.generator} and audited by "
+            f"{found.auditor}, so the independent review the job requires "
+            f"({job.llm.audit.requirement}) did not happen for this row."
+        )
+        if job.llm.audit.on_shared == "fail":
+            report.item_failures.append(reason)
+        item.needs_review(reason)
 
 
 def _shortfall_reasons(items: list[VocabularyItem]) -> list[str]:

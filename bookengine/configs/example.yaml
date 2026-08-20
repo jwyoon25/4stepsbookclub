@@ -96,6 +96,20 @@ llm:
   cache: true
   max_attempts: 3
 
+  # Both chains fall back to the same list, so a bad afternoon can leave one
+  # endpoint writing and marking every entry while this file still names two.
+  # Independence is measured from the completions that came back, and this is
+  # what the run does about the answer.
+  audit:
+    # provider = two endpoints (strict, the default)
+    # model    = two models, same provider allowed
+    # none     = the audit is kept for its rubric, not its independence
+    requirement: provider
+    # needs_review = keep the rows, do not export them as proved
+    # fail         = the run is not successful
+    # allow        = export anyway; the artifact still records what happened
+    on_shared: needs_review
+
 output:
   directory: ../output/the-hollow-road
   tsv_name: vocabulary.tsv

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from bookengine.errors import ProviderError
 from bookengine.llm.base import Completion, Message
@@ -211,6 +211,20 @@ class ScriptedProvider:
             "The fake provider was asked something it does not recognise:\n"
             + messages[-1].content[:400]
         )
+
+    def as_auditor(self) -> ScriptedProvider:
+        """The same behaviour under a different identity.
+
+        The engine now computes audit independence from which endpoint actually
+        answered, so a test that used one object for both roles would exercise
+        a run whose auditor was its own writer — a real failure, and not the
+        one those tests are about. Sharing the mutable counters keeps the pair
+        behaving as one scripted model with two names.
+        """
+        twin = replace(self, name="fake-auditor", model="auditor-1")
+        twin.calls = self.calls
+        twin.fail_audit = self.fail_audit
+        return twin
 
     def close(self) -> None:
         pass

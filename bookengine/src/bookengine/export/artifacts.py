@@ -29,6 +29,7 @@ from pathlib import Path
 
 from ..config import JobConfig
 from ..source.document import BookDocument
+from ..vocabulary.audit import independence_of, weakest_independence
 from ..vocabulary.models import Status, VocabularyItem
 from .tsv import exportable_items, vocabulary_rows
 from .workbook_contract import VOCABULARY_COLUMNS
@@ -251,13 +252,30 @@ def _audit_counts(items: list[VocabularyItem], *, job: JobConfig) -> dict:
     unaudited = sum(
         1 for item in items if item.audit is None and item.status is Status.READY
     )
+    ready = [item for item in items if item.status is Status.READY]
+    pairings = Counter(
+        (
+            independence_of(item).generator,
+            independence_of(item).auditor,
+        )
+        for item in ready
+    )
     return {
         "passed": passed,
         "failed": failed,
         "ready_without_audit": unaudited,
-        "independent": job.llm.audit_is_independent,
-        "generator": job.llm.generator.label,
-        "auditor": job.llm.auditor.label,
+        # What the job asked for, and what the endpoints did. They differ
+        # whenever both chains fell back to the same provider, which is exactly
+        # the case a configured-only answer would misreport.
+        "independence_configured": job.llm.configured_independence,
+        "independence_actual": weakest_independence(ready),
+        "independence_required": job.llm.audit.requirement,
+        "configured_generator": job.llm.generator.label,
+        "configured_auditor": job.llm.auditor.label,
+        "actual_pairings": [
+            {"generator": generator, "auditor": auditor, "items": count}
+            for (generator, auditor), count in sorted(pairings.items())
+        ],
     }
 
 
@@ -296,6 +314,7 @@ def _job_summary(job: JobConfig) -> dict:
             "min_characters": job.excerpt.min_characters,
             "max_sentences": job.excerpt.max_sentences,
             "prefer_unrepaired": job.excerpt.prefer_unrepaired,
+            "allow_uncertain_repairs": job.excerpt.allow_uncertain_repairs,
         },
         "exclusions": {
             "terms": list(job.exclusions.terms),
@@ -305,7 +324,9 @@ def _job_summary(job: JobConfig) -> dict:
             "generator": job.llm.generator.label,
             "auditor": job.llm.auditor.label,
             "fallbacks": [provider.label for provider in job.llm.fallbacks],
-            "audit_is_independent": job.llm.audit_is_independent,
+            "audit_requirement": job.llm.audit.requirement,
+            "audit_on_shared": job.llm.audit.on_shared,
+            "configured_independence": job.llm.configured_independence,
             "max_attempts": job.llm.max_attempts,
             "cache": job.llm.cache,
         },

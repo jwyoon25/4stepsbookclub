@@ -199,6 +199,34 @@ class ProviderConfig(_Strict):
         return f"{self.provider}/{self.model}"
 
 
+class AuditConfig(_Strict):
+    """What "independent" has to mean, and what happens when it does not hold.
+
+    The audit stage is worth having because something other than the writer
+    looked at the work. Both chains fall back to the same list, though, so a
+    run configured with two providers can end up with one answering both — and
+    a run that then reported an independent audit would be claiming a check it
+    did not perform.
+
+    `requirement` says what counts. `provider` is the strict reading and the
+    default: two endpoints, which fail differently and were trained by
+    different people. `model` accepts two models on one provider, which is
+    weaker — models from one lab share training data and failure modes — but is
+    a real second opinion and is sometimes all a free tier offers. `none` is
+    for a run where the audit is kept for its rubric rather than for its
+    independence, and it still records what actually happened.
+
+    `on_shared` says what to do about items that fall short. Retrying is not
+    among the options: if the auditor was the generator, it will be the
+    generator next time too. `needs_review` keeps the work and refuses to call
+    it proved, which is the honest default. `fail` is for a run whose output
+    goes straight to students. `allow` exports it and says so in the artifact.
+    """
+
+    requirement: Literal["provider", "model", "none"] = "provider"
+    on_shared: Literal["needs_review", "fail", "allow"] = "needs_review"
+
+
 class LLMConfig(_Strict):
     """Which endpoints do the generating and which do the auditing."""
 
@@ -207,26 +235,27 @@ class LLMConfig(_Strict):
     fallbacks: list[ProviderConfig] = Field(default_factory=list)
     cache: bool = True
     max_attempts: int = Field(default=3, ge=1, le=6)
+    audit: AuditConfig = Field(default_factory=AuditConfig)
 
-    @model_validator(mode="after")
-    def _independent(self) -> LLMConfig:
-        """Warn, not fail, when one model both writes and marks its own work.
+    @property
+    def configured_independence(self) -> str:
+        """What the configuration alone promises, before anything is called.
 
-        Independence is the point of the audit stage, and a shared provider
-        undermines it. It is not made an error because a single free provider
-        may be all that is available on a given day, and a run that is honest
-        about its weaker audit beats no run at all.
+        Worth reporting and not worth trusting. A job naming two providers can
+        still have one answer both calls, because both chains fall back to the
+        same list; a run's real independence is computed from the completions
+        that came back, and this is only the intent.
         """
-        if (
-            self.generator.provider == self.auditor.provider
-            and self.generator.model == self.auditor.model
-        ):
-            self.__dict__["_shared_model"] = True
-        return self
+        if self.generator.provider != self.auditor.provider:
+            return "provider"
+        if self.generator.model != self.auditor.model:
+            return "model"
+        return "none"
 
     @property
     def audit_is_independent(self) -> bool:
-        return not self.__dict__.get("_shared_model", False)
+        """Whether the configuration asks for two different models at all."""
+        return self.configured_independence != "none"
 
 
 class OutputConfig(_Strict):

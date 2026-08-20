@@ -180,6 +180,14 @@ def _print_summary(result: RunResult, job: JobConfig) -> None:
     )
     print(_line("Checking duplicates", f"{len(report.duplicate_conflicts)} found"))
     print(_line("Independent audit", f"{report.audit_passed}/{audit_total}"))
+    independence = report.audit_independence
+    print(
+        _line(
+            "Audit independence",
+            f"{independence.get('actual', 'none')} "
+            f"(required: {independence.get('required', 'none')})",
+        )
+    )
     print(_line("Final verification", "PASS" if report.ok else "FAILED"))
     print()
     for lesson in report.lessons:
@@ -187,12 +195,23 @@ def _print_summary(result: RunResult, job: JobConfig) -> None:
         print(f"  Lesson {lesson.lesson}: {lesson.ready}/{lesson.requested}{mark}")
     print()
     print(f"READY: {report.ready_total} / {job.total_requested}")
-    if not result.stats.audit_is_independent:
+    if report.audit_not_independent:
         print()
         print(
-            "  note: the generator and the auditor are the same model, so the "
-            "audit is weaker than it is designed to be. Configure a different "
-            "provider for `llm.auditor`."
+            f"  note: {report.audit_not_independent} row(s) were audited by the "
+            "same endpoint that wrote them, so nothing independent checked "
+            "them. Both chains reach the same provider — add another endpoint "
+            "to `llm.fallbacks`."
+        )
+    elif result.stats.audit_independence_actual != (
+        result.stats.audit_independence_configured
+    ):
+        print()
+        print(
+            "  note: the audit was "
+            f"{result.stats.audit_independence_actual}-level independent, where "
+            f"the job configures {result.stats.audit_independence_configured}. "
+            "A provider was down and both chains fell back."
         )
 
 
