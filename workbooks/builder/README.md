@@ -3,13 +3,17 @@
 Google Sheets is the authoring surface, Typst compiles the workbook **in the
 author's browser**, the real PDF is previewed before export, and approved PDFs
 reach Drive through Apps Script.
+For the staff-facing day-to-day process, use the concise
+[`RUNBOOK.md`](RUNBOOK.md). The detailed sections below document the
+implementation and the browser compatibility gate.
 [`../BUILDER-ARCHITECTURE-DECISION.md`](../BUILDER-ARCHITECTURE-DECISION.md)
 records why, and demanded one thing before any of it was built: proof that the
 compiler and the Drive round trip work inside Google. They do — the Phase 0 gate
 passed on 2026-08-19, and the runbook below still reproduces it.
 
-What is here now is that gate plus the builder itself: three menu items, the
-content contract they run, and the Drive export they finish with.
+What is here now is that gate plus the builder itself: setup, validation,
+preview, and export menu actions, the content contract they run, and the Drive
+export they finish with.
 
 ```text
 builder/
@@ -25,7 +29,7 @@ builder/
 └── apps-script/
     ├── SheetGrids.gs                # reads every tab as a grid of cells
     ├── SheetHighlights.gs           # marks the cell a validation message names
-    ├── WorkbookBuilder.gs           # the three menu items and the window they open
+    ├── WorkbookBuilder.gs           # builder menu items and the window they open
     ├── WorkbookBuilderDialog.html   # the dialog the window answers to
     ├── WorkbookExport.gs            # unpacks archives into the Drive build folder
     ├── Phase0.gs                    # the gate's own menu item and Drive write

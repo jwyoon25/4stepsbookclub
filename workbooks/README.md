@@ -49,21 +49,39 @@ npm run workbook:browser-gate    # serve that bundle for the Phase 0 gate
 npm run workbook:browser-verify  # compare the browser compiler with native Typst
 ```
 
-## Google Sheets authoring MVP
+## Google Sheets authoring workflow
 
-Use the checked template at
-`outputs/2026-08-19-google-sheets-mvp/4steps-workbook-authoring-template.xlsx`:
+The protected master Google Sheet is the source template. For every new book,
+follow the canonical sequence:
 
-1. Upload the `.xlsx` file to Google Drive, open it with Google Sheets, and make
-   a copy for the book.
-2. Edit the workbook and lesson tabs. Add one question, prompt, or vocabulary
-   entry per row. Do not rename tabs or column headings.
-3. In Google Sheets, choose **File → Download → Microsoft Excel (.xlsx)**.
-4. Import the download from the repository root:
+```text
+Make a copy → Set up workbook → Edit → Validate → Preview → Export
+```
 
-   ```bash
-   npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
-   ```
+The concise staff instructions are in
+[`builder/RUNBOOK.md`](builder/RUNBOOK.md). In summary:
+
+1. Open the master and choose **File → Make a copy**. Do not edit the master.
+2. In the copy, choose **4steps → Set up this workbook** and approve the
+   one-time Google authorization if prompted.
+3. Edit the workbook and content tabs without renaming tabs or column headings.
+4. Choose **4steps → Validate workbook** and fix every cell-specific error.
+5. Open the preview, inspect student and teacher PDFs, then choose **Create
+   all approved PDFs**.
+6. Check the timestamped Drive folder and confirm the expected files.
+
+The copied workbook is the source of truth for the book. There is no need to
+download an Excel file during the normal authoring workflow.
+
+### Local `.xlsx` importer and fallback renderer
+
+The checked `.xlsx` importer remains useful for local fixtures, CI, and the
+legacy/native renderer fallback. To import a downloaded workbook into a
+validated schema-v1 package:
+
+```bash
+npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx
+```
 
 The command creates a validated schema-v1 package under
 `workbooks/content/<generated-book-id>/`. It stops with a tab, row, and field
@@ -77,25 +95,23 @@ npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx \
   --output-dir workbooks/content/existing-book-id
 ```
 
-To import, validate, and immediately create all student and teacher PDFs:
+To import, validate, and immediately create all student and teacher PDFs with
+the local fallback:
 
 ```bash
 npm run workbook:import-sheet -- path/to/downloaded-workbook.xlsx --render
 ```
 
-The bound Apps Script in `service/apps-script/Code.gs` adds a **4steps → Create
-PDFs** menu to the Sheet. It exports the current workbook, sends it to the same
-checked importer and Typst renderer used locally, and saves every resulting PDF
-to this Drive structure:
+The production browser builder saves resulting PDFs to this Drive structure:
 
 ```text
 <sheet's parent folder>/4steps PDF Builds/<book title>/<timestamp>/
 ```
 
-The menu keeps Google Sheets as the authoring surface while preserving the
+The builder keeps Google Sheets as the authoring surface while preserving the
 student/teacher editions, standalone lessons, validation, layout rules, and PDF
-audits. It is generation-on-demand rather than a live viewer; a split editor/PDF
-viewer can still be added after real authors have proven the content contract.
+audits. It is generation-on-demand: the author previews the real PDF, then
+exports the approved set.
 
 ### Browser compiler gate
 
