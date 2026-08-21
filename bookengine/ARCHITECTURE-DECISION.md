@@ -135,9 +135,15 @@ to guess well.
 Where the book attests both forms or neither, the repair is recorded as
 uncertain, and no excerpt is drawn through one. Preferring passages without them
 would not be enough — a word with one usable occurrence would still be quoted
-through a spelling nobody can prove. `excerpt.allow_uncertain_repairs` is the
-deliberate way out for a book hyphenated past usefulness, and the ingestion
-report says how much of the book the bar is costing.
+through a spelling nobody can prove.
+
+There is no setting that exports one. `excerpt.unconfirmed_repairs` chooses
+between not offering such a passage at all and offering it as a `NEEDS_REVIEW`
+row a person can read; `verify_item` refuses it either way and does not consult
+the job file. A flag that could turn an unproved reading into a Ready row would
+make "this quotation is the book's own words" conditional on a config file, and
+that claim is the reason the engine exists. The ingestion report says how much
+of a book the bar is costing.
 
 ## Page furniture is labelled, not deleted
 

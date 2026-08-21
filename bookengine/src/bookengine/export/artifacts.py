@@ -309,7 +309,7 @@ def _job_summary(job: JobConfig) -> dict:
             "min_characters": job.excerpt.min_characters,
             "max_sentences": job.excerpt.max_sentences,
             "prefer_unrepaired": job.excerpt.prefer_unrepaired,
-            "allow_uncertain_repairs": job.excerpt.allow_uncertain_repairs,
+            "unconfirmed_repairs": job.excerpt.unconfirmed_repairs,
         },
         "exclusions": {
             "terms": list(job.exclusions.terms),

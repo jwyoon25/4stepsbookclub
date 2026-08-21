@@ -29,6 +29,8 @@ from bookengine.source.layout import (
 )
 from bookengine.source.search import find_occurrences
 from bookengine.source.text import normalize_term
+from bookengine.vocabulary.candidates import Candidate
+from bookengine.vocabulary.models import RubricScore
 from bookengine.vocabulary.quotes import build_excerpt, excerpt_candidates
 from bookengine.vocabulary.verify import verify_item
 from conftest import build_job
@@ -214,14 +216,16 @@ def test_no_selected_excerpt_reads_a_word_the_book_did_not_confirm(hyphen_book):
 
 
 def test_an_occurrence_over_an_unconfirmed_repair_yields_no_excerpt(hyphen_book):
-    """Refused under the default, available under the escape hatch.
+    """Refused under the default; visible, and still unexportable, under `review`.
 
-    Both halves matter. The first is the guarantee; the second is that a book
-    hyphenated past all usefulness still has a way to be worked with, chosen
-    deliberately rather than fallen into.
+    Both halves matter. The first is the guarantee. The second is that a book
+    hyphenated past usefulness can be looked at rather than only failing — and
+    that looking at it is all `review` buys, since the passage still cannot
+    reach a student.
     """
     document = ingest_book(hyphen_book, cache=None, use_cache=False).document
-    strict, permissive = ExcerptConfig(), ExcerptConfig(allow_uncertain_repairs=True)
+    strict = ExcerptConfig()
+    permissive = ExcerptConfig(unconfirmed_repairs="review")
 
     blocked = [
         occurrence
@@ -238,6 +242,11 @@ def test_an_occurrence_over_an_unconfirmed_repair_yields_no_excerpt(hyphen_book)
 
     assert all(
         build_excerpt(document, occurrence, strict) is None
+        for occurrence in blocked
+    )
+    # And what `review` returns is marked as something that cannot be exported.
+    assert all(
+        not build_excerpt(document, occurrence, permissive).is_quotable
         for occurrence in blocked
     )
 
@@ -374,3 +383,112 @@ def test_the_report_says_furniture_went_even_on_the_retry(margin_heading_book):
         pytest.skip("this rendering produced no repeated running heads")
     assert report.document.stats.furniture_lines_dropped > 0
     assert "none removed" not in report.render()
+
+
+# --- and no setting can turn that into an export ---------------------------
+
+
+def test_no_excerpt_policy_lets_an_unconfirmed_passage_reach_ready(
+    hyphen_book, tmp_path
+):
+    """The guarantee is not a default. It is the only behaviour there is.
+
+    `unconfirmed_repairs` decides whether such a passage is *offered* — skipped
+    outright, or produced so a person can look at it. Neither value makes it
+    exportable, and the check in `verify_item` does not read the config at all.
+    """
+    from bookengine.vocabulary.models import Status, VocabularyItem
+
+    document = ingest_book(hyphen_book, cache=None, use_cache=False).document
+    number, locator = uncertain_locator(document)
+    if locator is None:
+        pytest.skip("this rendering left no unconfirmed repairs")
+
+    chapter = document.chapter(number)
+    for policy in ("skip", "review"):
+        job: JobConfig = build_job(
+            hyphen_book,
+            tmp_path / "out",
+            lessons=[{"lesson": 1, "start_chapter": 1, "end_chapter": 4}],
+            excerpt={
+                "max_characters": 600,
+                "min_characters": 10,
+                "unconfirmed_repairs": policy,
+            },
+        )
+        item = VocabularyItem(lesson=1, term="corridor", normalized_term="corridor")
+        item.locator = locator
+        item.excerpt = chapter.slice(locator.char_start, locator.char_end)
+        item.definition = "a passage"
+        item.korean_meaning = "복도"
+        item.excerpt_context = "Mara walks."
+        item.status = Status.AUDIT_PENDING
+
+        verification = verify_item(document, job, item)
+
+        assert verification.checks["excerpt_is_confirmed_text"] is False, policy
+        assert not verification.ok, policy
+
+
+def test_a_reviewable_passage_is_parked_rather_than_exported(hyphen_book, tmp_path):
+    """`review` produces a row for a person, never a row for a student."""
+    from bookengine.export.tsv import exportable_items
+    from bookengine.llm.chain import ProviderChain
+    from bookengine.prompts import PromptLibrary
+    from bookengine.vocabulary.dedupe import DuplicateRegistry
+    from bookengine.vocabulary.models import Status
+    from bookengine.vocabulary.pipeline import Progress, RunStats, build_lesson
+    from fakes import ScriptedProvider
+
+    document = ingest_book(hyphen_book, cache=None, use_cache=False).document
+    words = [
+        word
+        for chapter in document.chapters
+        for paragraph in chapter.paragraphs
+        if paragraph.uncertain_repair_offsets
+        for word in chapter.slice(paragraph.char_start, paragraph.char_end).split()
+    ]
+    candidates = [
+        Candidate(
+            term=normalize_term(word),
+            sense="s",
+            score=RubricScore(4, 4, 4, 4, 4, 1),
+        )
+        for word in dict.fromkeys(words)
+        if len(normalize_term(word)) > 6
+    ]
+    if not candidates:
+        pytest.skip("this rendering left no unconfirmed repairs")
+
+    job = build_job(
+        hyphen_book,
+        tmp_path / "out",
+        vocabulary_per_lesson=8,
+        candidates_per_lesson=len(candidates),
+        lessons=[{"lesson": 1, "start_chapter": 1, "end_chapter": 4}],
+        excerpt={"min_characters": 10, "unconfirmed_repairs": "review"},
+    )
+    writer = ScriptedProvider()
+    produced = build_lesson(
+        document,
+        job,
+        job.lesson(1),
+        candidates,
+        DuplicateRegistry(job.dedupe),
+        ProviderChain(providers=[writer]),
+        ProviderChain(providers=[writer.as_auditor()]),
+        PromptLibrary(),
+        RunStats(),
+        Progress(),
+    )
+
+    parked = [item for item in produced if item.status is Status.NEEDS_REVIEW]
+    if not parked:
+        pytest.skip("every candidate here had a confirmed passage available")
+
+    # The passage is on the item, so a person can read it...
+    assert all(item.excerpt for item in parked)
+    assert all("rejoined across a line break" in item.failures[0] for item in parked)
+    # ...and none of them is in what gets pasted into the Sheet.
+    exported = {id(item) for item in exportable_items(produced)}
+    assert not any(id(item) in exported for item in parked)

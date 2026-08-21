@@ -212,10 +212,12 @@ def verify_item(
                 f"{item.term!r} has no {attribute.replace('_', ' ')}."
             )
 
+    # No configuration reaches this check. Whether such a passage is offered at
+    # all is `excerpt.unconfirmed_repairs`; whether one can be exported is not a
+    # question the job file gets to answer, because "this is the book's own
+    # words" is the claim the engine exists to make.
     unconfirmed = unconfirmed_words(document, item.locator)
-    verification.checks["excerpt_is_confirmed_text"] = (
-        job.excerpt.allow_uncertain_repairs or not unconfirmed
-    )
+    verification.checks["excerpt_is_confirmed_text"] = not unconfirmed
     if not verification.checks["excerpt_is_confirmed_text"]:
         listed = ", ".join(repr(word) for word in unconfirmed[:3])
         verification.reasons.append(

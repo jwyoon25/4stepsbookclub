@@ -188,6 +188,20 @@ def _attach_excerpt(
 
     item.locator = chosen.locator
     item.excerpt = chosen.text
+
+    if not chosen.is_quotable:
+        # Only reachable under `excerpt.unconfirmed_repairs: review`, and it
+        # ends the item's run here. The passage and its locator are attached
+        # first so the review artifact carries what a person needs to look at,
+        # and nothing further is spent on a row that cannot ship.
+        item.needs_review(
+            f"The best passage for {item.term!r} reads "
+            f"{', '.join(repr(word) for word in chosen.unconfirmed)}, rejoined "
+            "across a line break in a form the book does not use elsewhere. A "
+            "person has to check it against the book."
+        )
+        return False
+
     occurrences = find_occurrences(document, item.term, chapters=lesson.chapters)
     item.provenance.sentence_ids = chosen.locator.sentence_ids
     item.provenance.pages = tuple(

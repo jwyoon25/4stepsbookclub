@@ -34,10 +34,10 @@ and nothing you are told here should ever be used to work around them.
 4. **Never commit a book PDF.** They belong in `bookengine/sources/`, which is
    gitignored.
 5. **Never add `--no-cache` or edit a config to loosen a check** in order to get
-   a run to pass. A refusal is the product working. In particular, never set
-   `excerpt.allow_uncertain_repairs`, `llm.audit.on_shared: allow`, or a higher
-   `limits.provider_calls_per_candidate` to make a run finish — each turns a
-   refusal into an export.
+   a run to pass. A refusal is the product working. No setting can make an
+   unproved quotation or an unreviewed row exportable — that is enforced in
+   code, not by convention — so a config change made for that reason will not
+   work and will only obscure why the run came up short.
 6. **Never run `ingest --approve` yourself.** It records that a *person* has
    checked a chapter map against the book. You have not got the book. Show the
    operator the report and the command, and let them run it.

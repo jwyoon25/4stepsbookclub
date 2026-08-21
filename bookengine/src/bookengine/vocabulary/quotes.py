@@ -62,10 +62,20 @@ class ExcerptCandidate:
     text: str
     score: float
     notes: list[str] = field(default_factory=list)
+    # Words inside this passage that ingestion rejoined across a line ending
+    # and the book did not confirm. A candidate carrying any of these cannot
+    # become a Ready row; it is here so the caller can say so rather than
+    # having to re-derive it.
+    unconfirmed: tuple[str, ...] = ()
 
     @property
     def chapter(self) -> int:
         return self.locator.chapter
+
+    @property
+    def is_quotable(self) -> bool:
+        """Whether this passage may go to a student as the book's own words."""
+        return not self.unconfirmed
 
 
 def _sentences_from(document: BookDocument, occurrence: Occurrence) -> list:
@@ -96,8 +106,12 @@ def build_excerpt(
 
     A sentence longer than the limit is refused rather than trimmed. Trimming
     would produce a passage that is not a sentence in the book, and the point of
-    this engine is that everything it prints is. A passage reading a word the
-    book could not confirm the spelling of is refused for the same reason.
+    this engine is that everything it prints is.
+
+    A passage reading a word the book could not confirm is refused too under
+    the default policy. Under `review` it is returned, marked — never so that
+    it can be exported, but so a person can be shown what the book made
+    unreadable.
     """
     run = _sentences_from(document, occurrence)
 
@@ -131,8 +145,8 @@ def build_excerpt(
     # reconstructed and the book did not confirm — probably right, and
     # "probably right" is the one thing a quotation may not be, because the
     # student is told these are the book's own words.
-    unconfirmed = unconfirmed_words(document, locator)
-    if unconfirmed and not config.allow_uncertain_repairs:
+    unconfirmed = tuple(unconfirmed_words(document, locator))
+    if unconfirmed and config.unconfirmed_repairs == "skip":
         return None
 
     text = excerpt_for_cell(document, locator)
@@ -154,7 +168,8 @@ def build_excerpt(
         notes.append("contains a word rejoined across a line break")
     if unconfirmed:
         notes.append(
-            f"reads {unconfirmed[0]!r}, rejoined in a form the book does not confirm"
+            f"reads {unconfirmed[0]!r}, rejoined in a form the book does not "
+            "confirm, so this passage cannot go to a student"
         )
 
     if _WEAK_OPENING.match(text.lstrip("\"'“‘")):
@@ -184,7 +199,12 @@ def build_excerpt(
         notes.append(f"{len(chosen)} sentences")
 
     return ExcerptCandidate(
-        occurrence=occurrence, locator=locator, text=text, score=score, notes=notes
+        occurrence=occurrence,
+        locator=locator,
+        text=text,
+        score=score,
+        notes=notes,
+        unconfirmed=unconfirmed,
     )
 
 
@@ -202,7 +222,11 @@ def excerpt_candidates(
         for occurrence in find_occurrences(document, term, chapters=chapters)
         if (candidate := build_excerpt(document, occurrence, config)) is not None
     ]
-    candidates.sort(key=lambda candidate: -candidate.score)
+    # Quotable first, and only then by score. A score penalty would let a
+    # strong unquotable passage outrank a weak quotable one, which is the wrong
+    # trade at any weighting: the weak one can go to a student and the strong
+    # one cannot.
+    candidates.sort(key=lambda candidate: (not candidate.is_quotable, -candidate.score))
     return candidates[:shortlist]
 
 

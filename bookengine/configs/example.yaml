@@ -75,6 +75,18 @@ excerpt:
   # Prefer passages containing no word this engine rejoined across a line break.
   prefer_unrepaired: true
 
+  # What to do with a passage reading a word the book itself could not confirm
+  # the spelling of — where both `self-conscious` and `selfconscious` were
+  # equally consistent with the rest of the novel.
+  #
+  #   skip   — do not offer the passage; use another occurrence or another word
+  #   review — offer it as a NEEDS_REVIEW row a person can read
+  #
+  # Neither exports it. There is no value that does: an unproved reading
+  # cannot become a Ready row, and that is enforced in `verify_item` rather
+  # than left to this file.
+  unconfirmed_repairs: skip
+
 exclusions:
   # Per-book exclusions. The generic rules — no proper nouns, no invented
   # terminology, nothing far below the audience — are built in and are not

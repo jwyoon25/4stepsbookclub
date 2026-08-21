@@ -115,11 +115,15 @@ where a bad prompt shows itself.
 
 ## 5. Only then, the whole book
 
-Do not raise `llm.audit.on_shared` to `allow`, or
-`excerpt.allow_uncertain_repairs` to `true`, or
-`limits.provider_calls_per_candidate`, to make a run finish. Each of those turns
-a refusal into an export. If a run comes up short, `audit.json` says which
-lesson and why; that is the thing to fix.
+Do not raise `limits.provider_calls_per_candidate` to make a run finish — it is
+a ceiling on what a misbehaving endpoint may spend, and reaching it is a
+provider problem rather than a book problem.
+
+Nothing else in the job file can help, which is deliberate. `excerpt.
+unconfirmed_repairs` and `llm.audit` change what is *attempted* and what is
+*reported*; neither can make an unproved quotation or an unreviewed row
+exportable. If a run comes up short, `audit.json` says which lesson and why.
+That is the thing to fix.
 
 ## What "free" needs someone to confirm
 
