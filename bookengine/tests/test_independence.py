@@ -12,6 +12,8 @@ did not get it says so instead of inheriting the claim from its job file.
 
 from __future__ import annotations
 
+import pytest
+
 from bookengine.errors import ProviderError
 from bookengine.llm.base import Completion, Message
 from bookengine.llm.chain import ProviderChain
@@ -223,27 +225,61 @@ def test_the_relaxed_requirement_still_refuses_one_model_doing_both(
     assert result.report.audit_not_independent > 0
 
 
-def test_a_run_may_opt_out_but_the_artifact_still_says_what_happened(
+@pytest.mark.parametrize("setting", ["none", "off", "allow", "any", ""])
+def test_there_is_no_way_to_ask_for_an_audit_that_need_not_be_independent(setting):
+    """The guarantee is in the type, so it fails before a run can start.
+
+    A model marking its own work is not a second look; it is the same reasoning
+    asked twice, which is the failure the audit stage was added to avoid. There
+    is no spelling of "audit it but do not require independence".
+    """
+    from pydantic import ValidationError
+
+    from bookengine.config import AuditConfig
+
+    with pytest.raises(ValidationError):
+        AuditConfig(requirement=setting)
+
+
+@pytest.mark.parametrize("setting", ["allow", "export", "ignore", "warn"])
+def test_there_is_no_policy_that_exports_a_row_nobody_independently_checked(setting):
+    """`on_shared` chooses how loudly to refuse, never whether to."""
+    from pydantic import ValidationError
+
+    from bookengine.config import AuditConfig
+
+    with pytest.raises(ValidationError):
+        AuditConfig(on_shared=setting)
+
+
+def test_neither_on_shared_policy_exports_a_shared_audit(
     document, book_path, tmp_path
 ):
-    """`allow` exports the work; it does not rewrite the record."""
-    job = two_provider_job(
-        book_path,
-        tmp_path / "out",
-        audit={"requirement": "provider", "on_shared": "allow"},
-    )
-    shared = ScriptedProvider(name="gemini", model="model-c")
+    """The two values differ in what they say, not in what they ship."""
+    outcomes = {}
+    for policy in ("needs_review", "fail"):
+        job = two_provider_job(
+            book_path,
+            tmp_path / f"out-{policy}",
+            audit={"requirement": "provider", "on_shared": policy},
+        )
+        shared = ScriptedProvider(name="gemini", model="model-c")
+        result = run_with(
+            document,
+            job,
+            [FailingProvider("groq"), shared],
+            [FailingProvider("nvidia"), shared],
+        )
+        outcomes[policy] = result
 
-    result = run_with(
-        document,
-        job,
-        [FailingProvider("groq"), shared],
-        [FailingProvider("nvidia"), shared],
-    )
+    for policy, result in outcomes.items():
+        assert result.ready == [], policy
+        assert result.report.audit_independence["actual"] == "none", policy
+        assert result.report.audit_not_independent > 0, policy
 
-    assert result.ok, result.report.render()
-    assert result.stats.audit_independence_actual == "none"
-    assert result.report.audit_independence["actual"] == "none"
+    # What differs is only whether the shortfall is named as a run failure.
+    assert outcomes["fail"].report.item_failures != []
+    assert outcomes["needs_review"].report.item_failures == []
 
 
 def test_failing_the_run_names_the_rows_rather_than_only_counting_them(

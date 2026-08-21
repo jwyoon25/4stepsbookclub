@@ -222,9 +222,12 @@ fallback, one model writing and marking every row while the job file still names
 two providers. So independence is computed from the completions that came back
 rather than from the configuration, at three levels — two providers, two models
 on one provider, or neither — and a run claims the weakest level any exported
-row reached. `llm.audit.requirement` sets the bar and `llm.audit.on_shared` says
-what happens to rows below it; the default keeps the work and refuses to call it
-proved.
+row reached. `llm.audit.requirement` sets the bar at two providers or two models, and
+`llm.audit.on_shared` decides how loudly a run refuses the rows below it —
+never whether to. There is no configuration that exports a row its own writer
+approved, and no `requirement` value that asks for less than a second model,
+because "an independent check passed this" is a claim about what happened and a
+job file cannot make it true.
 
 ## Deferred
 

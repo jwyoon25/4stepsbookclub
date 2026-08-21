@@ -150,7 +150,7 @@ item with its reason. The common causes, and the honest response to each:
 | The audit rejected it | The second model found the definition, Korean, or context wrong | Nothing to do; it was replaced. Persistent failures suggest a weak auditor model |
 | Candidate pool exhausted | The lesson's chapters do not hold enough teachable words | Raise `candidates.pool_size`, widen the chapter range, or lower `vocabulary_per_lesson` |
 | Not scored | The model's reply omitted candidates | Usually a rate limit; re-run, since the cache makes it cheap |
-| Audited by the endpoint that wrote it | Both chains fell back to one provider | Add a reachable endpoint to `llm.fallbacks` and re-run. Do not change `llm.audit.on_shared` |
+| Audited by the endpoint that wrote it | Both chains fell back to one provider | Add a reachable endpoint to `llm.fallbacks` and re-run. No setting exports these rows, so changing `llm.audit` will not help |
 | Stopped at its budget | An endpoint answered badly for a whole lesson | Read the rejection reasons first. It is a provider problem, not a book problem |
 
 Raising `excerpt.max_characters` above 600 is not an option — that is the

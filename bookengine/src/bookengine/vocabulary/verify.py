@@ -369,9 +369,11 @@ def _apply_independence_policy(
     candidate too — so a run that failed items here would burn the whole pool
     proving the same thing twenty times.
 
-    `needs_review` demotes the affected items: the work is kept and readable,
-    and it is not exported as proved. `fail` puts it in the run's failures.
-    `allow` records what happened and exports anyway.
+    Both policies demote the affected items — the work is kept and readable and
+    is not exported as proved — and `fail` additionally puts it in the run's
+    failures. There is no policy that exports one, because "an independent
+    check passed this" is a claim about what happened, and a job file cannot
+    make it true.
     """
     ready = [item for item in items if item.status is Status.READY]
     report.audit_independence = {
@@ -380,9 +382,6 @@ def _apply_independence_policy(
         "actual": weakest_independence(ready),
         "on_shared": job.llm.audit.on_shared,
     }
-
-    if job.llm.audit.requirement == "none" or job.llm.audit.on_shared == "allow":
-        return
 
     shared = [
         (item, found)

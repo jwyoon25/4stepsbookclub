@@ -122,11 +122,14 @@ llm:
   audit:
     # provider = two endpoints (strict, the default)
     # model    = two models, same provider allowed
-    # none     = the audit is kept for its rubric, not its independence
+    #
+    # There is no way to ask for an audit that need not be independent. A model
+    # marking its own work is the same reasoning asked twice, which is the
+    # failure this stage exists to avoid.
     requirement: provider
-    # needs_review = keep the rows, do not export them as proved
-    # fail         = the run is not successful
-    # allow        = export anyway; the artifact still records what happened
+    # What happens to rows that fall short. Neither exports one.
+    #   needs_review — hold them out of the TSV, let the rest of the run stand
+    #   fail         — additionally report the run as unsuccessful
     on_shared: needs_review
 
 output:

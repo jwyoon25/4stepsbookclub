@@ -238,19 +238,26 @@ class AuditConfig(_Strict):
     default: two endpoints, which fail differently and were trained by
     different people. `model` accepts two models on one provider, which is
     weaker — models from one lab share training data and failure modes — but is
-    a real second opinion and is sometimes all a free tier offers. `none` is
-    for a run where the audit is kept for its rubric rather than for its
-    independence, and it still records what actually happened.
+    a real second opinion, and it is always reachable, since every free
+    provider publishes more than one model.
 
-    `on_shared` says what to do about items that fall short. Retrying is not
-    among the options: if the auditor was the generator, it will be the
-    generator next time too. `needs_review` keeps the work and refuses to call
-    it proved, which is the honest default. `fail` is for a run whose output
-    goes straight to students. `allow` exports it and says so in the artifact.
+    There is no third value, and no way to say "audit it but do not require
+    independence". A model marking its own work is not a second look at all;
+    it is the same reasoning asked twice, which is the specific failure the
+    audit stage was added to avoid. Anything below `model` is a row nobody
+    checked.
+
+    `on_shared` says what to do about rows that fall short, and neither value
+    exports one. `needs_review` keeps the work, holds it out of the TSV, and
+    lets the rest of the run stand. `fail` additionally puts it in the run's
+    failures, for a pipeline where a partial result is not wanted. Retrying is
+    not among the options: if the auditor was the generator, it will be the
+    generator for the next candidate too, and failing items would burn the
+    whole pool proving that twenty times.
     """
 
-    requirement: Literal["provider", "model", "none"] = "provider"
-    on_shared: Literal["needs_review", "fail", "allow"] = "needs_review"
+    requirement: Literal["provider", "model"] = "provider"
+    on_shared: Literal["needs_review", "fail"] = "needs_review"
 
 
 class LLMConfig(_Strict):
