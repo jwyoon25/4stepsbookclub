@@ -119,7 +119,72 @@ against the book, check that the Korean is Korean and the chapter numbers are
 right. Then read `audit.json` — particularly the rejected candidates, which are
 where a bad prompt shows itself.
 
-## 5. Only then, the whole book
+## 5. Find out whether the auditor is any good
+
+Everything up to here proves the *software* handles a `FAIL` correctly. None of
+it proves a free model will notice the mistake in the first place, and that is
+now the largest unknown in the system. An auditor that passes everything is
+worth nothing and looks exactly like an auditor that is working.
+
+So before the whole book, corrupt Lesson 1's own output and see what comes back.
+Take the twenty entries you have just read, make a copy, and break fifteen to
+twenty of them — one fault each, spread across the kinds the audit claims to
+catch:
+
+| Corruption | Should show up as |
+| --- | --- |
+| Korean replaced with a plausible word for a *different* sense | `korean_accuracy` |
+| Korean replaced with something unrelated | `korean_accuracy` |
+| Definition of another sense of the same word | `definition_accuracy` |
+| Definition subtly too broad or too narrow | `definition_accuracy` |
+| Story context stating something the paragraphs do not show | `context_accuracy` |
+| Story context explaining the word instead of the scene | `context_accuracy` |
+| Word swapped for something a Grade 3 reader knows | `difficulty` TOO_EASY |
+| Word swapped for a rare technical term | `difficulty` TOO_HARD |
+| Word swapped for a character name or invented slang | `FAIL`, any field |
+
+Leave the rest untouched — the false-positive rate matters as much as the catch
+rate. An auditor that fails sound entries costs real words on every run.
+
+Run the corrupted set back through the audit stage on its own:
+
+```python
+from bookengine.config import load_job
+from bookengine.llm.registry import build_chains
+from bookengine.prompts import PromptLibrary
+from bookengine.source.ingest import ingest_book
+from bookengine.vocabulary.audit import audit_batch
+
+job = load_job("configs/the-maze-runner.yaml")
+document = ingest_book(job.book.path, title=job.book.title).document
+_, auditor = build_chains(job.llm)
+
+verdicts = audit_batch(items, job, document, auditor, PromptLibrary())
+for item in items:
+    print(item.term, verdicts[item.normalized_term].passed)
+```
+
+`items` is a list of `VocabularyItem`; the corrupted ones are the same objects
+with `korean_meaning`, `definition` or `excerpt_context` edited. Do not edit
+`excerpt` or the locator — those are not the auditor's job and the engine proves
+them separately.
+
+What the result tells you:
+
+- **Catches most faults, fails nothing sound.** The auditor is doing its job.
+  Proceed.
+- **Misses a whole category** — say, every wrong Korean gets through. That is a
+  prompt problem or a model problem, and it is specific enough to act on. Try
+  the other configured provider as auditor before rewriting the prompt.
+- **Passes everything.** The audit stage is decoration. Do not run the book
+  until that is fixed; the whole design assumes this stage is real.
+- **Fails sound entries too.** Every run will lose good words to it. Worth
+  knowing before it is doing that a hundred at a time.
+
+Keep the corrupted set. It is the regression test for any later prompt change,
+and it costs one audit call to re-run.
+
+## 6. Only then, the whole book
 
 Do not raise `limits.provider_calls_per_candidate` to make a run finish — it is
 a ceiling on what a misbehaving endpoint may spend, and reaching it is a
