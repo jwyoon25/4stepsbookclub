@@ -48,49 +48,66 @@ class Occurrence:
         return f"Chapter {self.chapter}"
 
 
-# What an elided neighbouring paragraph is replaced with, so a model reading
-# the window can tell a trimmed paragraph from one that ended there.
+# What an elided stretch of prose is replaced with, so a model reading a window
+# can tell a trimmed paragraph from one that ended there.
 ELISION = "[...]"
+
+# How much book text one request may carry, in characters.
+#
+# The cap is not about cost — these are free endpoints — but about what a
+# badly segmented book could do. Paragraph assembly rebuilds paragraphs from
+# positioned lines, and a PDF that defeats it can merge six pages into one
+# "paragraph"; without a bound, a single definition request would then post
+# tens of thousands of characters of a copyrighted novel to a third party.
+# Ingestion flags such a book, and this is the bound that holds whether or not
+# anybody read the flag.
+CONTEXT_CHARACTER_LIMIT = 1800
 
 
 @dataclass(frozen=True, slots=True)
 class ContextWindow:
-    """The prose around a quotation, for grounding an explanation."""
+    """The prose around a quotation, for grounding an explanation.
+
+    `focus` is the span within `passage` that the window exists to be about —
+    the excerpt itself. It is what survives trimming, so a bounded window is
+    still a window onto the right sentence rather than the first 1,800
+    characters of whatever paragraph the excerpt happened to land in.
+    """
 
     chapter: int
     page: int
     before: str
     passage: str
     after: str
+    focus: tuple[int, int] = (0, 0)
 
-    def as_prompt_block(self, *, limit: int | None = None) -> str:
+    def as_prompt_block(self, *, limit: int = CONTEXT_CHARACTER_LIMIT) -> str:
         """The window as it is shown to a model, with the passage marked.
 
-        `limit` bounds the source text, not the rendered block: the paragraph
-        labels are a fixed overhead on top of it. The paragraph the excerpt
-        sits in is never trimmed — it is the thing being judged — so the budget
-        comes off the neighbours, the previous paragraph losing its opening and
-        the next one its ending, which are the ends furthest from the passage.
-        A passage already over the budget leaves them out entirely.
+        `limit` bounds the book's characters. The paragraph labels and the
+        elision markers sit on top of it, and the focus span always survives —
+        so the true ceiling is `limit` plus a fixed overhead, and the floor is
+        whatever the excerpt itself measures.
+
+        What gets cut, in order: the neighbouring paragraphs from their outer
+        ends, which are furthest from the passage, and then the passage itself
+        from around the focus. In an ordinary book nothing is cut at all.
         """
-        before, after = self.before, self.after
-        if limit is not None:
-            before, after = self._trimmed(limit)
+        passage = _around(self.passage, self.focus, limit)
+        before, after = self._neighbours(max(0, limit - len(passage)))
 
         parts = []
         if before:
             parts.append(f"[previous paragraph]\n{before}")
-        parts.append(f"[paragraph containing the excerpt]\n{self.passage}")
+        parts.append(f"[paragraph containing the excerpt]\n{passage}")
         if after:
             parts.append(f"[next paragraph]\n{after}")
         return "\n\n".join(parts)
 
-    def _trimmed(self, limit: int) -> tuple[str, str]:
-        """The neighbouring paragraphs, cut to fit whatever budget is left."""
-        spare = limit - len(self.passage)
+    def _neighbours(self, spare: int) -> tuple[str, str]:
+        """The paragraphs either side, cut to whatever budget is left."""
         if spare <= 0:
             return "", ""
-
         share = spare // 2
         return (
             _keep_end(self.before, share),
@@ -98,20 +115,62 @@ class ContextWindow:
         )
 
 
+def _around(text: str, focus: tuple[int, int], budget: int) -> str:
+    """A stretch of `text` that fits `budget` and still contains `focus`.
+
+    The focus is never sacrificed to the budget: a window that dropped the
+    sentence it exists to be about would be worse than no window, because a
+    model would answer from the surrounding prose and appear to have read the
+    passage.
+    """
+    if len(text) <= budget:
+        return text
+
+    start = max(0, min(focus[0], len(text)))
+    end = max(start, min(focus[1], len(text)))
+    spare = max(0, budget - (end - start))
+
+    left = max(0, start - spare // 2)
+    right = min(len(text), end + spare - (start - left))
+
+    # Cut at word boundaries, but never past the focus.
+    if left > 0:
+        space = text.find(" ", left)
+        left = start if space == -1 else min(space + 1, start)
+    if right < len(text):
+        space = text.rfind(" ", 0, right)
+        right = end if space == -1 else max(space, end)
+
+    piece = text[left:right]
+    if left > 0:
+        piece = f"{ELISION} {piece.lstrip()}"
+    if right < len(text):
+        piece = f"{piece.rstrip()} {ELISION}"
+    return piece
+
+
 def _keep_end(text: str, budget: int) -> str:
-    """The last `budget` characters of a paragraph, marked as cut."""
+    """The last `budget` characters of a paragraph, cut at a word boundary."""
     if len(text) <= budget:
         return text
     room = budget - len(ELISION) - 1
-    return "" if room <= 0 else f"{ELISION} {text[-room:].lstrip()}"
+    if room <= 0:
+        return ""
+    tail = text[-room:]
+    space = tail.find(" ")
+    return f"{ELISION} {tail if space == -1 else tail[space + 1 :]}"
 
 
 def _keep_start(text: str, budget: int) -> str:
-    """The first `budget` characters of a paragraph, marked as cut."""
+    """The first `budget` characters of a paragraph, cut at a word boundary."""
     if len(text) <= budget:
         return text
     room = budget - len(ELISION) - 1
-    return "" if room <= 0 else f"{text[:room].rstrip()} {ELISION}"
+    if room <= 0:
+        return ""
+    head = text[:room]
+    space = head.rfind(" ")
+    return f"{head if space == -1 else head[:space]} {ELISION}"
 
 
 def _sentence_overlaps_repair(
@@ -201,24 +260,6 @@ def occurs_in_chapters(
     return bool(find_occurrences(document, term, chapters=chapters, limit=1))
 
 
-def context_window(
-    document: BookDocument,
-    occurrence: Occurrence,
-    *,
-    paragraphs_before: int = 1,
-    paragraphs_after: int = 1,
-) -> ContextWindow:
-    """The paragraphs around an occurrence, for a grounded explanation."""
-    return _window_around(
-        document,
-        chapter_number=occurrence.chapter,
-        paragraph_id=occurrence.paragraph_id,
-        page=occurrence.page,
-        paragraphs_before=paragraphs_before,
-        paragraphs_after=paragraphs_after,
-    )
-
-
 def context_for_locator(
     document: BookDocument,
     locator: ExcerptLocator,
@@ -226,12 +267,17 @@ def context_for_locator(
     paragraphs_before: int = 1,
     paragraphs_after: int = 1,
 ) -> ContextWindow:
-    """The paragraphs around a quotation that has already been cut.
+    """The paragraphs around a quotation, focused on the quotation itself.
 
-    The generator gets its window from the occurrence it was writing about; the
-    auditor has only a finished item, and a finished item carries a locator.
-    Both routes land in the same function, because an auditor shown different
-    source text from the writer would be checking a claim nobody made.
+    One function rather than two. There used to be a second entry point keyed
+    on an occurrence, whose focus was the whole sentence — and a sentence in a
+    badly segmented book has no bound, which is exactly the thing the window's
+    budget exists to bound. Every caller now describes what it wants by
+    locator, and a locator's span is capped by `ExcerptConfig.max_characters`.
+
+    The generator and the auditor therefore see the same window for the same
+    item, which the audit prompt already relies on: it tells the auditor the
+    entry was written from these same paragraphs.
     """
     chapter = document.chapter(locator.chapter)
     paragraph = chapter.paragraph_containing(locator.char_start)
@@ -245,6 +291,10 @@ def context_for_locator(
         chapter_number=locator.chapter,
         paragraph_id=paragraph.id,
         page=locator.page_start or paragraph.page_start,
+        focus=(
+            locator.char_start - paragraph.char_start,
+            locator.char_end - paragraph.char_start,
+        ),
         paragraphs_before=paragraphs_before,
         paragraphs_after=paragraphs_after,
     )
@@ -256,6 +306,7 @@ def _window_around(
     chapter_number: int,
     paragraph_id: str,
     page: int,
+    focus: tuple[int, int],
     paragraphs_before: int,
     paragraphs_after: int,
 ) -> ContextWindow:
@@ -279,4 +330,5 @@ def _window_around(
         before=joined(position - paragraphs_before, position),
         passage=chapter.slice(target.char_start, target.char_end),
         after=joined(position + 1, position + 1 + paragraphs_after),
+        focus=focus,
     )

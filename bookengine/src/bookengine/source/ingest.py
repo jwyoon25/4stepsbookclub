@@ -73,6 +73,18 @@ SHORT_CHAPTER_SHARE = 0.25
 # almost certainly been removed, so an operator should read a few excerpts.
 HIGH_REPAIR_PER_PARAGRAPH = 0.5
 
+# A paragraph longer than this is not a paragraph. Real ones run to a few
+# hundred characters and a deliberately long literary one to a couple of
+# thousand; past this the assembler has merged blocks that a reader sees as
+# separate — usually a page or a scene break it could not detect — and the
+# chapter's structure is not what it appears to be.
+#
+# It is a review signal rather than a refusal because the failure is a matter
+# of degree and a person can see it in one line of output. The bound that does
+# not depend on anyone reading it is `CONTEXT_CHARACTER_LIMIT`, which caps what
+# any single request may carry however badly a book is segmented.
+SUSPICIOUS_PARAGRAPH_CHARACTERS = 5_000
+
 # Well under the share at which `extract_pdf` refuses the book outright, but
 # enough near-empty pages to be worth a look: it is what a part-title-heavy
 # book and a partly scanned one both look like from here.
@@ -296,6 +308,7 @@ def ingest_book(
     concerns.extend(_detection_concerns(document))
     concerns.extend(_chapter_size_concerns(document))
     concerns.extend(_sparse_page_concerns(document))
+    concerns.extend(_paragraph_size_concerns(document))
     notes.extend(_repair_notes(document))
 
     if cache is not None and use_cache:
@@ -350,6 +363,7 @@ def _from_cache(
         *_detection_concerns(document),
         *_chapter_size_concerns(document),
         *_sparse_page_concerns(document),
+        *_paragraph_size_concerns(document),
     ]
 
     return IngestionReport(
@@ -452,6 +466,40 @@ def _chapter_size_concerns(document: BookDocument) -> list[str]:
             )
 
     return notes
+
+
+def _paragraph_size_concerns(document: BookDocument) -> list[str]:
+    """Flag paragraphs so large that the assembler cannot have got them right.
+
+    A merged block is not a wrong quotation — excerpts are still cut at
+    sentence boundaries inside it — but it means the paragraph map is wrong,
+    and the paragraph map is what "the passage around this excerpt" is built
+    from. An explanation grounded in six pages of unrelated prose is grounded
+    in the wrong thing.
+    """
+    oversized = [
+        (chapter.number, len(chapter.text[paragraph.char_start : paragraph.char_end]))
+        for chapter in document.chapters
+        for paragraph in chapter.paragraphs
+        if paragraph.char_end - paragraph.char_start > SUSPICIOUS_PARAGRAPH_CHARACTERS
+    ]
+    if not oversized:
+        return []
+
+    largest = max(size for _, size in oversized)
+    chapters = sorted({number for number, _ in oversized})
+    listed = ", ".join(str(number) for number in chapters[:8])
+    if len(chapters) > 8:
+        listed = f"{listed} and {len(chapters) - 8} more"
+    label = "chapter" if len(chapters) == 1 else "chapters"
+
+    return [
+        f"{len(oversized)} paragraph(s) are over "
+        f"{SUSPICIOUS_PARAGRAPH_CHARACTERS:,} characters, the largest "
+        f"{largest:,}, in {label} {listed}. Paragraph assembly has merged "
+        "blocks a reader sees as separate, so the paragraph map is wrong even "
+        "where the sentences inside it are right. Read one of them."
+    ]
 
 
 def _repair_notes(document: BookDocument) -> list[str]:

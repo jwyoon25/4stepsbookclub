@@ -222,17 +222,13 @@ def _draft(
     prompts: PromptLibrary,
     sense: str,
 ) -> bool:
-    occurrences = find_occurrences(document, item.term, chapters=lesson.chapters)
-    if not occurrences:
-        item.fail(f"{item.term!r} no longer occurs in {lesson.reading_range}.")
+    if item.locator is None:
+        item.fail(f"{item.term!r} has no excerpt to write a definition from.")
         return False
 
-    chosen = occurrences[
-        min(item.provenance.occurrence_index or 0, len(occurrences) - 1)
-    ]
     try:
         draft, completion = draft_entry(
-            document, job, item, chosen, chain, prompts, sense=sense
+            document, job, item, chain, prompts, sense=sense
         )
     except StructuredResponseError as failure:
         item.fail(f"The definition could not be written: {failure}")

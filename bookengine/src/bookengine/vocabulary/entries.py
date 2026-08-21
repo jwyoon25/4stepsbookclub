@@ -26,7 +26,7 @@ from ..llm.chain import ProviderChain
 from ..llm.structured import generate_structured
 from ..prompts import PromptLibrary
 from ..source.document import BookDocument
-from ..source.search import Occurrence, context_window
+from ..source.search import CONTEXT_CHARACTER_LIMIT, context_for_locator
 from .models import VocabularyItem
 from .schemas import EntryDraft
 
@@ -39,16 +39,20 @@ def draft_entry(
     document: BookDocument,
     job: JobConfig,
     item: VocabularyItem,
-    occurrence: Occurrence,
     chain: ProviderChain,
     prompts: PromptLibrary,
     *,
     sense: str = "",
 ) -> tuple[EntryDraft, Completion]:
-    """Write the three student-facing fields for one item."""
-    window = context_window(
+    """Write the three student-facing fields for one item.
+
+    The window is built from the item's own locator, so it is centred on the
+    passage being defined and bounded: a book whose paragraph assembly merged
+    six pages into one block cannot make this request carry six pages of it.
+    """
+    window = context_for_locator(
         document,
-        occurrence,
+        item.locator,
         paragraphs_before=CONTEXT_PARAGRAPHS,
         paragraphs_after=CONTEXT_PARAGRAPHS,
     )
@@ -56,7 +60,7 @@ def draft_entry(
         "entry",
         audience=job.audience.label,
         book_title=job.book.title or document.title,
-        context=window.as_prompt_block(),
+        context=window.as_prompt_block(limit=CONTEXT_CHARACTER_LIMIT),
         excerpt=item.excerpt or "",
         sense=sense or "not yet determined",
         term=item.term,

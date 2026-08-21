@@ -159,6 +159,31 @@ list. Detection reads everything and its heading indices stay valid; paragraph
 assembly reads only the prose. Neither pass can put `THE MAZE RUNNER 143` in a
 student's excerpt.
 
+## Every request carries a bounded amount of the book
+
+Paragraph assembly rebuilds paragraphs from positioned lines, and it is only as
+good as the layout it is given. A PDF whose page breaks it cannot see merges
+blocks a reader sees as separate, and a "paragraph" becomes six pages of a
+copyrighted novel — which a definition request would then post whole to a third
+party.
+
+So the context window has a character budget it cannot exceed, and it is
+centred on the excerpt rather than on the paragraph's opening: a bounded window
+onto the wrong sentence would be worse than none, because a model would answer
+from the surrounding prose and appear to have read the passage. The neighbours
+are cut first, then the passage from around the excerpt, always at word
+boundaries and always marked. In an ordinary book nothing is cut at all.
+
+There is one window function rather than two for the same reason. The older
+pair included one keyed on an occurrence, whose focus was the whole sentence —
+and a sentence in a badly segmented book has no bound either. Every caller now
+asks by locator, and a locator's span is capped by `excerpt.max_characters`.
+
+Ingestion also flags a book with paragraphs too large to be paragraphs, because
+a wrong paragraph map is worth knowing about even when nothing is leaking. That
+is a review signal; the budget is the guarantee, and it does not depend on
+anybody having read the signal.
+
 ## A lesson is filled before the next one starts
 
 Lessons are built in order, and each claims its vocabulary from a registry the

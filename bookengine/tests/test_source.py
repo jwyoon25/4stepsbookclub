@@ -10,7 +10,7 @@ from bookengine.source.cache import ParseCache
 from bookengine.source.document import build_document
 from bookengine.source.ingest import ingest_book
 from bookengine.source.pdf import extract_pdf
-from bookengine.source.search import context_window, find_occurrences
+from bookengine.source.search import context_for_locator, find_occurrences
 from bookengine.source.text import normalize_for_matching
 from fixtures.prose import chapter_specs
 from fixtures.synthetic_book import render_book
@@ -93,8 +93,17 @@ def test_occurrence_search_respects_the_lesson_s_chapter_range(document):
 
 
 def test_the_context_window_is_real_neighbouring_prose(document):
+    from bookengine.source.excerpt import ExcerptLocator
+
     occurrence = find_occurrences(document, "predicament")[0]
-    window = context_window(document, occurrence)
+    window = context_for_locator(
+        document,
+        ExcerptLocator(
+            chapter=occurrence.chapter,
+            char_start=occurrence.char_start,
+            char_end=occurrence.char_end,
+        ),
+    )
     chapter = document.chapter(occurrence.chapter)
 
     assert normalize_for_matching(window.passage) in chapter.normalized

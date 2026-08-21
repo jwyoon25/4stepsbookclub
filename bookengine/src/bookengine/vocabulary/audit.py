@@ -29,7 +29,7 @@ from ..llm.chain import ProviderChain
 from ..llm.structured import generate_structured
 from ..prompts import PromptLibrary
 from ..source.document import BookDocument
-from ..source.search import context_for_locator
+from ..source.search import CONTEXT_CHARACTER_LIMIT, context_for_locator
 from ..source.text import normalize_term
 from .models import AUDIT_ASSESSMENT_LABELS, AuditVerdict, VocabularyItem
 from .schemas import AuditReport
@@ -41,17 +41,17 @@ AUDIT_BATCH = 8
 # One paragraph either side, the same window the entry was written from.
 CONTEXT_PARAGRAPHS = 1
 
-# How much source text one entry may carry. The target paragraph is never
-# trimmed, so what a tighter budget costs is the neighbours' outer ends.
+# How much source text one entry may carry, from `source/search.py`, which is
+# also where the bound is enforced.
 #
-# These two numbers multiply, and the product is the thing to watch. At this
-# budget a full batch is roughly 18,000 characters of book plus 9,000 of
+# It multiplies with the batch size, and the product is the thing to watch. At
+# this budget a full batch is roughly 18,000 characters of book plus 9,000 of
 # prompt — call it 7,000 input tokens, against a 4,096-token reply. Any
 # endpoint with a 16k context is comfortable and an 8k one is not, so a free
 # provider with a short context needs the batch reduced rather than the
 # budget: the batch is what lets the auditor see two entries teaching one
 # idea, and the budget is what lets it check a claim at all.
-CONTEXT_CHARACTER_BUDGET = 1800
+CONTEXT_CHARACTER_BUDGET = CONTEXT_CHARACTER_LIMIT
 
 # What the auditor is told when the source could not be produced for an entry.
 # It reads as a refusal rather than as an absence, because an auditor that

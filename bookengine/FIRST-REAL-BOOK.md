@@ -37,6 +37,12 @@ have to actually read:
 | Words rejoined across lines | Plus how many the book could not confirm. |
 | Ingestion status | `PASS` or `REVIEW_REQUIRED`. |
 
+Paragraphs are worth a second look on a new book. If the report names any over
+5,000 characters, paragraph assembly has merged blocks a reader sees as
+separate — usually a page or scene break it could not detect. Excerpts are
+still cut at sentence boundaries inside such a block, so nothing wrong is
+quoted, but "the passage around this excerpt" is then the wrong passage.
+
 A chapter map that looks suspicious is `REVIEW_REQUIRED`, and `vocab` refuses to
 run against it until a person says otherwise. That is the whole point of the
 status: chapter assignment is the one thing in a workbook that nothing
