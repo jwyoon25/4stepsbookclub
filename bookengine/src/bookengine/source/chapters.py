@@ -47,9 +47,19 @@ _ROMAN_VALUES = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
 # Lines that mean the story has ended. Text after one of these belongs to the
 # book but not to any chapter a lesson can reference.
+#
+# `EPILOGUE` is the one of these that is still the story, and it is here for
+# exactly that reason. It is not a numbered chapter, so there is no chapter
+# reference that would be true of it — and without this line it runs on into
+# whatever chapter precedes it. The Maze Runner's epilogue was a third of what
+# ingestion called chapter 62, and its sentences were quotable, verifiable, and
+# cited as chapter 62 to a student who would not find them there.
+#
+# Only ever consulted after the last chapter heading, so the most any entry
+# here can do is shorten the final chapter.
 _BACK_MATTER = (
     "ACKNOWLEDGMENTS", "ACKNOWLEDGEMENTS", "ABOUT THE AUTHOR", "AFTERWORD",
-    "APPENDIX", "GLOSSARY", "BIBLIOGRAPHY", "READING GROUP GUIDE",
+    "EPILOGUE", "APPENDIX", "GLOSSARY", "BIBLIOGRAPHY", "READING GROUP GUIDE",
     "DISCUSSION QUESTIONS", "ALSO BY",
 )
 

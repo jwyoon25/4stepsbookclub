@@ -221,3 +221,54 @@ def test_there_is_nothing_to_approve_on_a_clean_book(ordinary, tmp_path, capsys)
     assert code == 0
     assert "Nothing to approve" in capsys.readouterr().out
     assert not (tmp_path / "cache" / "approvals.json").exists()
+
+
+# --- what a cached report is allowed to forget -----------------------------
+
+
+def test_a_cached_report_names_the_furniture_a_fresh_one_names(ordinary, tmp_path):
+    """The regression: `_from_cache` built a report with no furniture at all.
+
+    The count survived the cache in `stats`, so a second run said three hundred
+    lines had been removed and could not name one of them. The records now live
+    on the document, which is the thing the cache stores, and the report reads
+    them from there — so the two paths cannot answer differently.
+    """
+    cache = ParseCache(directory=tmp_path / "cache")
+    fresh = ingest_book(ordinary, cache=cache)
+    cached = ingest_book(ordinary, cache=cache)
+
+    assert fresh.from_cache is False
+    assert cached.from_cache is True
+    assert fresh.furniture, "the fixture book has running heads to find"
+    assert cached.furniture == fresh.furniture
+
+
+def test_the_furniture_line_of_the_report_reads_the_same_either_way(
+    ordinary, tmp_path
+):
+    """Same numbers, same examples, same sentence."""
+    cache = ParseCache(directory=tmp_path / "cache")
+    fresh = ingest_book(ordinary, cache=cache).render()
+    cached = ingest_book(ordinary, cache=cache).render()
+
+    def furniture_line(rendered: str) -> str:
+        return next(
+            line for line in rendered.splitlines() if line.startswith("Running heads")
+        )
+
+    assert furniture_line(cached) == furniture_line(fresh)
+    assert "none found" not in furniture_line(cached)
+
+
+def test_a_cached_document_carries_the_same_furniture_as_a_fresh_parse(
+    ordinary, tmp_path
+):
+    """Serialised and read back, record for record."""
+    cache = ParseCache(directory=tmp_path / "cache")
+    fresh = ingest_book(ordinary, cache=cache).document
+    cached = ingest_book(ordinary, cache=cache).document
+
+    assert cached.furniture == fresh.furniture
+    assert cached.stats.furniture_lines_dropped == fresh.stats.furniture_lines_dropped
+    assert all(record.pages > 0 and record.example for record in cached.furniture)

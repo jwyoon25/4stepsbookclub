@@ -190,9 +190,9 @@ Do not raise `limits.provider_calls_per_candidate` to make a run finish — it i
 a ceiling on what a misbehaving endpoint may spend, and reaching it is a
 provider problem rather than a book problem.
 
-Nothing else in the job file can help, which is deliberate. `excerpt.
-unconfirmed_repairs` and `llm.audit` change what is *attempted* and what is
-*reported*; neither can make an unproved quotation or an unreviewed row
+Nothing else in the job file can help, which is deliberate.
+`excerpt.unconfirmed_repairs` and `llm.audit` change what is *attempted* and
+what is *reported*; neither can make an unproved quotation or an unreviewed row
 exportable. If a run comes up short, `audit.json` says which lesson and why.
 That is the thing to fix.
 

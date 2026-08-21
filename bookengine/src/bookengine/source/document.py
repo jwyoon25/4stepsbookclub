@@ -25,7 +25,7 @@ from pathlib import Path
 import pysbd
 
 from .chapters import ChapterDetection
-from .layout import PageMetrics, assemble_paragraphs
+from .layout import FurnitureRecord, PageMetrics, assemble_paragraphs
 from .pdf import ExtractedBook, TextLine
 from .text import normalize_with_offsets
 
@@ -181,6 +181,11 @@ class BookDocument:
     detection_style: str | None
     detection_confidence: str
     detection_warnings: list[str] = field(default_factory=list)
+    # The running heads and folios this book repeats, kept beside the count of
+    # them in `stats`. On the document rather than on the ingestion report so
+    # that a cached parse can say the same things a fresh one does — a report
+    # assembled from two sources is a report that can disagree with itself.
+    furniture: list[FurnitureRecord] = field(default_factory=list)
     stats: IngestionStats = field(default_factory=IngestionStats)
 
     @property
@@ -236,6 +241,7 @@ def build_document(
     *,
     title: str,
     furniture_dropped: int = 0,
+    furniture_records: list[FurnitureRecord] | None = None,
     lexicon: frozenset[str] | None = None,
 ) -> BookDocument:
     """Assemble chapters, paragraphs, and sentences into the book's structure.
@@ -354,6 +360,7 @@ def build_document(
         detection_style=detection.style,
         detection_confidence=detection.confidence,
         detection_warnings=list(detection.warnings),
+        furniture=list(furniture_records or []),
         stats=stats,
     )
 
@@ -368,6 +375,7 @@ def document_to_dict(document: BookDocument) -> dict:
         "detection_style": document.detection_style,
         "detection_confidence": document.detection_confidence,
         "detection_warnings": document.detection_warnings,
+        "furniture": [asdict(record) for record in document.furniture],
         "stats": asdict(document.stats),
         "chapters": [
             {
@@ -420,6 +428,9 @@ def document_from_dict(payload: dict) -> BookDocument:
         detection_style=payload["detection_style"],
         detection_confidence=payload["detection_confidence"],
         detection_warnings=list(payload.get("detection_warnings", [])),
+        furniture=[
+            FurnitureRecord(**record) for record in payload.get("furniture", [])
+        ],
         stats=IngestionStats(**payload["stats"]),
     )
 

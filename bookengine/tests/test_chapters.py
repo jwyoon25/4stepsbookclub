@@ -118,3 +118,80 @@ def test_number_words_are_read_and_other_words_are_not(word, expected):
 )
 def test_only_canonical_roman_numerals_are_read(numeral, expected):
     assert parse_roman(numeral) == expected
+
+
+# --- the epilogue ----------------------------------------------------------
+
+# A word that appears only after the EPILOGUE line, so its presence in the last
+# chapter is proof the boundary did not hold.
+MEMO_MARKER = "chancelor"
+
+EPILOGUE_MEMO = [
+    "EPILOGUE",
+    f"Internal memorandum from Ava Paige, {MEMO_MARKER}. The trial results "
+    "were most extraordinary, and the subjects will be allowed one full "
+    "night of sleep before the next stage begins.",
+]
+
+
+def epilogue_book(tmp_path, count: int = 6):
+    """A novel whose last chapter is followed by an unnumbered epilogue."""
+    from bookengine.source.ingest import ingest_book
+
+    chapters = chapter_specs(count)
+    path = tmp_path / "with-epilogue.pdf"
+    render_book(path, chapters=chapters, back_matter=EPILOGUE_MEMO)
+    return ingest_book(path, cache=None, use_cache=False).document, chapters
+
+
+def test_an_epilogue_ends_the_last_chapter(tmp_path):
+    """It is still the story, and that is exactly why it has to be cut off.
+
+    An epilogue is not a numbered chapter, so no chapter reference is true of
+    it. Left attached, its sentences are quotable, they verify, and they are
+    cited as the last chapter to a student who will not find them there — which
+    is what The Maze Runner did before this.
+    """
+    document, chapters = epilogue_book(tmp_path)
+    last = document.chapter(len(chapters))
+
+    assert "EPILOGUE" not in last.text.upper()
+    assert MEMO_MARKER not in last.text.lower()
+
+
+def test_the_epilogue_does_not_cost_the_book_a_chapter(tmp_path):
+    """The boundary trims the last chapter; it must not drop or renumber one."""
+    document, chapters = epilogue_book(tmp_path)
+
+    assert document.chapter_numbers == [c.number for c in chapters]
+
+
+def test_the_last_chapter_still_ends_on_its_own_last_sentence(tmp_path):
+    document, chapters = epilogue_book(tmp_path)
+    written = chapters[-1].paragraphs[-1]
+
+    assert document.chapter(len(chapters)).text.endswith(written[-40:])
+
+
+def test_epilogue_prose_cannot_be_quoted_or_cited(tmp_path):
+    """The end-to-end version: no locator in the book reaches that text."""
+    from bookengine.source.search import find_occurrences
+
+    document, _ = epilogue_book(tmp_path)
+
+    assert find_occurrences(document, MEMO_MARKER) == []
+    assert find_occurrences(document, "memorandum") == []
+
+
+def test_a_book_without_an_epilogue_is_unaffected(tmp_path):
+    """The control: the marker only bites when the book actually has one."""
+    from bookengine.source.ingest import ingest_book
+
+    chapters = chapter_specs(6)
+    path = tmp_path / "no-epilogue.pdf"
+    render_book(path, chapters=chapters)
+    document = ingest_book(path, cache=None, use_cache=False).document
+    written = chapters[-1].paragraphs[-1]
+
+    assert document.chapter_numbers == [c.number for c in chapters]
+    assert document.chapter(6).text.endswith(written[-40:])

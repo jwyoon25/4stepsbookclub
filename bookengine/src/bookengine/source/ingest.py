@@ -128,7 +128,6 @@ class IngestionReport:
 
     document: BookDocument
     from_cache: bool
-    furniture: list[FurnitureRecord] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     concerns: list[str] = field(default_factory=list)
     # Which detection pass produced the chapter map. A cached document does not
@@ -138,6 +137,17 @@ class IngestionReport:
     @property
     def chapter_count(self) -> int:
         return len(self.document.chapters)
+
+    @property
+    def furniture(self) -> list[FurnitureRecord]:
+        """The running heads and folios this book repeats.
+
+        Read off the document rather than held here, because the document is
+        what the cache stores. A field set only on the fresh path would leave a
+        cached run reporting "none found" about a book it had removed three
+        hundred folios from.
+        """
+        return self.document.furniture
 
     @property
     def status(self) -> str:
@@ -301,6 +311,7 @@ def ingest_book(
         metrics,
         title=book_title,
         furniture_dropped=furniture.dropped_count,
+        furniture_records=furniture.records,
         lexicon=build_lexicon(prose),
     )
 
@@ -322,7 +333,6 @@ def ingest_book(
     return IngestionReport(
         document=document,
         from_cache=False,
-        furniture=list(furniture.records),
         notes=notes,
         concerns=concerns,
         chapter_pass=chapter_pass,
