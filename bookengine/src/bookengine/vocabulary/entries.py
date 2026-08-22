@@ -34,6 +34,21 @@ from .schemas import EntryDraft
 # little enough that the request stays small and the book stays local.
 CONTEXT_PARAGRAPHS = 1
 
+# What one draft may spend on its answer.
+#
+# The ceiling is not free. Groq's free tier charges its per-minute token
+# allowance for what a request *reserves* — input plus `max_output_tokens` —
+# rather than for what it uses, so a generous ceiling is paid for on every call
+# whether or not a single token of it is wanted. At the 4,096 default an entry
+# draft reserved 5,574 of the 8,000 available in a minute, for an answer that
+# measured 344-410 tokens across three runs.
+#
+# This one cannot grow with the input: `EntryDraft` is three fields the schema
+# caps at 600, 100 and 700 characters, so roughly 350 tokens of content however
+# long the passage was. The rest is the model thinking. 1,024 is about two and
+# a half times the largest answer observed.
+ENTRY_OUTPUT_TOKENS = 1024
+
 
 def draft_entry(
     document: BookDocument,
@@ -72,6 +87,7 @@ def draft_entry(
             Message(role="user", content=rendered.user),
         ],
         EntryDraft,
+        max_output_tokens=ENTRY_OUTPUT_TOKENS,
     )
 
 

@@ -43,6 +43,13 @@ from .quotes import ExcerptCandidate, choose_excerpt, render_shortlist
 from .schemas import OccurrenceChoice
 from .verify import FinalReport, assign_orders, final_verification, verify_item
 
+# What choosing a passage may spend on its answer. The smallest of the four
+# generator stages by a wide margin: `OccurrenceChoice` is an integer and one
+# sentence the schema caps at 240 characters, and it measured 253-304 tokens
+# across three runs. The 4,096 default reserved 5,096 of Groq's 8,000 per
+# minute to return a number.
+OCCURRENCE_OUTPUT_TOKENS = 768
+
 
 @dataclass(slots=True)
 class RunStats:
@@ -154,6 +161,7 @@ def _occurrence_chooser(
                 Message(role="user", content=rendered.user),
             ],
             OccurrenceChoice,
+            max_output_tokens=OCCURRENCE_OUTPUT_TOKENS,
         )
         return answer.index
 

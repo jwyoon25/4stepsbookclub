@@ -80,6 +80,42 @@ class PoolReport:
         }
 
 
+# What the two batched generator stages may spend on their answers.
+#
+# The ceiling is not free. Groq's free tier charges its per-minute token
+# allowance for what a request reserves — input plus `max_output_tokens` — not
+# for what it uses, so an unused ceiling is still paid for on every call. Both
+# stages here answer with one object per item sent, so a single number would be
+# wrong at every batch size but one: it is a budget per item plus a floor for
+# the model's own preamble.
+#
+# Measured on `openai/gpt-oss-120b`, three runs each, against fixture prose.
+# Ranking twenty-five candidates answered in 2,681-3,675 tokens, which is 107
+# to 147 apiece; proposing candidates ran 65 to 134 apiece and saturated a
+# 3,000-token ceiling once. The budgets below sit above the worst run of each.
+#
+# Ranking is the tightest stage in the engine on Groq: twenty-five candidates
+# is already 3,323 tokens of input, so the answer has under 4,700 to fit into.
+# Batches much larger than that do not fit in a single request at all — fifty
+# was refused outright with HTTP 413 — which is a limit on `rank_batch` rather
+# than something a ceiling here can solve.
+RANKING_TOKENS_PER_CANDIDATE = 160
+RANKING_TOKENS_FLOOR = 512
+
+CANDIDATE_TOKENS_PER_WORD = 150
+CANDIDATE_TOKENS_FLOOR = 768
+
+
+def ranking_output_tokens(candidates: int) -> int:
+    """The answer budget for scoring this many candidates."""
+    return RANKING_TOKENS_FLOOR + RANKING_TOKENS_PER_CANDIDATE * max(candidates, 1)
+
+
+def candidate_output_tokens(wanted: int) -> int:
+    """The answer budget for proposing this many words."""
+    return CANDIDATE_TOKENS_FLOOR + CANDIDATE_TOKENS_PER_WORD * max(wanted, 1)
+
+
 def _batched(values: list, size: int) -> list[list]:
     return [values[index : index + size] for index in range(0, len(values), size)]
 
@@ -152,6 +188,7 @@ def _propose_with_model(
                     Message(role="user", content=rendered.user),
                 ],
                 CandidateList,
+                max_output_tokens=candidate_output_tokens(per_chunk),
             )
         except StructuredResponseError:
             # One unusable chunk is not a failed lesson; the harvest and the
@@ -239,6 +276,7 @@ def _score(
                     Message(role="user", content=rendered.user),
                 ],
                 RankedList,
+                max_output_tokens=ranking_output_tokens(len(batch)),
             )
         except StructuredResponseError:
             report.unscored.extend(candidate.term for candidate in batch)
