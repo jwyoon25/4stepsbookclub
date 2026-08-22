@@ -158,8 +158,8 @@ def command_smoke(arguments: argparse.Namespace) -> int:
 
     results = smoke_test_all(job.llm)
     for result in results:
-        print(f"  {result.render()}")
-    print()
+        print(result.render_block())
+        print()
     print(render_report(results, job.llm))
 
     if arguments.json:

@@ -216,6 +216,13 @@ class ProviderConfig(_Strict):
     model: str
     base_url: str | None = None
     api_key_env: str | None = None
+    # What this deployment believes running this endpoint costs. It is a
+    # declaration, not a measurement — nothing here inspects an account or a
+    # card, and it could not. Its whole job is to let `LLMConfig` refuse a
+    # `paid` endpoint anywhere in the normal route, so that "no workbook costs
+    # anything" survives a future edit by somebody who does not know that was
+    # the rule.
+    cost: Literal["free", "paid"] = "free"
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_output_tokens: int = Field(default=4096, ge=256, le=32768)
     timeout_seconds: float = Field(default=90.0, gt=0)
@@ -266,9 +273,43 @@ class LLMConfig(_Strict):
     generator: ProviderConfig
     auditor: ProviderConfig
     fallbacks: list[ProviderConfig] = Field(default_factory=list)
+    # Endpoints kept for evaluation and never used to make a workbook. They are
+    # here so `smoke` can report on them and so a person comparing auditors has
+    # somewhere to name the comparison — and they are a separate list rather
+    # than a flag because `build_chains` then cannot reach them by accident.
+    # Nothing puts this list in a chain.
+    benchmark: list[ProviderConfig] = Field(default_factory=list)
     cache: bool = True
     max_attempts: int = Field(default=3, ge=1, le=6)
     audit: AuditConfig = Field(default_factory=AuditConfig)
+
+    @model_validator(mode="after")
+    def _production_route_is_free(self) -> LLMConfig:
+        """Refuse a paid endpoint anywhere a workbook could reach it.
+
+        The product rule is that a normal run costs nothing, and the way that
+        rule dies is not a decision — it is a fallback added on a bad afternoon
+        by somebody who needed the run to finish. So it is checked here, where
+        a job naming a paid endpoint in the normal route fails to load rather
+        than quietly billing on the third retry.
+
+        A quota that runs out is a provider failure, and the chain treats it as
+        one. That is the intended behaviour: stop, or fall back to another free
+        endpoint. Never start spending.
+        """
+        charged = [
+            provider.label
+            for provider in (self.generator, self.auditor, *self.fallbacks)
+            if provider.cost == "paid"
+        ]
+        if charged:
+            raise ValueError(
+                "The generating route may only contain endpoints marked "
+                "`cost: free`, and " + ", ".join(charged) + " is marked paid. "
+                "Move it to `llm.benchmark`, which nothing routes a workbook "
+                "through."
+            )
+        return self
 
     @property
     def configured_independence(self) -> str:

@@ -81,6 +81,11 @@ KNOWN_ENDPOINTS: dict[str, KnownEndpoint] = {
 class OpenAICompatibleProvider:
     """A chat endpoint that accepts the OpenAI request body."""
 
+    # The key under `usage` holding this provider's own meter, if it has one.
+    # Subclasses set it; nothing here assumes tokens are the only unit anyone
+    # charges in.
+    usage_units_key: str | None = None
+
     def __init__(
         self,
         config: ProviderConfig,
@@ -295,6 +300,7 @@ class OpenAICompatibleProvider:
             prompt_tokens=_token_count(usage.get("prompt_tokens")),
             completion_tokens=_token_count(usage.get("completion_tokens")),
             schema_mode=mode,
+            usage_units=_usage_units(usage, self.usage_units_key),
         )
 
     def _hint(self, response: httpx.Response) -> str | None:
@@ -336,6 +342,16 @@ def _content_text(content: object) -> str:
         ]
         return "".join(pieces)
     return ""
+
+
+def _usage_units(usage: dict, key: str | None) -> float | None:
+    """The provider's own meter for this call, when it reports one."""
+    if key is None:
+        return None
+    value = usage.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value)
 
 
 def _token_count(value: object) -> int | None:

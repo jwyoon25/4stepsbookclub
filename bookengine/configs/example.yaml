@@ -98,19 +98,31 @@ exclusions:
 llm:
   # Model identifiers come from the environment. Free providers change their
   # catalogues without notice, so a model id committed to this file goes stale.
+  # The defaults below were confirmed live on 2026-08-22; PROVIDERS.md records
+  # what was measured, and `bookengine smoke --config <job>` re-checks it.
   generator:
     provider: groq
-    model: ${GENERATOR_MODEL:-llama-3.3-70b-versatile}
+    model: ${GENERATOR_MODEL:-openai/gpt-oss-120b}
+    max_output_tokens: 4096
 
   # A different provider and a different model family, so the audit is a second
-  # opinion rather than the same opinion twice.
+  # opinion rather than the same opinion twice. It thinks before answering, so
+  # both ceilings are higher than the defaults.
   auditor:
-    provider: nvidia
-    model: ${AUDITOR_MODEL:-meta/llama-3.3-70b-instruct}
+    provider: cloudflare
+    model: ${AUDITOR_MODEL:-@cf/zai-org/glm-4.7-flash}
+    max_output_tokens: 8192
+    timeout_seconds: 240
 
   fallbacks:
     - provider: gemini
-      model: ${GEMINI_MODEL:-gemini-2.0-flash}
+      model: ${GEMINI_MODEL:-gemini-3.7-flash}
+      max_output_tokens: 8192
+
+  # Endpoints for evaluation. `build_chains` does not read this list, so no run
+  # can route a workbook through one however the rest of the file is edited.
+  # `cost: paid` is only accepted here.
+  benchmark: []
 
   cache: true
   max_attempts: 3

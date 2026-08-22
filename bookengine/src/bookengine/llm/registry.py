@@ -21,6 +21,7 @@ from ..config import LLMConfig, ProviderConfig
 from .base import LLMProvider
 from .cache import ResponseCache
 from .chain import ProviderChain
+from .cloudflare import CloudflareProvider
 from .gemini import GeminiProvider
 from .mlx_local import MLXLocalProvider
 from .openai_compatible import OpenAICompatibleProvider
@@ -29,6 +30,10 @@ from .openai_compatible import OpenAICompatibleProvider
 # defaults. Everything absent from here is assumed OpenAI-compatible, which is
 # what makes an unknown free provider usable without a code change.
 _SPECIAL_CASES = {
+    # Workers AI is the OpenAI shape, but its URL carries the account id, so it
+    # cannot be a base URL constant. `cloudflare.py` is that one difference.
+    "cloudflare": CloudflareProvider,
+    "workers-ai": CloudflareProvider,
     "gemini": GeminiProvider,
     "google": GeminiProvider,
     "mlx": MLXLocalProvider,
@@ -55,6 +60,10 @@ def build_chains(
     where an endpoint is down and there is nothing else to reach for. The audit
     is weaker when that happens, and the run says so rather than pretending
     otherwise.
+
+    `config.benchmark` is not read here, and that is the whole of how an
+    evaluation endpoint is kept away from a workbook: there is no path from
+    that list into a chain, so no run can reach one however it is configured.
     """
     cache = (
         ResponseCache(directory=cache_directory, enabled=config.cache)

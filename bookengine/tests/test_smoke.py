@@ -256,7 +256,8 @@ def test_one_reachable_provider_is_flagged_against_a_strict_audit_policy(
 
     report = render_report(smoke_test_all(config), config)
 
-    assert "Only one provider is reachable" in report
+    assert "one provider reachable" in report
+    assert "requirement" in report
 
 
 def test_no_reachable_endpoint_says_the_run_would_not_start(endpoint, monkeypatch):
@@ -266,4 +267,4 @@ def test_no_reachable_endpoint_says_the_run_would_not_start(endpoint, monkeypatc
 
     report = render_report(smoke_test_all(config), config)
 
-    assert "No endpoint answered" in report
+    assert "No endpoint a workbook could use answered" in report

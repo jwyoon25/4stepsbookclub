@@ -98,6 +98,11 @@ class Completion:
     completion_tokens: int | None
     cached: bool = False
     schema_mode: str | None = None
+    # What the provider says this call cost in its own meter, where it keeps
+    # one that is not tokens — Cloudflare bills Workers AI in Neurons and the
+    # free plan is a daily allowance of them. `None` everywhere else, because
+    # inventing a number would be worse than not having one.
+    usage_units: float | None = None
 
 
 class LLMProvider(Protocol):

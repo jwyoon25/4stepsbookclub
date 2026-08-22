@@ -83,6 +83,11 @@ class SmokeResult:
     """What one endpoint did when it was asked the smallest possible question."""
 
     label: str
+    # What this endpoint is for: `generator`, `auditor`, `fallback`, or
+    # `benchmark`. Carried so the report can say plainly that an evaluation
+    # endpoint answered and is still not going to see a book.
+    role: str = "generator"
+    label_provider: str = ""
     api_key_env: str | None = None
     api_key_present: bool = False
     reached: bool = False
@@ -91,6 +96,7 @@ class SmokeResult:
     model_reported: str | None = None
     schema_mode: str | None = None
     seconds: float = 0.0
+    usage_units: float | None = None
     retryable: bool | None = None
     error: str | None = None
     checks: dict[str, bool] = field(default_factory=dict)
@@ -99,6 +105,53 @@ class SmokeResult:
     def ok(self) -> bool:
         """Whether this endpoint can be used for a run as it stands."""
         return self.reached and self.parsed and self.answered_correctly
+
+    def render_block(self) -> str:
+        """One endpoint, as a column an operator reads down.
+
+        Each line is a stage of the same request, in the order they had to
+        succeed, so a failure names the stage that stopped rather than leaving
+        somebody to infer it from an HTTP code.
+        """
+        rows = [f"{self.label}   [{self.role}]"]
+
+        def row(name: str, value: str) -> str:
+            return f"  {name}{'.' * max(2, 24 - len(name))} {value}"
+
+        if not self.api_key_present:
+            rows.append(row("credential", f"MISSING  {self.error or ''}"))
+            return "\n".join(rows)
+
+        rows.append(row("credential", "PASS"))
+        if not self.reached:
+            label = {True: "RATE LIMITED / BUSY", False: "REFUSED"}.get(
+                self.retryable, "UNREACHABLE"
+            )
+            rows.append(row("endpoint", f"{label}  {self.error or ''}"))
+            return "\n".join(rows)
+
+        rows.append(row("endpoint", f"PASS  {self.seconds:.1f}s"))
+        rows.append(
+            row("model", f"{self.model_reported}"
+                + ("" if self.checks.get("model_id_matches_request", True)
+                   else "   <- SUBSTITUTED, not what was asked for"))
+        )
+        if not self.parsed:
+            rows.append(row("structured output", f"FAILED  {self.error or ''}"))
+            return "\n".join(rows)
+
+        rows.append(row("structured output", f"PASS  ({self.schema_mode})"))
+        rows.append(
+            row("answer", "PASS" if self.answered_correctly
+                else "WRONG  right shape, wrong contents")
+        )
+        rows.append(row("provenance", "PASS" if self.checks.get(
+            "reported_a_model_id") else "no model id returned"))
+        if self.usage_units is not None:
+            rows.append(row("usage", f"{self.usage_units:.1f} units"))
+        if self.role == "benchmark":
+            rows.append(row("routing", "benchmark only — never sees book text"))
+        return "\n".join(rows)
 
     def render(self) -> str:
         if self.ok:
@@ -133,7 +186,9 @@ class SmokeResult:
             "answered_correctly": self.answered_correctly,
             "model_reported": self.model_reported,
             "schema_mode": self.schema_mode,
+            "role": self.role,
             "seconds": round(self.seconds, 2),
+            "usage_units": self.usage_units,
             "retryable": self.retryable,
             "error": self.error,
             "checks": dict(self.checks),
@@ -141,7 +196,7 @@ class SmokeResult:
 
 
 def smoke_test_provider(
-    config: ProviderConfig, *, timer=time.monotonic
+    config: ProviderConfig, *, role: str = "generator", timer=time.monotonic
 ) -> SmokeResult:
     """Send one endpoint the smallest structured request there is.
 
@@ -151,7 +206,12 @@ def smoke_test_provider(
     case visible as itself — a 429 arrives as an unreachable endpoint marked
     retryable, rather than as a pause.
     """
-    result = SmokeResult(label=config.label, api_key_env=config.api_key_env)
+    result = SmokeResult(
+        label=config.label,
+        role=role,
+        label_provider=config.provider,
+        api_key_env=config.api_key_env,
+    )
 
     started = timer()
     try:
@@ -212,6 +272,7 @@ def smoke_test_provider(
     result.parsed = True
     result.model_reported = completion.model
     result.schema_mode = completion.schema_mode
+    result.usage_units = completion.usage_units
     result.checks = {
         "authenticated": True,
         "structured_response_parsed": True,
@@ -230,20 +291,29 @@ def smoke_test_provider(
 
 
 def smoke_test_all(config: LLMConfig) -> list[SmokeResult]:
-    """Test every endpoint a job could reach, in the order a run would try them.
+    """Test every endpoint a job names, in the order a run would reach them.
 
     The generator and the auditor first, then the shared fallbacks, because a
     run whose primaries are fine never touches the rest and a run whose
-    primaries are down depends entirely on them.
+    primaries are down depends entirely on them. Benchmark endpoints come last
+    and are labelled as such: they are tested because a key is configured and
+    somebody will want to know it still works, not because a workbook will ever
+    reach one.
     """
     seen: set[str] = set()
     results: list[SmokeResult] = []
 
-    for provider in (config.generator, config.auditor, *config.fallbacks):
+    roles = [
+        (config.generator, "generator"),
+        (config.auditor, "auditor"),
+        *((provider, "fallback") for provider in config.fallbacks),
+        *((provider, "benchmark") for provider in config.benchmark),
+    ]
+    for provider, role in roles:
         if provider.label in seen:
             continue
         seen.add(provider.label)
-        results.append(smoke_test_provider(provider))
+        results.append(smoke_test_provider(provider, role=role))
 
     return results
 
@@ -251,41 +321,102 @@ def smoke_test_all(config: LLMConfig) -> list[SmokeResult]:
 def render_report(results: list[SmokeResult], config: LLMConfig) -> str:
     """What the results mean for a run, given this job's audit policy.
 
-    The per-endpoint lines are `SmokeResult.render`; this is only the reading
-    of them, because the two are printed together and saying it twice would
-    make the important half harder to find.
+    The per-endpoint blocks are `SmokeResult.render_block`; this is the reading
+    of them. It ends with the route a workbook would actually take, because
+    that — not the list of endpoints that happened to answer — is the thing an
+    operator is deciding whether to trust.
     """
     lines: list[str] = []
-    working = [result for result in results if result.ok]
+    by_role = {result.label: result for result in results}
+    routable = [
+        result for result in results
+        if result.role != "benchmark" and result.ok
+    ]
 
-    if not working:
+    if not routable:
         lines.append(
-            "No endpoint answered. A run would fail at its first model call."
+            "No endpoint a workbook could use answered. A run would fail at "
+            "its first model call."
         )
         return "\n".join(lines)
 
-    providers = {result.label.split("/", 1)[0] for result in working}
+    generator = by_role.get(config.generator.label)
+    auditor = by_role.get(config.auditor.label)
+    def state(label: str) -> str:
+        """How a chain would fare with this endpoint, not just whether it
+        answered once. Retries are off during a smoke test, so an endpoint that
+        is merely busy looks identical to one that is refusing — and a run
+        would tell them apart, because the chain retries one and not the other.
+        """
+        result = by_role.get(label)
+        if result is None:
+            return "untested"
+        if result.ok:
+            return "ready"
+        return "busy" if result.retryable else "down"
+
+    working_fallbacks = [
+        provider.label for provider in config.fallbacks
+        if state(provider.label) in {"ready", "busy"}
+    ]
+
+    def route(name: str, configured, result) -> str:
+        if result is not None and result.ok:
+            return f"  {name}{'.' * max(2, 24 - len(name))} {configured.label}"
+        first = next(
+            (label for label in working_fallbacks if label != configured.label),
+            None,
+        )
+        state = f"{configured.label} DOWN"
+        return (
+            f"  {name}{'.' * max(2, 24 - len(name))} {state}"
+            + (f" -> {first}" if first else " -> nothing left")
+        )
+
+    lines.append("Production route")
+    lines.append(route("generator", config.generator, generator))
+    lines.append(route("auditor", config.auditor, auditor))
     lines.append(
-        f"{len(working)} of {len(results)} endpoint(s) answered, across "
-        f"{len(providers)} provider(s)."
+        f"  {'fallback'}{'.' * 16} "
+        + (
+            ", ".join(
+                f"{label} ({state(label)})" for label in working_fallbacks
+            )
+            if working_fallbacks
+            else "none reachable"
+        )
     )
 
-    if len(providers) < 2 and config.audit.requirement == "provider":
+    benchmarks = [result.label for result in results if result.role == "benchmark"]
+    if benchmarks:
+        lines.append(f"  {'benchmark only'}{'.' * 10} {', '.join(benchmarks)}")
+
+    # What independence the reachable endpoints can actually deliver today.
+    providers = {
+        result.label_provider
+        for result in results
+        if result.role != "benchmark" and state(result.label) in {"ready", "busy"}
+    }
+    requirement = config.audit.requirement
+    if len(providers) >= 2:
+        lines.append(f"  {'independence'}{'.' * 12} provider (requirement: "
+                     f"{requirement})")
+    else:
         lines.append(
-            "Only one provider is reachable, and `llm.audit.requirement` is "
-            "`provider`. Every row would be written and audited by the same "
-            f"endpoint, and `llm.audit.on_shared` is `{config.audit.on_shared}`."
+            f"  {'independence'}{'.' * 12} NONE — one provider reachable, and "
+            f"`llm.audit.requirement` is `{requirement}`. Every row would be "
+            f"written and audited by the same endpoint, and `on_shared` is "
+            f"`{config.audit.on_shared}`, so none would export as proved."
         )
 
     substituted = [
-        result
-        for result in working
+        result for result in routable
         if not result.checks.get("model_id_matches_request", True)
     ]
     for result in substituted:
         lines.append(
-            f"{result.label} answered as {result.model_reported}. The provider "
-            "substituted a model; provenance will record what answered."
+            f"\n{result.label} answered as {result.model_reported}. The "
+            "provider substituted a model; provenance records what answered."
         )
 
     return "\n".join(lines)
