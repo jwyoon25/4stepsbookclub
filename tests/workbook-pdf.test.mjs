@@ -144,6 +144,32 @@ test(
 );
 
 test(
+  "renders a zero-line response without handwriting rules",
+  { skip: !typstAvailable },
+  async () => {
+    await withPdfPackage(async ({ manifestPath, lessonPath, outputDirectory }) => {
+      const lesson = await readJson(lessonPath);
+      lesson.sections.readingComprehension.forEach((question) => {
+        question.responseSpace = { mode: "custom-lines", lines: 0 };
+      });
+      await writeJson(lessonPath, lesson);
+
+      const targets = await buildWorkbookPdfs(manifestPath, { outputDirectory });
+      const studentLesson = targets.find(
+        ({ scope, edition }) => scope === "lesson" && edition === "student",
+      );
+      const report = await inspectWorkbookPdf(studentLesson.outputPath);
+      const comprehensionPages = report.pages.filter((page) =>
+        page.headerCanonical.includes("READINGCOMPREHENSION"),
+      );
+
+      assert.ok(comprehensionPages.length > 0);
+      assert.ok(comprehensionPages.every((page) => page.ruledLines.length === 0));
+    });
+  },
+);
+
+test(
   "keeps page totals and continuation labels stable under pagination stress",
   { skip: !typstAvailable },
   async () => {

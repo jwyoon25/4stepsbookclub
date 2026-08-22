@@ -172,6 +172,27 @@ test("holds the response-space rules the template dropdown implies", () => {
     mode: "custom-lines",
     lines: 5,
   });
+
+  const withoutResponseLines = workbookGrids({
+    Comprehension: grid("Comprehension", [
+      [
+        "",
+        3,
+        1,
+        "Choose the best answer.",
+        "",
+        "",
+        "Accept the correct choice.",
+        "Custom lines",
+        0,
+      ],
+    ]),
+  });
+  const zeroLineResult = parseWorkbookGrids(withoutResponseLines);
+  assert.deepEqual(
+    zeroLineResult.lessons[0].sections.readingComprehension[0].responseSpace,
+    { mode: "custom-lines", lines: 0 },
+  );
 });
 
 test("orders section items by their Order column, not by row", () => {

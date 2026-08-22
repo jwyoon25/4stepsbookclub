@@ -449,8 +449,13 @@
         block(width: 124mm, text(font: serif, size: size-body, fill: ink-body, framing)),
       )
 
-      if instructions != none {
-        place(top + left, dy: 51mm, block(
+      // The section list must follow the instruction box's measured height.
+      // A fixed y-position lets longer, perfectly valid Sheet copy collide
+      // with the heading below it.
+      let instruction-box = if instructions == none {
+        none
+      } else {
+        block(
           width: 124mm,
           inset: (x: 4mm, y: 3.2mm),
           radius: 2pt,
@@ -461,31 +466,46 @@
             v(1.6mm)
             text(font: sans, size: 8.5pt, fill: ink-soft, instructions)
           },
-        ))
+        )
+      }
+
+      if instruction-box != none {
+        place(top + left, dy: 51mm, instruction-box)
       }
 
       // The four sections of this lesson, shown as the tabs they will appear as.
       if sections.len() > 0 {
-        let section-top = if instructions == none { 55.8mm } else { 76mm }
-        place(top + left, dy: section-top, caps("In this lesson", fill: muted))
-        place(top + left, dy: section-top + 7.1mm, block(width: 100%, stack(
-          spacing: 3.5mm,
-          ..sections.enumerate().map(((i, s)) => grid(
-            columns: (tab-width-active, 1fr),
-            column-gutter: 5mm,
-            align: horizon,
-            rect(
-              width: tab-width-active, height: tab-height,
-              fill: step-fill.at(i), radius: (right: tab-radius), stroke: none,
-            ),
-            {
-              text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, s.name)
-              h(2mm)
-              text(font: sans, size: 9.5pt, fill: muted,
-                "·  Step " + str(i + 1) + " " + step-actions.at(i) + "  ·  " + s.detail)
-            },
-          )),
-        )))
+        let section-content = {
+          caps("In this lesson", fill: muted)
+          v(7.1mm)
+          block(width: 100%, stack(
+            spacing: 3.5mm,
+            ..sections.enumerate().map(((i, s)) => grid(
+              columns: (tab-width-active, 1fr),
+              column-gutter: 5mm,
+              align: horizon,
+              rect(
+                width: tab-width-active, height: tab-height,
+                fill: step-fill.at(i), radius: (right: tab-radius), stroke: none,
+              ),
+              {
+                text(font: sans, size: 9.5pt, weight: "semibold", fill: ink, s.name)
+                h(2mm)
+                text(font: sans, size: 9.5pt, fill: muted,
+                  "·  Step " + str(i + 1) + " " + step-actions.at(i) + "  ·  " + s.detail)
+              },
+            )),
+          ))
+        }
+
+        if instruction-box == none {
+          place(top + left, dy: 55.8mm, section-content)
+        } else {
+          context {
+            let section-top = 51mm + measure(instruction-box, width: 124mm).height + 4mm
+            place(top + left, dy: section-top, section-content)
+          }
+        }
       }
     }),
   )
@@ -642,7 +662,7 @@
         }
       } else {
         v(space-prompt-to-response)
-        response-lines(lines)
+        if lines > 0 { response-lines(lines) }
       }
     },
   )

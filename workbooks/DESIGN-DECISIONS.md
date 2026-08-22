@@ -177,7 +177,8 @@ head identifies the section, and the page itself uses the compact label
 
 Every question and writing prompt offers the same response-space choices: Short
 answer, Short paragraph, Extended answer, Full page, Multiple pages, or a custom
-positive number of lines. Section defaults make the common choice effortless,
+whole number of lines, including zero for prompts such as multiple-choice items.
+Section defaults make the common choice effortless,
 but tutors may override them per item.
 
 Short answer maps to 3 lines and Short paragraph to 6. Extended answer is

@@ -210,7 +210,7 @@ function guidanceValue(grid, rowNumber, columnNumber, columnName) {
 
 function responseSpaceValue(grid, rowNumber) {
   const modeLabel = textValue(grid, rowNumber, 8, "Response space");
-  const lines = integerValue(grid, rowNumber, 9, "Custom lines");
+  const lines = integerValue(grid, rowNumber, 9, "Custom lines", { minimum: 0 });
   const pages = integerValue(grid, rowNumber, 10, "Total response pages");
 
   if (modeLabel === undefined) {

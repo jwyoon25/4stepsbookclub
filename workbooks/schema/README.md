@@ -116,7 +116,8 @@ moves to the next page. Exact responses longer than the 14-line prompt-page cap
 continue on explicitly labelled pages that hold up to 35 lines at the standard
 7 mm rhythm.
 
-For an exact positive number of lines:
+For an exact number of lines, including zero when a prompt needs no handwriting
+area:
 
 ```json
 {
@@ -135,7 +136,8 @@ For two or more full response pages, `pages` is the total number of pages:
 ```
 
 This provides fast common choices without taking away the tutor's ability to
-request any positive line count.
+request any whole line count, including zero when the prompt itself contains
+the answer choices.
 
 ## Guidance fields
 

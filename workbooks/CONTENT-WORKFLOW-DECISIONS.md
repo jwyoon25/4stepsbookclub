@@ -72,8 +72,9 @@ Each question contains:
 - Student response space — Short answer (3 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
-The tutor may replace the default with any response-space preset or any positive
-number of lines.
+The tutor may replace the default with any response-space preset or any whole
+number of lines, including zero when a prompt such as a multiple-choice item
+needs no handwriting area.
 
 ## Critical Thinking & Analysis
 
@@ -85,8 +86,9 @@ Each question contains:
 - Student response space — Short paragraph (6 lines) by default
 - Tutor note or answer guidance — required when a teacher version is requested
 
-The tutor may replace the default with any response-space preset or any positive
-number of lines.
+The tutor may replace the default with any response-space preset or any whole
+number of lines, including zero when a prompt such as a multiple-choice item
+needs no handwriting area.
 
 ## Paragraph Writing
 
@@ -97,8 +99,10 @@ Each writing item contains:
 - Response space — one page by default
 - Example structure or rubric — optional
 
-The tutor may replace the default with any response-space preset or any positive
-number of lines. A lesson may contain more than one writing prompt.
+The tutor may replace the default with any response-space preset or any whole
+number of lines. A zero-line setting is useful when the prompt itself contains
+the choices and needs no handwriting area. A lesson may contain more than one
+writing prompt.
 
 Every Comprehension question, Analysis question, and Writing prompt uses the
 same optional **Guidance and requirements** list. Tutors may add one or more
@@ -117,7 +121,7 @@ same tutor-facing chooser:
 - **Extended answer** — provisionally 12 lines and approximately half a page
 - **Full page** — all available 7 mm writing lines on one response page
 - **Multiple pages** — the tutor chooses the number of full response pages
-- **Custom lines** — the tutor enters any positive number of lines
+- **Custom lines** — the tutor enters any whole number of lines, including zero
 
 The `Extended answer` mapping is not locked. Its current 12-line / half-page
 description must be reviewed after the final page design is approved with the
