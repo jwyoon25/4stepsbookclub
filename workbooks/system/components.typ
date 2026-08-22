@@ -569,7 +569,7 @@
       sticky: true,
       width: 100%,
       above: space-band-above,
-      below: space-band-below,
+      below: space-section-to-first-item,
       box(width: 100%, height: band-height, {
         place(top + left, dx: -overhang, rect(
           width: block-width + overhang, height: band-bar-height,
@@ -664,11 +664,12 @@
   teacher-guidance: none,
   rubric: none,
   step: 1,
+  first-in-section: false,
 ) = {
   block(
     breakable: false,
     width: 100%,
-    above: space-between-questions,
+    above: if first-in-section { 0pt } else { space-between-questions },
     below: 0pt,
     {
       place(top + left, dx: gutter-dx, dy: 0.6mm, box(
@@ -703,11 +704,12 @@
   response-guidance: none,
   quote: none,
   step: 3,
+  first-in-section: false,
 ) = {
   block(
     breakable: false,
     width: 100%,
-    above: space-between-questions,
+    above: if first-in-section { 0pt } else { space-between-questions },
     below: 0pt,
     {
       place(top + left, dx: gutter-dx, dy: 0.6mm, box(
@@ -816,13 +818,14 @@
   excerpt-context: none,
   chapter-reference: none,
   index: 0,
+  first-in-section: false,
 ) = block(
   breakable: false,
   width: 100%,
   above: 0mm,
   below: 0mm,
   {
-    v(space-vocab-entry)
+    if not first-in-section { v(space-vocab-entry) }
     // The number and entry content share this post-spacing origin. Keeping the
     // number outside this inner block would anchor it above the term whenever
     // entry spacing changes.

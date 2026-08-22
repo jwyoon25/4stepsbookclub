@@ -54,6 +54,7 @@
   [Where does the opening scene take place, and how much time has passed since
     the end of the previous section?],
   lines: lines-short,
+  first-in-section: true,
 )
 
 #question(
@@ -100,6 +101,7 @@
     convincing? Use at least one detail from Chapter 10 to support your view.],
   lines: lines-extended,
   step: 2,
+  first-in-section: true,
 )
 
 #question(
@@ -143,6 +145,7 @@
     [After each quotation, explain what it shows — do not let it speak for itself.],
     [End by acknowledging what a reader who disagreed with you might point to.],
   ),
+  first-in-section: true,
 )
 ]
 
@@ -160,6 +163,7 @@
   "resolute",
   "단호한",
   index: 0,
+  first-in-section: true,
   definition: [Determined and unwavering; refusing to be moved from a decision once
     it has been made.],
   from-book: ["She remained resolute even as the others began, one by one, to

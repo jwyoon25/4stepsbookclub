@@ -30,7 +30,12 @@
   }
 }
 
-#let render-teacher-item(number, item, step) = question(
+#let render-teacher-item(
+  number,
+  item,
+  step,
+  first-in-section: false,
+) = question(
   str(number),
   item.at("prompt"),
   quote: optional(item, "quotation"),
@@ -39,6 +44,7 @@
   teacher-guidance: optional(item, "teacherGuidance"),
   rubric: optional(item, "exampleStructureOrRubric"),
   step: step,
+  first-in-section: first-in-section,
 )
 
 #let render-student-item(
@@ -62,6 +68,7 @@
       quote: quote,
       response-guidance: optional(item, "responseGuidance"),
       step: step,
+      first-in-section: first-in-section,
     )
 
     let remaining = line-count - first-page-count
@@ -85,6 +92,7 @@
       response-guidance: optional(item, "responseGuidance"),
       quote: quote,
       step: step,
+      first-in-section: first-in-section,
     )
 
     for index in range(continuation-count) {
@@ -109,7 +117,12 @@
     section-band(step, name, description)
     for ((index, item)) in items.enumerate() {
       if edition == "Teacher" {
-        render-teacher-item(index + 1, item, step)
+        render-teacher-item(
+          index + 1,
+          item,
+          step,
+          first-in-section: index == 0,
+        )
       } else {
         render-student-item(
           index + 1,
@@ -132,7 +145,12 @@
     )
     for ((index, item)) in items.enumerate() {
       if edition == "Teacher" {
-        render-teacher-item(index + 1, item, 3)
+        render-teacher-item(
+          index + 1,
+          item,
+          3,
+          first-in-section: index == 0,
+        )
       } else {
         render-student-item(
           index + 1,
@@ -164,6 +182,7 @@
         excerpt-context: item.at("excerptContext"),
         chapter-reference: optional(item, "chapterReference"),
         index: index,
+        first-in-section: index == 0,
       )
     }
   })
