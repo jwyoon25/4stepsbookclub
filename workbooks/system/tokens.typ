@@ -160,6 +160,7 @@
 #let space-prompt-to-response = 1mm
 #let space-band-above = 9mm
 #let space-band-below = 9mm
+#let section-band-min-height = 23.5mm
 #let space-vocab-field = 2.4mm
 #let space-vocab-entry = 4.5mm
 

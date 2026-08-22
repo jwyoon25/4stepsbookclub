@@ -538,27 +538,51 @@
 #let section-band(step, name, description) = {
   let c = step-fill.at(step - 1)
   let overhang = margin-left - rule-x
-  block(
-    sticky: true,
-    width: 100%,
-    above: space-band-above,
-    below: space-band-below,
-    box(width: 100%, height: 23.5mm, {
-      place(top + left, dx: -overhang, rect(
-        width: block-width + overhang, height: band-bar-height,
-        fill: c, radius: (right: tab-radius), stroke: none,
-      ))
-      place(top + left, dy: 6mm,
-        caps("Step " + str(step) + "  ·  " + step-actions.at(step - 1), size: size-furniture, fill: step-deep.at(step - 1)),
-      )
-      place(top + left, dy: 10.4mm,
-        text(font: serif, size: size-section-title, weight: "bold", fill: ink, name),
-      )
-      place(top + left, dy: 19.1mm,
-        block(width: 126mm, text(font: sans, size: 8.5pt, fill: muted, description)),
-      )
-    }),
+  let title-content = block(
+    width: 126mm,
+    text(font: serif, size: size-section-title, weight: "bold", fill: ink, name),
   )
+  let description-content = block(
+    width: 126mm,
+    text(font: sans, size: 8.5pt, fill: muted, description),
+  )
+
+  // The original band had a fixed height while its description was placed at
+  // an absolute y-position. A wrapped description therefore occupied space
+  // that the band did not reserve. Keep the approved one-line height as a
+  // minimum, but grow the band to contain either the title or description.
+  context {
+    let title-bottom = 10.4mm + measure(title-content, width: 126mm).height + 1mm
+    let description-bottom = 19.1mm + measure(description-content, width: 126mm).height + 1mm
+    let content-bottom = if title-bottom > description-bottom {
+      title-bottom
+    } else {
+      description-bottom
+    }
+    let band-height = if content-bottom > section-band-min-height {
+      content-bottom
+    } else {
+      section-band-min-height
+    }
+
+    block(
+      sticky: true,
+      width: 100%,
+      above: space-band-above,
+      below: space-band-below,
+      box(width: 100%, height: band-height, {
+        place(top + left, dx: -overhang, rect(
+          width: block-width + overhang, height: band-bar-height,
+          fill: c, radius: (right: tab-radius), stroke: none,
+        ))
+        place(top + left, dy: 6mm,
+          caps("Step " + str(step) + "  ·  " + step-actions.at(step - 1), size: size-furniture, fill: step-deep.at(step - 1)),
+        )
+        place(top + left, dy: 10.4mm, title-content)
+        place(top + left, dy: 19.1mm, description-content)
+      }),
+    )
+  }
 }
 
 // --- Question unit ----------------------------------------------------------
