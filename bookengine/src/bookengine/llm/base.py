@@ -31,7 +31,9 @@ from __future__ import annotations
 import email.utils
 import json
 import os
-from collections.abc import Mapping, Sequence
+import threading
+import time
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from typing import Protocol
@@ -59,6 +61,43 @@ SHAPE_REJECTION_STATUS = frozenset({400, 415, 422, 501})
 # Free endpoints answer failures with anything from a JSON error object to a
 # gateway's HTML. Enough of it to diagnose the problem, not enough to fill a log.
 _BODY_CHARACTERS = 300
+
+
+class RequestPacer:
+    """Evenly space request starts for one provider instance.
+
+    Hosted limits apply across stages, so the pacer belongs to the provider,
+    below the chain and structured-output layers. A lock makes the schedule
+    safe if a caller ever invokes the synchronous provider from multiple
+    threads; the current pipeline itself is serial.
+    """
+
+    def __init__(
+        self,
+        min_interval_seconds: float = 0.0,
+        *,
+        monotonic: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
+    ) -> None:
+        if min_interval_seconds < 0:
+            raise ValueError("min_interval_seconds cannot be negative")
+        self.min_interval_seconds = float(min_interval_seconds)
+        self._monotonic = monotonic
+        self._sleep = sleep
+        self._lock = threading.Lock()
+        self._last_started: float | None = None
+
+    def wait_for_slot(self) -> float:
+        """Wait as needed, record this request start, and return its timestamp."""
+        with self._lock:
+            now = self._monotonic()
+            if self._last_started is not None:
+                delay = self.min_interval_seconds - (now - self._last_started)
+                if delay > 0:
+                    self._sleep(delay)
+                    now = self._monotonic()
+            self._last_started = now
+            return now
 
 
 @dataclass(frozen=True, slots=True)

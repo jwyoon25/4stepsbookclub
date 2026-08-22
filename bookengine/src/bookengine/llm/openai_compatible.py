@@ -27,6 +27,7 @@ from ..errors import ConfigError, ProviderError
 from .base import (
     Completion,
     Message,
+    RequestPacer,
     as_openai_messages,
     build_client,
     describe_response,
@@ -63,6 +64,7 @@ class KnownEndpoint:
 # the last word.
 KNOWN_ENDPOINTS: dict[str, KnownEndpoint] = {
     "groq": KnownEndpoint("https://api.groq.com/openai/v1", "GROQ_API_KEY"),
+    "mistral": KnownEndpoint("https://api.mistral.ai/v1", "MISTRAL_API_KEY"),
     "nvidia": KnownEndpoint("https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY"),
     "sambanova": KnownEndpoint("https://api.sambanova.ai/v1", "SAMBANOVA_API_KEY"),
     "cerebras": KnownEndpoint("https://api.cerebras.ai/v1", "CEREBRAS_API_KEY"),
@@ -93,6 +95,7 @@ class OpenAICompatibleProvider:
         client: httpx.Client | None = None,
         require_api_key: bool = True,
         default_base_url: str | None = None,
+        pacer: RequestPacer | None = None,
     ) -> None:
         self.name = config.provider
         self.model = config.model
@@ -121,6 +124,8 @@ class OpenAICompatibleProvider:
             config.timeout_seconds
         )
         self._owns_client = client is None
+        self._pacer = pacer or RequestPacer(config.min_request_interval_seconds)
+        self.rate_limit_headers: dict[str, str] = {}
 
         # Modes this endpoint has already rejected. Kept per instance rather
         # than per class: the same provider name can point at two endpoints.
@@ -237,12 +242,15 @@ class OpenAICompatibleProvider:
         if self._api_key:
             headers["Authorization"] = f"Bearer {self._api_key}"
 
+        self._pacer.wait_for_slot()
         try:
             response = self._client.post(
                 f"{self.base_url}/chat/completions", json=payload, headers=headers
             )
         except httpx.HTTPError as cause:
             raise transport_error(self.name, cause) from cause
+
+        self.rate_limit_headers = _rate_limit_headers(response.headers)
 
         if response.status_code >= 400:
             raise status_error(self.name, response, hint=self._hint(response))
@@ -359,3 +367,14 @@ def _token_count(value: object) -> int | None:
     if isinstance(value, bool) or not isinstance(value, int):
         return None
     return value
+
+
+def _rate_limit_headers(headers: httpx.Headers) -> dict[str, str]:
+    """Keep useful provider limit telemetry and nothing secret-bearing."""
+    return {
+        key.lower(): value
+        for key, value in headers.items()
+        if key.lower() == "retry-after"
+        or key.lower().startswith("x-ratelimit-")
+        or key.lower().startswith("ratelimit-")
+    }

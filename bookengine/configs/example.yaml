@@ -98,12 +98,18 @@ exclusions:
 llm:
   # Model identifiers come from the environment. Free providers change their
   # catalogues without notice, so a model id committed to this file goes stale.
-  # The defaults below were confirmed live on 2026-08-22; PROVIDERS.md records
+  # The defaults below were confirmed live on 2026-08-23; PROVIDERS.md records
   # what was measured, and `bookengine smoke --config <job>` re-checks it.
   generator:
-    provider: groq
-    model: ${GENERATOR_MODEL:-openai/gpt-oss-120b}
+    provider: mistral
+    model: ${GENERATOR_MODEL:-mistral-large-2512}
+    # This deployment marks the endpoint free only while its included monthly
+    # allowance is active and paid overage remains disabled.
+    cost: free
     max_output_tokens: 4096
+    max_request_tokens: 250000
+    # Four requests/minute observed live; 15.5s adds margin over the 15s edge.
+    min_request_interval_seconds: 15.5
 
   # A different provider and a different model family, so the audit is a second
   # opinion rather than the same opinion twice. It thinks before answering, so
@@ -115,6 +121,10 @@ llm:
     timeout_seconds: 240
 
   fallbacks:
+    - provider: groq
+      model: ${GROQ_MODEL:-openai/gpt-oss-120b}
+      max_output_tokens: 4096
+      max_request_tokens: 8000
     - provider: gemini
       model: ${GEMINI_MODEL:-gemini-3.7-flash}
       max_output_tokens: 8192

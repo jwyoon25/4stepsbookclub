@@ -27,6 +27,7 @@ from ..errors import ProviderError
 from .base import (
     Completion,
     Message,
+    RequestPacer,
     build_client,
     describe_response,
     is_shape_rejection,
@@ -121,6 +122,7 @@ class GeminiProvider:
         config: ProviderConfig,
         *,
         client: httpx.Client | None = None,
+        pacer: RequestPacer | None = None,
     ) -> None:
         self.name = config.provider
         # `models/gemini-x` and `gemini-x` are both things people write down.
@@ -139,6 +141,7 @@ class GeminiProvider:
             config.timeout_seconds
         )
         self._owns_client = client is None
+        self._pacer = pacer or RequestPacer(config.min_request_interval_seconds)
         self._rejected: set[str] = set()
 
     @property
@@ -270,6 +273,7 @@ class GeminiProvider:
             "x-goog-api-key": self._api_key,
         }
 
+        self._pacer.wait_for_slot()
         try:
             response = self._client.post(url, json=payload, headers=headers)
         except httpx.HTTPError as cause:

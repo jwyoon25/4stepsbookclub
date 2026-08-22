@@ -24,8 +24,8 @@ from ..errors import ProviderChainError, ProviderError
 from .base import Completion, LLMProvider, Message
 from .cache import ResponseCache
 
-# Backoff doubles from here. Free endpoints publish per-minute quotas, so the
-# ceiling is high enough to outlast one.
+# Guessed backoff doubles from here. An explicit provider Retry-After is not
+# capped: knowingly retrying before its window ends only produces another 429.
 BASE_DELAY_SECONDS = 2.0
 MAX_DELAY_SECONDS = 45.0
 
@@ -144,12 +144,12 @@ class ProviderChain:
         """How long to wait before trying the same provider again.
 
         An endpoint that sent `Retry-After` has told us its answer, and it is
-        better than a guess — but it is not allowed to park a run for an hour,
-        so it is capped like any other delay.
+        authoritative. The provider's request pacer will additionally enforce
+        any remaining configured interval before the next HTTP request starts.
         """
         advertised = getattr(error, "retry_after", None)
         if advertised is not None:
-            return min(float(advertised), MAX_DELAY_SECONDS)
+            return float(advertised)
         backoff = min(BASE_DELAY_SECONDS * (2 ** (attempt - 1)), MAX_DELAY_SECONDS)
         # Jitter keeps several lessons in one run from retrying in lockstep.
         return backoff * (0.5 + 0.5 * self.jitter())

@@ -90,8 +90,16 @@ def test_the_maze_runner_job_cannot_attempt_a_batch_of_fifty():
     os.environ.setdefault("CLOUDFLARE_AUDIT_MODEL", "@cf/zai-org/glm-4.7-flash")
     job = load_job("configs/the-maze-runner.yaml")
 
+    assert job.llm.generator.provider == "mistral"
+    assert job.llm.generator.model == "mistral-large-2512"
     assert job.candidates.rank_batch < 50
-    assert ranking_request_tokens(job.candidates.rank_batch) <= GROQ_CEILING
+    assert ranking_request_tokens(job.candidates.rank_batch) <= (
+        job.llm.generator.max_request_tokens or 0
+    )
+    groq = next(item for item in job.llm.fallbacks if item.provider == "groq")
+    assert ranking_request_tokens(job.candidates.rank_batch) <= (
+        groq.max_request_tokens or 0
+    )
     assert validate_generator_budget(job) == []
 
 

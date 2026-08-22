@@ -55,18 +55,6 @@ lessons:
   - lesson: 1
     start_chapter: 1
     end_chapter: 12
-  - lesson: 2
-    start_chapter: 13
-    end_chapter: 24
-  - lesson: 3
-    start_chapter: 25
-    end_chapter: 36
-  - lesson: 4
-    start_chapter: 37
-    end_chapter: 48
-  - lesson: 5
-    start_chapter: 49
-    end_chapter: 62
 
 exclusions:
   # This book invents its own slang, and a student learning `shuck` learns

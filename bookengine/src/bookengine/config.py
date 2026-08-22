@@ -247,6 +247,10 @@ class ProviderConfig(_Strict):
     # unset it is not checked, which is the right default for an endpoint
     # nobody has measured.
     max_request_tokens: int | None = Field(default=None, ge=1024)
+    # Minimum spacing between starts of actual HTTP requests to this endpoint.
+    # This is transport policy, not part of a model request's semantic identity:
+    # changing it must not invalidate successful cached completions.
+    min_request_interval_seconds: float = Field(default=0.0, ge=0.0)
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_output_tokens: int = Field(default=4096, ge=256, le=32768)
     timeout_seconds: float = Field(default=90.0, gt=0)

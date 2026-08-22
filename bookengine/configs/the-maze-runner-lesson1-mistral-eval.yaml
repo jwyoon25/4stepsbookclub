@@ -1,0 +1,72 @@
+# Evaluation-only Lesson 1 job. It deliberately has no generator fallbacks so
+# every generated field in a READY row must come from Mistral. The production
+# job retains its Groq and Gemini fallbacks.
+
+book:
+  path: ../sources/the-maze-runner.pdf
+  title: The Maze Runner
+  expected_chapters: 62
+
+audience:
+  grade_min: 7
+  grade_max: 8
+  description: >-
+    Korean middle-school students reading a full English novel. They can follow
+    the story; the vocabulary is the part that stops them.
+
+vocabulary_per_lesson: 20
+candidates_per_lesson: 60
+
+lessons:
+  - lesson: 1
+    start_chapter: 1
+    end_chapter: 12
+
+exclusions:
+  terms:
+    - shuck
+    - shuck-face
+    - klunk
+    - greenie
+    - griever
+    - shank
+    - slinthead
+    - glade
+    - glader
+    - wicked
+  allow_invented_terms: false
+
+llm:
+  generator:
+    provider: mistral
+    model: ${MISTRAL_MODEL:-mistral-large-2512}
+    cost: free
+    max_output_tokens: 4096
+    timeout_seconds: 90
+    max_request_tokens: 250000
+    min_request_interval_seconds: 15.5
+
+  auditor:
+    provider: cloudflare
+    model: ${CLOUDFLARE_AUDIT_MODEL:-@cf/zai-org/glm-4.7-flash}
+    max_output_tokens: 8192
+    timeout_seconds: 240
+
+  # Empty by design: this file is only for a clean Mistral generator sample.
+  fallbacks: []
+
+  benchmark:
+    - provider: nvidia
+      model: ${NVIDIA_MODEL:-nvidia/nemotron-3-super-120b-a12b}
+      max_output_tokens: 8192
+      timeout_seconds: 120
+
+  cache: true
+  max_attempts: 3
+
+  audit:
+    requirement: provider
+    on_shared: needs_review
+
+output:
+  directory: ../output/the-maze-runner

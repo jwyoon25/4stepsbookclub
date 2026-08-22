@@ -25,6 +25,7 @@ from conftest import build_job
 from fakes import ScriptedProvider
 
 GROQ = {"provider": "groq", "model": "openai/gpt-oss-120b"}
+MISTRAL = {"provider": "mistral", "model": "mistral-large-2512"}
 CLOUDFLARE = {"provider": "cloudflare", "model": "@cf/google/gemma-4-26b-a4b-it"}
 GEMINI = {"provider": "gemini", "model": "gemini-3.7-flash"}
 NVIDIA = {"provider": "nvidia", "model": "nvidia/nemotron-3-super-120b-a12b"}
@@ -33,8 +34,10 @@ NVIDIA = {"provider": "nvidia", "model": "nvidia/nemotron-3-super-120b-a12b"}
 # --- what may be in the route at all ---------------------------------------
 
 
-def test_the_normal_route_is_the_two_free_providers_and_a_free_fallback():
-    config = LLMConfig(generator=GROQ, auditor=CLOUDFLARE, fallbacks=[GEMINI])
+def test_the_normal_route_contains_only_declared_free_providers():
+    config = LLMConfig(
+        generator=MISTRAL, auditor=CLOUDFLARE, fallbacks=[GROQ, GEMINI]
+    )
 
     assert config.configured_independence == "provider"
     assert all(
@@ -47,7 +50,7 @@ def test_the_normal_route_is_the_two_free_providers_and_a_free_fallback():
 def test_a_paid_endpoint_cannot_be_a_primary(slot):
     """The rule that "a workbook costs nothing" should survive a bad afternoon."""
     paid = {"provider": "openai", "model": "gpt-4o", "cost": "paid"}
-    config = {"generator": GROQ, "auditor": CLOUDFLARE, slot: paid}
+    config = {"generator": MISTRAL, "auditor": CLOUDFLARE, slot: paid}
 
     with pytest.raises(ValidationError) as failure:
         LLMConfig(**config)
@@ -58,7 +61,7 @@ def test_a_paid_endpoint_cannot_be_a_fallback_either():
     """Which is where it would actually get added, on the third retry."""
     with pytest.raises(ValidationError):
         LLMConfig(
-            generator=GROQ,
+            generator=MISTRAL,
             auditor=CLOUDFLARE,
             fallbacks=[GEMINI, {"provider": "openai", "model": "o", "cost": "paid"}],
         )
@@ -67,7 +70,7 @@ def test_a_paid_endpoint_cannot_be_a_fallback_either():
 def test_a_paid_endpoint_may_still_be_named_for_benchmarking():
     """Naming it is how somebody compares against it. Routing to it is not."""
     config = LLMConfig(
-        generator=GROQ,
+        generator=MISTRAL,
         auditor=CLOUDFLARE,
         benchmark=[{"provider": "openai", "model": "gpt-4o", "cost": "paid"}],
     )
@@ -79,7 +82,10 @@ def test_a_paid_endpoint_may_still_be_named_for_benchmarking():
 
 def chains(**overrides):
     config = LLMConfig(
-        generator=GROQ, auditor=CLOUDFLARE, fallbacks=[GEMINI], **overrides
+        generator=MISTRAL,
+        auditor=CLOUDFLARE,
+        fallbacks=[GROQ, GEMINI],
+        **overrides,
     )
     generator, auditor = build_chains(config)
     try:
@@ -97,19 +103,22 @@ def test_a_benchmark_endpoint_is_in_no_chain():
     assert not any("nvidia" in label for label in generator + auditor)
 
 
-def test_the_generator_starts_at_groq_and_the_auditor_at_cloudflare():
+def test_the_generator_starts_at_mistral_and_the_auditor_at_cloudflare():
     generator, auditor = chains()
 
-    assert generator[0].startswith("groq/")
+    assert generator[0].startswith("mistral/")
     assert auditor[0].startswith("cloudflare/")
 
 
-def test_both_chains_share_the_fallback():
+def test_both_chains_share_the_ordered_fallbacks():
     """Which is what makes the independence gate necessary rather than tidy."""
     generator, auditor = chains()
 
-    assert generator[-1].startswith("gemini/")
-    assert auditor[-1].startswith("gemini/")
+    assert generator[1:] == [
+        "groq/openai/gpt-oss-120b",
+        "gemini/gemini-3.7-flash",
+    ]
+    assert auditor[1:] == generator[1:]
 
 
 # --- independence, decided from what answered ------------------------------

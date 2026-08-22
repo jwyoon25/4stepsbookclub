@@ -93,7 +93,7 @@ def test_when_everything_fails_the_error_says_what_each_provider_said():
     assert "llm.fallbacks" in message
 
 
-def test_a_retry_after_header_is_honoured_and_capped():
+def test_a_retry_after_header_is_honoured_without_shortening_it():
     waits = []
     error = ProviderError("429", provider="groq", retryable=True)
     error.retry_after = 9999
@@ -103,7 +103,19 @@ def test_a_retry_after_header_is_honoured_and_capped():
     )
 
     link.complete(PROMPT)
-    assert waits and waits[0] <= 45
+    assert waits == [9999.0]
+
+
+def test_retry_without_retry_after_keeps_bounded_exponential_backoff():
+    waits = []
+    error = ProviderError("temporary", provider="groq", retryable=True)
+    limited = Stub("groq", errors=[error], answers=["ok"])
+    link = ProviderChain(
+        providers=[limited], sleep=waits.append, jitter=lambda: 0.5
+    )
+
+    link.complete(PROMPT)
+    assert waits == [1.5]
 
 
 def test_an_empty_chain_is_refused():
