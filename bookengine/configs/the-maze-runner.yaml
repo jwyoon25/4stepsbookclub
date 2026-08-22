@@ -100,6 +100,11 @@ llm:
     model: ${GROQ_MODEL:-openai/gpt-oss-120b}
     max_output_tokens: 4096
     timeout_seconds: 90
+    # Groq's free tier refuses a single request over this outright — measured,
+    # not documented: `HTTP 413 … on tokens per minute (TPM): Limit 8000`. The
+    # engine checks the largest request this job would make against it before
+    # calling anything.
+    max_request_tokens: 8000
 
   # Cloudflare audits. A different provider and a different model family from
   # the generator, which matters: Workers AI also serves `@cf/openai/gpt-oss-120b`,

@@ -34,6 +34,7 @@ from .prompts import PromptLibrary
 from .source.approval import ApprovalStore
 from .source.cache import ParseCache
 from .source.ingest import ingest_book
+from .vocabulary.candidates import validate_generator_budget
 from .vocabulary.pipeline import Progress, RunResult, run_job
 
 BANNER = "4Steps Vocabulary Generator"
@@ -214,6 +215,13 @@ def command_vocab(arguments: argparse.Namespace) -> int:
 
     notes = validate_lessons_against_book(job, document.chapter_numbers)
     print(_line("Lesson configuration", "PASS"))
+
+    # Before a model is called: would the generator accept the largest request
+    # this job will make? A provider that refuses it does so with a status
+    # code, and finding that out here costs nothing rather than a chapter map,
+    # a candidate pool and minutes of a per-minute allowance.
+    notes.extend(validate_generator_budget(job))
+    print(_line("Generator budget", "PASS"))
     print()
 
     if arguments.ingest_only:

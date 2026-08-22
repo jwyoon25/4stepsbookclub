@@ -115,9 +115,21 @@ class CandidateConfig(_Strict):
     mode: Literal["harvest", "model", "hybrid"] = "harvest"
     # How many word types the harvester shortlists before any model sees them.
     pool_size: int = Field(default=250, ge=10, le=2000)
-    # Candidates scored per request. Free endpoints truncate long replies, and a
-    # truncated ranking silently loses the words at the end of the list.
-    rank_batch: int = Field(default=50, ge=5, le=200)
+    # Candidates scored per request. Two things bound this and they pull the
+    # same way. A free endpoint asked for too many at once truncates its reply,
+    # and a truncated ranking silently loses the words at the end of the list.
+    # And the request itself has to fit: ranking is the largest single call the
+    # generator makes, so it is the stage that meets a provider's per-request
+    # ceiling first.
+    #
+    # 20 rather than the 50 this used to be, because 50 does not fit the
+    # engine's primary zero-cost generator at all — Groq's free tier refuses it
+    # with HTTP 413 before a token is generated. Measured on the real Maze
+    # Runner text against `openai/gpt-oss-120b`: a batch of 20 reserves about
+    # 6,600 of the 8,000 available, and a batch of 25 reserves 7,910 on its
+    # heaviest lesson, which is ninety tokens of room. A default is the value
+    # that should work on a book nobody has measured.
+    rank_batch: int = Field(default=20, ge=5, le=200)
     # Characters of book text per request in `model` mode.
     chunk_characters: int = Field(default=9000, ge=1000, le=60000)
     # A candidate the model marks this risky is dropped before it costs a quote.
@@ -223,6 +235,18 @@ class ProviderConfig(_Strict):
     # anything" survives a future edit by somebody who does not know that was
     # the rule.
     cost: Literal["free", "paid"] = "free"
+    # The largest single request this endpoint accepts, counted as input plus
+    # reserved output. Free tiers publish this as a per-minute allowance and
+    # then refuse a single request that exceeds it outright — Groq answers one
+    # with `HTTP 413 … on tokens per minute (TPM): Limit 8000, Requested
+    # 13477` rather than slowing it down, so it is a shape constraint on the
+    # request and not a rate to wait out.
+    #
+    # Declared rather than discovered: nothing here queries an endpoint's
+    # limits, and a provider that raises one costs an edit to this line. Left
+    # unset it is not checked, which is the right default for an endpoint
+    # nobody has measured.
+    max_request_tokens: int | None = Field(default=None, ge=1024)
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_output_tokens: int = Field(default=4096, ge=256, le=32768)
     timeout_seconds: float = Field(default=90.0, gt=0)

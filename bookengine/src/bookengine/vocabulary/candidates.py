@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..config import JobConfig, LessonConfig
-from ..errors import StructuredResponseError
+from ..errors import ConfigError, StructuredResponseError
 from ..llm.base import Message
 from ..llm.chain import ProviderChain
 from ..llm.structured import generate_structured
@@ -106,6 +106,36 @@ CANDIDATE_TOKENS_PER_WORD = 150
 CANDIDATE_TOKENS_FLOOR = 768
 
 
+# What a ranking request costs on the way in, so a job can be refused before
+# it spends twenty minutes discovering the same thing from an HTTP code.
+#
+# Fitted to measured `prompt_tokens` on `openai/gpt-oss-120b`: 2,619 at fifteen
+# candidates, 3,015 at twenty, 3,323 at twenty-five. That is about 72 apiece on
+# top of a fixed prompt, and the fit predicts the batch of fifty Groq refused
+# — 13,762 estimated against the 13,477 it reported — which is the case worth
+# predicting.
+#
+# Rounded up rather than down. An estimator used to refuse work should err
+# towards refusing work that would have fitted, not towards letting through
+# work that will not.
+RANKING_INPUT_PER_CANDIDATE = 72
+RANKING_INPUT_FLOOR = 1_650
+
+# How close to a declared ceiling is close enough to say so out loud. A request
+# at ninety-five percent of the limit fits today and is one longer sentence
+# from not fitting.
+BUDGET_WARNING_SHARE = 0.90
+
+
+def ranking_request_tokens(candidates: int) -> int:
+    """Everything one ranking request reserves: its prompt and its answer."""
+    return (
+        RANKING_INPUT_FLOOR
+        + RANKING_INPUT_PER_CANDIDATE * max(candidates, 1)
+        + ranking_output_tokens(candidates)
+    )
+
+
 def ranking_output_tokens(candidates: int) -> int:
     """The answer budget for scoring this many candidates."""
     return RANKING_TOKENS_FLOOR + RANKING_TOKENS_PER_CANDIDATE * max(candidates, 1)
@@ -114,6 +144,71 @@ def ranking_output_tokens(candidates: int) -> int:
 def candidate_output_tokens(wanted: int) -> int:
     """The answer budget for proposing this many words."""
     return CANDIDATE_TOKENS_FLOOR + CANDIDATE_TOKENS_PER_WORD * max(wanted, 1)
+
+
+def validate_generator_budget(job: JobConfig) -> list[str]:
+    """Refuse a job whose largest request the generator would not accept.
+
+    Ranking is the biggest single call this engine makes, and a provider that
+    will not take it says so with an HTTP status rather than a smaller answer.
+    Discovering that from an exception is a poor trade: the run has already
+    built a chapter map, harvested a pool and spent minutes of a per-minute
+    allowance by the time the first batch goes out.
+
+    So it is checked here, against the ceiling the job declares for its own
+    generator, before anything is called. An endpoint with no declared ceiling
+    is not checked — the alternative is inventing a limit for it, which would
+    refuse working jobs.
+
+    Returns notes. Raises `ConfigError` only when the request provably does not
+    fit, because that is the case no amount of patience fixes.
+    """
+    ceiling = job.llm.generator.max_request_tokens
+    if ceiling is None:
+        return []
+
+    notes: list[str] = []
+    batch = job.candidates.rank_batch
+    needed = ranking_request_tokens(batch)
+
+    if needed > ceiling:
+        largest = _largest_batch_within(ceiling)
+        raise ConfigError(
+            f"`candidates.rank_batch` is {batch}, and scoring {batch} "
+            f"candidates in one request reserves about {needed:,} tokens — "
+            f"more than the {ceiling:,} {job.llm.generator.label} accepts in "
+            f"one call. It would refuse every ranking batch of the run.\n"
+            f"  Set `candidates.rank_batch` to {largest} or less."
+        )
+
+    if needed > ceiling * BUDGET_WARNING_SHARE:
+        notes.append(
+            f"Ranking {batch} candidates reserves about {needed:,} of the "
+            f"{ceiling:,} tokens {job.llm.generator.label} allows in one "
+            f"request. That fits, with {ceiling - needed:,} to spare — a book "
+            f"whose example sentences run longer than this estimate would not. "
+            f"`candidates.rank_batch` is the setting to lower."
+        )
+
+    if job.candidates.mode in {"model", "hybrid"}:
+        notes.append(
+            f"`candidates.mode` is {job.candidates.mode!r}, which sends "
+            f"{job.candidates.chunk_characters:,} characters of the book per "
+            "request. On an endpoint this size that is known not to fit — the "
+            "9,000-character default alone is roughly 6,400 tokens before the "
+            "answer. Harvest mode is the measured path; lower "
+            "`candidates.chunk_characters` before relying on this one."
+        )
+
+    return notes
+
+
+def _largest_batch_within(ceiling: int) -> int:
+    """The biggest ranking batch that still fits, so the error names a fix."""
+    batch = 1
+    while batch < 200 and ranking_request_tokens(batch + 1) <= ceiling:
+        batch += 1
+    return batch
 
 
 def _batched(values: list, size: int) -> list[list]:
